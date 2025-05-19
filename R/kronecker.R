@@ -318,7 +318,7 @@ setMethod(
 
       Q <- function(n, theta) {
         Q1 <- cgeneric_get(X, "Q", theta = theta[1:nth1], optimize = FALSE)
-        Q2 <- cgeneric_get(Y, "Q", theta = theta[nth1+1:nth2], optimize = FALSE)
+        Q2 <- INLA::inla.rgeneric.q(Y, "Q", theta = theta[nth1+1:nth2], optimize = FALSE)
         QQ <- INLA::inla.as.sparse(kronecker(Q1, Q2))
         idx <- which(QQ@i <= QQ@j)
         return(QQ@x[idx])
