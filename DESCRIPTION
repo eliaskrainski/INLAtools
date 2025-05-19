@@ -1,0 +1,35 @@
+Package: INLAtools
+Type: Package
+Title: Tools for the INLA Package
+Version: 0.0.1.903
+Maintainer: Elias Teixeira Krainski <eliaskrainski@gmail.com>
+Authors@R: c(
+ person(given = c("Elias"),
+        family = "Teixeira Krainski",
+        email = "eliaskrainski@gmail.com",
+        role = c("cre", "aut", "cph"),
+        comment = c(ORCID = "0000-0002-7063-2615")),
+ person(given = "Haavard",
+        family = "Rue’",
+        role = "aut",
+        comment = c(ORCID = "0000-0002-0222-1881"))
+        )
+Description: Contain C and R code to work with 
+  Markov Gaussian models defined using the 
+  cgeneric struct as an interface for the INLA 
+  program.
+Additional_repositories: https://inla.r-inla-download.org/R/testing
+License: GPL (>=2) 
+Encoding: UTF-8
+RoxygenNote: 7.3.2
+NeedsCompilation: yes
+Roxygen: list(markdown = TRUE)
+Depends:
+    R (>= 4.3),
+    Matrix
+Imports:
+    methods,
+    utils
+Suggests:
+    INLA (>= 24.02.09)
+BuildVignettes: true
