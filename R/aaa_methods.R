@@ -1,11 +1,14 @@
 #' Methods to work with a `model`.
 #' @name methods
 #' @description
-#' For a given model object the `intial`,
+#' For a given model object query the `initial`,
 #' `mu`, log `prior`, `graph` or precision `prec`
-#' can be evaluated/retrieved, each one
-#' through a method function.
+#' can be evaluated/retrieved.
 #' @param model object to represent a model
+#' @return the result of the desired query
+#' of the 'cgeneric' model.
+#' 'graph' and 'prec' can be either a vector
+#' (if optimize = TRUE) or a sparse matrix.
 NULL
 #> NULL
 
@@ -27,6 +30,7 @@ mu <- function(model, theta) {
 }
 #' @describeIn methods
 #' Evaluate the log-prior for a given `theta`
+#' @seealso [prior.cgeneric()]
 #' @export
 prior <- function(model, theta) {
   UseMethod("prior")

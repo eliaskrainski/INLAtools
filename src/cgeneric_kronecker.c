@@ -27,23 +27,12 @@
 
 #include "INLAtools.h"
 
-#ifdef __APPLE__
-#include <dlfcn.h>
-#else
-#include <ltdl.h>
-#endif
-
 typedef struct
 {
 	int nth1;
-#ifdef __APPLE__
   void *handle1;
-  void *handle2
-#else
-  lt_dlhandle handle1;
-  lt_dlhandle handle2;
-#endif
-	inla_cgeneric_func_tp *model1_func;
+  void *handle2;
+  inla_cgeneric_func_tp *model1_func;
 	inla_cgeneric_func_tp *model2_func;
 }
 	cache_tp;
@@ -162,29 +151,20 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 #endif
 		if (!(data->cache)) {
 			cache_tp *d12cache = Calloc(1, cache_tp);
-#ifdef __APPLE__
 			d12cache->handle1 = dlopen(&dataM1->chars[1]->chars[0], RTLD_LAZY);
+			if (!d12cache->handle1) {
+			  Rf_error("Failed to load shared library '%s': %s", &dataM1->chars[1]->chars[0], dlerror());
+			}
 			if (strcmp(&dataM1->chars[1]->chars[0], &dataM2->chars[1]->chars[0]) != 0) {
 			  d12cache->handle2 = dlopen(&dataM2->chars[1]->chars[0], RTLD_LAZY);
+			  if (!d12cache->handle2) {
+			    Rf_error("Failed to load shared library '%s': %s", &dataM2->chars[0]->chars[0], dlerror());
+			  }
 			} else {
 			  d12cache->handle2 = d12cache->handle1;
 			}
-			d12cache->model1_func = (inla_cgeneric_func_tp *) dlsym(d12cache->handle1, &dataM1->chars[0]->chars[0]);
-			d12cache->model2_func = (inla_cgeneric_func_tp *) dlsym(d12cache->handle2, &dataM2->chars[0]->chars[0]);
-#else
-			lt_dlinit();
-			lt_dlerror();
-			d12cache->handle1 = lt_dlopen(&dataM1->chars[1]->chars[0]);
-			if (strcmp(&dataM1->chars[1]->chars[0], &dataM2->chars[1]->chars[0]) != 0) {
-			  d12cache->handle2 = lt_dlopen(&dataM2->chars[1]->chars[0]);
-			} else {
-			  d12cache->handle2 = d12cache->handle1;
-			}
-			d12cache->model1_func = (inla_cgeneric_func_tp *) lt_dlsym(d12cache->handle1, &dataM1->chars[0]->chars[0]);
-			d12cache->model2_func = (inla_cgeneric_func_tp *) lt_dlsym(d12cache->handle2, &dataM2->chars[0]->chars[0]);
-			assert(d12cache->model1_func);
-			assert(d12cache->model2_func);
-#endif
+			*(void **)(&d12cache->model1_func) = (inla_cgeneric_func_tp *) dlsym(d12cache->handle1, &dataM1->chars[0]->chars[0]);
+			*(void **)(&d12cache->model2_func) = (inla_cgeneric_func_tp *) dlsym(d12cache->handle2, &dataM2->chars[0]->chars[0]);
 			d12cache->nth1 = (int) d12cache->model1_func(INLA_CGENERIC_INITIAL, NULL, dataM1)[0];
 			data->cache = (void *) d12cache;
 		}
@@ -317,13 +297,10 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 
 	case INLA_CGENERIC_QUIT:
 	{
-#ifdef __APPLE__
 	  dlclose(d12cache->handle1);
-	  dlclose(d12cache->handle2);
-#else
-	  lt_dlclose(d12cache->handle1);
-	  lt_dlclose(d12cache->handle2);
-#endif
+	  if (strcmp(&dataM1->chars[1]->chars[0], &dataM2->chars[1]->chars[0]) != 0) {
+	    dlclose(d12cache->handle2);
+	  }
 	  free(d12cache);
 	}
 	default:

@@ -27,12 +27,6 @@
 
 #include "INLAtools.h"
 
-#ifdef __APPLE__
-#include <dlfcn.h>
-#else
-#include <ltdl.h>
-#endif
-
 SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, SEXP doubles, SEXP chars, SEXP mats, SEXP smats)
 {
 
@@ -294,33 +288,14 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 
 	}
 
-	inla_cgeneric_func_tp *model_func = NULL;
 	// load lib
-#ifdef __APPLE__
 	void *handle;
-	char *error;
 	handle = dlopen(cgeneric_shlib, RTLD_LAZY);
-	model_func = (inla_cgeneric_func_tp *) dlsym(handle, cgeneric_model);
-	if ((error = dlerror()) != NULL)  {
-        	Rprintf("%s", error);
-        	exit(1);
-        }
-#else
-	static int ltdl_init = 1;
-	if (ltdl_init) {
-#pragma omp critical (Name_97a987bafe2f18c620f3cefa664a9f775cb7559b)
-	  if (ltdl_init) {
-	    lt_dlinit();
-	    lt_dlerror();
-	    ltdl_init = 0;
-	  }
+	if (!handle) {
+	  Rf_error("Failed to load shared library '%s': %s", cgeneric_shlib, dlerror());
 	}
-	lt_dlhandle handle;
-	handle = lt_dlopen(cgeneric_shlib);
-	model_func = (inla_cgeneric_func_tp *) lt_dlsym(handle, cgeneric_model);
-	assert(model_func);
-#endif
-
+	inla_cgeneric_func_tp *model_func = NULL;
+	*(void **)(&model_func) = dlsym(handle, cgeneric_model);
 	SEXP Rret = R_NilValue;
 
 	if (strcmp(CMD, "graph") == 0) {
@@ -395,12 +370,7 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 		UNPROTECT(1);
 	}
 
-#ifdef __APPLE__
 	dlclose(handle);
-#else
-  lt_dlclose(handle);
-#endif
-
 	free(cgeneric_data);
 	free(ret);
 

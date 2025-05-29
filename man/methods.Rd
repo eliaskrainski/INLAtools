@@ -30,11 +30,16 @@ and each column as a different case.}
 \item{optimize}{logical indicating if it is to be
 returned only the elements and not as a sparse matrix.}
 }
+\value{
+the result of the desired query
+of the 'cgeneric' model.
+'graph' and 'prec' can be either a vector
+(if optimize = TRUE) or a sparse matrix.
+}
 \description{
-For a given model object the \code{intial},
+For a given model object query the \code{initial},
 \code{mu}, log \code{prior}, \code{graph} or precision \code{prec}
-can be evaluated/retrieved, each one
-through a method function.
+can be evaluated/retrieved.
 }
 \section{Functions}{
 \itemize{
@@ -49,3 +54,6 @@ through a method function.
 \item \code{prec()}: Retrieve the precision for a given \code{theta}
 
 }}
+\seealso{
+\code{\link[=prior.cgeneric]{prior.cgeneric()}}
+}

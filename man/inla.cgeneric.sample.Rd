@@ -6,7 +6,14 @@
 model component from an \code{inla} output, like
 \code{inla::inla.iidkd.sample()}.}
 \usage{
-inla.cgeneric.sample(n = 10000, result, name, from.theta, simplify = FALSE)
+inla.cgeneric.sample(
+  n = 10000,
+  result,
+  name,
+  model,
+  from.theta,
+  simplify = FALSE
+)
 }
 \arguments{
 \item{n}{integer as the sample size.}
@@ -16,13 +23,22 @@ inla.cgeneric.sample(n = 10000, result, name, from.theta, simplify = FALSE)
 \item{name}{character with the name of the model
 component in the set of random effects.}
 
-\item{from.theta}{a \code{cgeneric} model, or a function to
-convert from theta to the desired output for each sample.}
+\item{model}{a \code{cgeneric} model}
+
+\item{from.theta}{a function to convert from
+theta to the desired output for each sample.}
 
 \item{simplify}{logical (see ?sapply).}
+}
+\value{
+matrix (if n>1 and length(from.theta)>1)
+or numeric vector otherwise.
 }
 \description{
 Draw samples from hyperparameters of a \code{cgeneric}
 model component from an \code{inla} output, like
 \code{inla::inla.iidkd.sample()}.
+}
+\seealso{
+\code{\link[=prior.cgeneric]{prior.cgeneric()}}
 }

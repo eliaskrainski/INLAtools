@@ -5,6 +5,8 @@
 #' @param FUN see [kronecker()]
 #' @param make.dimnames see [kronecker()]
 #' @param ... see [kronecker()]
+#' @return if 'X' and 'Y' are 'cgeneric' return a
+#' 'cgeneric', else a 'rgeneric'.
 #' @rdname kronecker
 #' @useDynLib INLAtools
 #' @importFrom utils str
@@ -50,7 +52,7 @@ setMethod(
       } else {
         libpath <- system.file("libs", package = "INLAtools")
         if (Sys.info()["sysname"] == "Windows") {
-          libpath <- file.path(libpath, "INLAtools.dll")
+          libpath <- file.path(libpath, "x64/INLAtools.dll")
         } else {
           libpath <- file.path(libpath, "INLAtools.so")
         }

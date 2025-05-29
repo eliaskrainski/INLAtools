@@ -3,9 +3,9 @@
 #' @description
 #' Build data needed to implement a model whose
 #' precision has a conditional precision parameter.
-#' This uses the C interface in [INLA::cgeneric()],
+#' This uses the C interface in the 'INLA' package,
 #' that can be used as a linear predictor
-#' model component with [INLA::f()].
+#' model component with an 'f' term.
 #' @param R the structure matrix for the model definition.
 #' @param param length two vector with the parameters
 #' `a` and `p` for the PC-prior distribution defined from
@@ -43,39 +43,15 @@
 #' Scaling intrinsic Gaussian Markov random field priors in
 #' spatial modelling. Spatial Statistics, vol. 8, p. 39-51.
 #' @return a `cgeneric` object, see [cgeneric()].
+#' @seealso [prior.cgeneric()]
 #' @useDynLib INLAtools
+#' @importFrom methods as
 #' @examples
-#' ## two ways to define an 'iid' model
-#' prior.par <- c(1, 0.5)
-#' ma <- cgeneric("generic0", R = Diagonal(5),
-#'    param = prior.par, constr = FALSE)
-#' mb <- cgeneric("iid", n = 5, param = prior.par)
-#' all.equal(ma, mb)
-#'
-#' ## Retrieve the precision
-#' prec(ma, theta = log(3))
-#'
-#' lamb <- -log(prior.par[2])/prior.par[1]
-#' pmode <- log(2)/lamb
-#' ## prior for log(precision) and sigma
-#' par(mfrow = c(1, 2))
-#' plot(function(x)
-#'  exp(prior(ma, theta = matrix(x, nrow=1))),
-#'   -3, 3, n = 601, xlab = "precision", ylab = "density")
-#' rug(pmode, lwd = 3, col = 2)
-#' plot(function(x)
-#' exp(prior(ma,
-#'   theta = matrix(-2*log(x), nrow = 1))+log(2)-log(x)),
-#'   1/100, 10, n = 1000,
-#'   xlab = expression(sigma), ylab = "density")
-#' plot(function(x) dexp(x, lamb), 1/100, 10, n = 1000,
-#'    add = TRUE, lty = 2, col = 2)
-#' rug(exp(-pmode/2), lwd = 3, col = 2)
-#'
 #' ## structured precision matrix model definition
 #' R <- Matrix(toeplitz(c(2,-1,0,0,0)))
 #' mR <- cgeneric("generic0", R = R,
-#'   scale = FALSE, param = c(1, 0.05))
+#'   scale = FALSE, param = c(1, 0.05),
+#'   useINLAprecomp = FALSE)
 #' graph(mR)
 #' prec(mR, theta = 0)
 cgeneric_generic0 <-
@@ -89,13 +65,13 @@ cgeneric_generic0 <-
 
     if(is.null(libpath)) {
       if (useINLAprecomp) {
-        libpath <- INLA::inla.external.lib("graphpcor")
+        libpath <- INLA::inla.external.lib("INLAtools")
       } else {
-        libpath <- system.file("libs", package = "graphpcor")
+        libpath <- system.file("libs", package = "INLAtools")
         if (Sys.info()["sysname"] == "Windows") {
-          libpath <- file.path(libpath, "graphpcor.dll")
+          libpath <- file.path(libpath, "x64/INLAtools.dll")
         } else {
-          libpath <- file.path(libpath, "graphpcor.so")
+          libpath <- file.path(libpath, "INLAtools.so")
         }
       }
     }
@@ -107,7 +83,7 @@ cgeneric_generic0 <-
     stopifnot(param[2]>=0)
     stopifnot(param[2]<=1)
 
-    R <- INLA::inla.as.sparse(R)
+    R <- Sparse(R)
 
     n <- as.integer(nrow(R))
     stopifnot(n>0)
@@ -123,12 +99,16 @@ cgeneric_generic0 <-
     }
 
     if(scale) {
-      R <- INLA::inla.as.sparse(
+      Rs <- try(
         INLA::inla.scale.model(
           Q = R,
           constr = list(A = matrix(1, 1, n), e = 0)
-        )
-      )
+      ))
+      if(inherits(R, "try-error")) {
+        warning("Please install 'INLA'!")
+      } else {
+        R <- Rs
+      }
     }
 
     ord <- order(R@i[idx])
@@ -184,16 +164,15 @@ cgeneric_generic0 <-
     return(the_model)
 
   }
-#' @describeIn cgeneric_generic0
-#' The [cgeneric_iid()] uses the [cgeneric_generic0]
+#' The [cgeneric_iid] uses the [cgeneric_generic0]
 #' with the structure matrix as the identity.
 #' @param n integer required to specify the model size
+#' @inheritParams cgeneric_generic0
 #' @importFrom Matrix Diagonal
 cgeneric_iid <-
   function(n,
            param,
            constr = FALSE,
-           scale = TRUE,
            debug = FALSE,
            useINLAprecomp = TRUE,
            libpath = NULL) {

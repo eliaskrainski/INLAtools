@@ -61,13 +61,13 @@ cgeneric.default <- function(model,
   ## it uses INLA::inla.cgeneric.define()
   if(is.null(libpath)) {
     if (useINLAprecomp) {
-      shlib <- INLA::inla.external.lib("graphpcor")
+      shlib <- INLA::inla.external.lib("INLAtools")
     } else {
-      libpath <- system.file("libs", package = "graphpcor")
+      libpath <- system.file("libs", package = "INLAtools")
       if (Sys.info()["sysname"] == "Windows") {
-        shlib <- file.path(libpath, "graphpcor.dll")
+        shlib <- file.path(libpath, "x64/INLAtools.dll")
       } else {
-        shlib <- file.path(libpath, "graphpcor.so")
+        shlib <- file.path(libpath, "INLAtools.so")
       }
     }
   } else {
@@ -108,25 +108,29 @@ cgeneric.character <- function(model, ...) {
 #' @param result an `inla` output.
 #' @param name character with the name of the model
 #' component in the set of random effects.
-#' @param from.theta a `cgeneric` model, or a function to
-#' convert from theta to the desired output for each sample.
+#' @param model a `cgeneric` model
+#' @param from.theta a function to convert from
+#' theta to the desired output for each sample.
 #' @param simplify logical (see ?sapply).
+#' @return matrix (if n>1 and length(from.theta)>1)
+#' or numeric vector otherwise.
+#' @seealso [prior.cgeneric()]
 #' @export
 inla.cgeneric.sample <- function(n = 1e4, result, name,
-                                 from.theta, simplify = FALSE) {
+                                 model, from.theta, simplify = FALSE) {
   stopifnot(!missing(result))
   stopifnot(inherits(result, "inla"))
   stopifnot(!missing(name))
-  stopifnot(!missing(from.theta))
+  stopifnot(!missing(model))
   stopifnot(n > 0)
   idx <- grep(name, names(result$mode$theta))
   xx <- INLA::inla.hyperpar.sample(
     n = n,
     result = result,
     intern = TRUE)[, idx, drop = FALSE]
-  if(inherits(from.theta, "cgeneric")) {
+  if(inherits(model, "cgeneric")) {
     result <- sapply(1:n, function(i)
-      cgeneric_get(model = from.theta,
+      cgeneric_get(model = model,
                    cmd = "Q",
                    theta = xx[i, ]),
       simplify = simplify

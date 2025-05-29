@@ -2,7 +2,6 @@
 % Please edit documentation in R/cgeneric_generic0.R
 \name{cgeneric_generic0}
 \alias{cgeneric_generic0}
-\alias{cgeneric_iid}
 \title{Build an \code{cgeneric} object for a \code{generic0} model.
 See details.}
 \usage{
@@ -10,16 +9,6 @@ cgeneric_generic0(
   R,
   param,
   constr = TRUE,
-  scale = TRUE,
-  debug = FALSE,
-  useINLAprecomp = TRUE,
-  libpath = NULL
-)
-
-cgeneric_iid(
-  n,
-  param,
-  constr = FALSE,
   scale = TRUE,
   debug = FALSE,
   useINLAprecomp = TRUE,
@@ -49,8 +38,6 @@ be used the shared object pre-compiled by INLA.
 This is not considered if 'libpath' is provided.}
 
 \item{libpath}{string, default is NULL, with the path to the shared object.}
-
-\item{n}{integer required to specify the model size}
 }
 \value{
 a \code{cgeneric} object, see \code{\link[=cgeneric]{cgeneric()}}.
@@ -58,9 +45,9 @@ a \code{cgeneric} object, see \code{\link[=cgeneric]{cgeneric()}}.
 \description{
 Build data needed to implement a model whose
 precision has a conditional precision parameter.
-This uses the C interface in \code{\link[INLA:cgeneric]{INLA::cgeneric()}},
+This uses the C interface in the 'INLA' package,
 that can be used as a linear predictor
-model component with \code{\link[INLA:f]{INLA::f()}}.
+model component with an 'f' term.
 }
 \details{
 The precision matrix is defined as
@@ -79,44 +66,12 @@ Therefore, when the model is scaled,
 \eqn{\tau} is the marginal precision,
 otherwise \eqn{\tau} is the conditional precision.
 }
-\section{Functions}{
-\itemize{
-\item \code{cgeneric_iid()}: The \code{\link[=cgeneric_iid]{cgeneric_iid()}} uses the \link{cgeneric_generic0}
-with the structure matrix as the identity.
-
-}}
 \examples{
-## two ways to define an 'iid' model
-prior.par <- c(1, 0.5)
-ma <- cgeneric("generic0", R = Diagonal(5),
-   param = prior.par, constr = FALSE)
-mb <- cgeneric("iid", n = 5, param = prior.par)
-all.equal(ma, mb)
-
-## Retrieve the precision
-prec(ma, theta = log(3))
-
-lamb <- -log(prior.par[2])/prior.par[1]
-pmode <- log(2)/lamb
-## prior for log(precision) and sigma
-par(mfrow = c(1, 2))
-plot(function(x)
- exp(prior(ma, theta = matrix(x, nrow=1))),
-  -3, 3, n = 601, xlab = "precision", ylab = "density")
-rug(pmode, lwd = 3, col = 2)
-plot(function(x)
-exp(prior(ma,
-  theta = matrix(-2*log(x), nrow = 1))+log(2)-log(x)),
-  1/100, 10, n = 1000,
-  xlab = expression(sigma), ylab = "density")
-plot(function(x) dexp(x, lamb), 1/100, 10, n = 1000,
-   add = TRUE, lty = 2, col = 2)
-rug(exp(-pmode/2), lwd = 3, col = 2)
-
 ## structured precision matrix model definition
 R <- Matrix(toeplitz(c(2,-1,0,0,0)))
 mR <- cgeneric("generic0", R = R,
-  scale = FALSE, param = c(1, 0.05))
+  scale = FALSE, param = c(1, 0.05),
+  useINLAprecomp = FALSE)
 graph(mR)
 prec(mR, theta = 0)
 }
@@ -124,4 +79,7 @@ prec(mR, theta = 0)
 Sigrunn Holbek Sørbye and Håvard Rue (2014).
 Scaling intrinsic Gaussian Markov random field priors in
 spatial modelling. Spatial Statistics, vol. 8, p. 39-51.
+}
+\seealso{
+\code{\link[=prior.cgeneric]{prior.cgeneric()}}
 }

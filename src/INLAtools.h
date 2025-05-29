@@ -33,15 +33,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <dlfcn.h>
 #include <R.h>
-#include <R_ext/Utils.h> // needed to allow user interrupts
 #include <Rdefines.h>
 #include <Rinternals.h>
+#include <R_ext/Rdynload.h> // needed to allow user interrupts
+#include <R_ext/Utils.h> // needed to allow user interrupts
 #include "cgeneric.h"
 
 #if defined(_OPENMP)
 #include <omp.h>
 #endif
+
 
 #if !defined(Calloc)
 #define Calloc(n_, type_)  (type_ *)calloc((n_), sizeof(type_))

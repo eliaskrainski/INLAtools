@@ -27,6 +27,10 @@ a method for \code{\link[=kronecker]{kronecker()}}}
 
 \item{...}{see \code{\link[=kronecker]{kronecker()}}}
 }
+\value{
+if 'X' and 'Y' are 'cgeneric' return a
+'cgeneric', else a 'rgeneric'.
+}
 \description{
 Kronecker (product) between two \code{cgeneric} models as
 a method for \code{\link[=kronecker]{kronecker()}}
