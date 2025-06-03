@@ -180,7 +180,8 @@ mu.cgeneric <- function(model, theta) {
 #' @export
 #' @seealso [cgeneric_generic0()]
 #' @examples
-#' old.par <- par()
+#' old.par <- par(no.readonly = TRUE)
+#'
 #' ## Setting the prior parameters
 #' prior.par <- c(1, 0.5) # P(sigma > 1) = 0.5
 #' cmodel <- cgeneric(

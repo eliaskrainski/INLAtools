@@ -29,13 +29,15 @@
 
 typedef struct
 {
-	int nth1;
+  inla_cgeneric_data_tp *dataM1;
+  inla_cgeneric_data_tp *dataM2;
   void *handle1;
   void *handle2;
   inla_cgeneric_func_tp *model1_func;
 	inla_cgeneric_func_tp *model2_func;
+	int nth1;
 }
-	cache_tp;
+cache_tp;
 
 double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgeneric_data_tp *data)
 {
@@ -111,63 +113,70 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 	assert(nc2 > 1);
 	assert(data->n_chars > 5);
 
-	assert(!strcasecmp(data->ints[1]->name, "debug"));     // this will always be the case
-	assert(!strcasecmp(data->ints[ni1 + 1]->name, "debug"));	// this will always be the case
-//	int debug = (data->ints[1]->ints[0] | data->ints[ni1 + 1]->ints[0]);
-
-	assert(!strcasecmp(data->ints[ni1 + ni2]->name, "idx1u"));	// this will always be the case
-	assert(!strcasecmp(data->ints[ni1 + ni2 + 1]->name, "idx2u"));	// this will always be the case
-
-	assert(!strcasecmp(data->smats[nsm1 + nsm2]->name, "Kgraph"));	// this will always be the case
-
-	inla_cgeneric_data_tp *dataM1 = Calloc(1, inla_cgeneric_data_tp);
-	inla_cgeneric_data_tp *dataM2 = Calloc(1, inla_cgeneric_data_tp);
-
-	dataM1->n_ints = ni1;
-	dataM1->ints = &data->ints[0];
-	dataM1->n_doubles = nd1;
-	dataM1->doubles = &data->doubles[0];
-	dataM1->n_chars = nc1;
-	dataM1->chars = &data->chars[2];		       // first two is for KM!
-	dataM1->n_mats = nm1;
-	dataM1->mats = &data->mats[0];
-	dataM1->n_smats = nsm1;
-	dataM1->smats = &data->smats[0];
-
-	dataM2->n_ints = ni2;
-	dataM2->ints = &data->ints[ni1];
-	dataM2->n_doubles = nd2;
-	dataM2->doubles = &data->doubles[nd1];
-	dataM2->n_chars = nc2;
-	dataM2->chars = &data->chars[2 + nc1];		       // first two is for KM!
-	dataM2->n_mats = nm2;
-	dataM2->mats = &data->mats[nm1];
-	dataM2->n_smats = nsm2;
-	dataM2->smats = &data->smats[nsm1];
-
 	if (!(data->cache)) {
+
 #ifdef _OPENMP
 #pragma omp critical (Name_5bd4b7198feb5550e84446518f90d47072338c18)
 #endif
-		if (!(data->cache)) {
-			cache_tp *d12cache = Calloc(1, cache_tp);
-			d12cache->handle1 = dlopen(&dataM1->chars[1]->chars[0], RTLD_LAZY);
-			if (!d12cache->handle1) {
-			  Rf_error("Failed to load shared library '%s': %s", &dataM1->chars[1]->chars[0], dlerror());
-			}
-			if (strcmp(&dataM1->chars[1]->chars[0], &dataM2->chars[1]->chars[0]) != 0) {
-			  d12cache->handle2 = dlopen(&dataM2->chars[1]->chars[0], RTLD_LAZY);
-			  if (!d12cache->handle2) {
-			    Rf_error("Failed to load shared library '%s': %s", &dataM2->chars[0]->chars[0], dlerror());
-			  }
-			} else {
-			  d12cache->handle2 = d12cache->handle1;
-			}
-			*(void **)(&d12cache->model1_func) = (inla_cgeneric_func_tp *) dlsym(d12cache->handle1, &dataM1->chars[0]->chars[0]);
-			*(void **)(&d12cache->model2_func) = (inla_cgeneric_func_tp *) dlsym(d12cache->handle2, &dataM2->chars[0]->chars[0]);
-			d12cache->nth1 = (int) d12cache->model1_func(INLA_CGENERIC_INITIAL, NULL, dataM1)[0];
-			data->cache = (void *) d12cache;
-		}
+
+	  assert(!strcasecmp(data->ints[1]->name, "debug"));     // this will always be the case
+	  assert(!strcasecmp(data->ints[ni1 + 1]->name, "debug"));	// this will always be the case
+	  //	int debug = (data->ints[1]->ints[0] | data->ints[ni1 + 1]->ints[0]);
+
+	  assert(!strcasecmp(data->ints[ni1 + ni2]->name, "idx1u"));	// this will always be the case
+	  assert(!strcasecmp(data->ints[ni1 + ni2 + 1]->name, "idx2u"));	// this will always be the case
+
+	  assert(!strcasecmp(data->smats[nsm1 + nsm2]->name, "Kgraph"));	// this will always be the case
+
+	  cache_tp *d12cache = Calloc(1, cache_tp);
+	  d12cache->dataM1 = Calloc(1, inla_cgeneric_data_tp);
+	  d12cache->dataM2 = Calloc(1, inla_cgeneric_data_tp);
+
+	  d12cache->dataM1->n_ints = ni1;
+	  d12cache->dataM1->ints = &data->ints[0];
+	  d12cache->dataM1->n_doubles = nd1;
+	  d12cache->dataM1->doubles = &data->doubles[0];
+	  d12cache->dataM1->n_chars = nc1;
+	  d12cache->dataM1->chars = &data->chars[2];	// first two is for KM!
+	  d12cache->dataM1->n_mats = nm1;
+	  d12cache->dataM1->mats = &data->mats[0];
+	  d12cache->dataM1->n_smats = nsm1;
+	  d12cache->dataM1->smats = &data->smats[0];
+
+	  d12cache->dataM2->n_ints = ni2;
+	  d12cache->dataM2->ints = &data->ints[ni1];
+	  d12cache->dataM2->n_doubles = nd2;
+	  d12cache->dataM2->doubles = &data->doubles[nd1];
+	  d12cache->dataM2->n_chars = nc2;
+	  d12cache->dataM2->chars = &data->chars[2 + nc1];		       // first two is for KM!
+	  d12cache->dataM2->n_mats = nm2;
+	  d12cache->dataM2->mats = &data->mats[nm1];
+	  d12cache->dataM2->n_smats = nsm2;
+	  d12cache->dataM2->smats = &data->smats[nsm1];
+
+	  d12cache->handle1 = dlopen(&d12cache->dataM1->chars[1]->chars[0], RTLD_LAZY);
+	  if (!d12cache->handle1) {
+	    Rf_error("Failed to load shared library '%s': %s",
+              &d12cache->dataM1->chars[1]->chars[0], dlerror());
+	  }
+	  if (strcmp(&d12cache->dataM1->chars[1]->chars[0],
+              &d12cache->dataM2->chars[1]->chars[0]) != 0) {
+	    d12cache->handle2 = dlopen(&d12cache->dataM2->chars[1]->chars[0], RTLD_LAZY);
+	    if (!d12cache->handle2) {
+	      Rf_error("Failed to load shared library '%s': %s",
+                &d12cache->dataM2->chars[0]->chars[0], dlerror());
+	    }
+	  } else {
+	    d12cache->handle2 = d12cache->handle1;
+	  }
+	  *(void **)(&d12cache->model1_func) = dlsym(d12cache->handle1,
+                                 &d12cache->dataM1->chars[0]->chars[0]);
+	  *(void **)(&d12cache->model2_func) = dlsym(d12cache->handle2,
+                                 &d12cache->dataM2->chars[0]->chars[0]);
+	  d12cache->nth1 = (int) d12cache->model1_func(INLA_CGENERIC_INITIAL, NULL,
+                     d12cache->dataM1)[0];
+
+	  data->cache = (void *) d12cache;
 	}
 
 	assert(data->cache);
@@ -210,8 +219,8 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 		ret[0] = -1;				       /* REQUIRED */
 		ret[1] = M;
 
-		ret1 = d12cache->model1_func(INLA_CGENERIC_Q, theta1, dataM1);
-		ret2 = d12cache->model2_func(INLA_CGENERIC_Q, theta2, dataM2);
+		ret1 = d12cache->model1_func(INLA_CGENERIC_Q, theta1, d12cache->dataM1);
+		ret2 = d12cache->model2_func(INLA_CGENERIC_Q, theta2, d12cache->dataM2);
 
 		int nu1 = data->ints[ni1 + ni2]->len;
 		int nu2 = data->ints[ni1 + ni2 + 1]->len;
@@ -260,8 +269,8 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 		// return c(M, initials)
 		// where M is the number of hyperparameters
 
-		ret1 = d12cache->model1_func(INLA_CGENERIC_INITIAL, NULL, dataM1);
-		ret2 = d12cache->model2_func(INLA_CGENERIC_INITIAL, NULL, dataM2);
+		ret1 = d12cache->model1_func(INLA_CGENERIC_INITIAL, NULL, d12cache->dataM1);
+		ret2 = d12cache->model2_func(INLA_CGENERIC_INITIAL, NULL, d12cache->dataM2);
 
 		int nth1 = (int) ret1[0], nth2 = (int) ret2[0];
 
@@ -287,8 +296,8 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 	case INLA_CGENERIC_LOG_PRIOR:
 	{
 		// return c(LOG_PRIOR)
-		ret1 = d12cache->model1_func(INLA_CGENERIC_LOG_PRIOR, theta1, dataM1);
-		ret2 = d12cache->model2_func(INLA_CGENERIC_LOG_PRIOR, theta2, dataM2);
+		ret1 = d12cache->model1_func(INLA_CGENERIC_LOG_PRIOR, theta1, d12cache->dataM1);
+		ret2 = d12cache->model2_func(INLA_CGENERIC_LOG_PRIOR, theta2, d12cache->dataM2);
 
 		ret = Calloc(1, double);
 		ret[0] = ret1[0] + ret2[0];
@@ -298,7 +307,7 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 	case INLA_CGENERIC_QUIT:
 	{
 	  dlclose(d12cache->handle1);
-	  if (strcmp(&dataM1->chars[1]->chars[0], &dataM2->chars[1]->chars[0]) != 0) {
+	  if (strcmp(&d12cache->dataM1->chars[1]->chars[0], &d12cache->dataM2->chars[1]->chars[0]) != 0) {
 	    dlclose(d12cache->handle2);
 	  }
 	  free(d12cache);

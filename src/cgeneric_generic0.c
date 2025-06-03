@@ -56,9 +56,7 @@ double *inla_cgeneric_generic0(inla_cgeneric_cmd_tp cmd, double *theta, inla_cge
 		}
 	}
 
-	// the number of neighbors at the diagonal
-	// and the (upper) graph (-1)
-	// NOTE: scale this above def one!!!
+	// usuallly: R[i,i] = \sum_{j!i} R[i,j]
 	assert(data->n_smats > 0);
 	assert(!strcasecmp(data->smats[0]->name, "Rgraph"));
 	inla_cgeneric_smat_tp *Rgraph = data->smats[0];

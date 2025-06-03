@@ -65,7 +65,8 @@ The functions listed below are for each \code{cmd} case.
 
 }}
 \examples{
-old.par <- par()
+old.par <- par(no.readonly = TRUE)
+
 ## Setting the prior parameters
 prior.par <- c(1, 0.5) # P(sigma > 1) = 0.5
 cmodel <- cgeneric(

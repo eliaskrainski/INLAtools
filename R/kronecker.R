@@ -1,12 +1,16 @@
-#' Kronecker (product) between two `cgeneric` models as
-#' a method for [kronecker()]
+#' Kronecker (product) between `cgeneric`/`rgeneric` models,
+#' implemented as [kronecker()] methods.
+#' @name kronecker
 #' @param X `cgeneric` or `rgeneric`
 #' @param Y `cgeneric` or `rgeneric`
 #' @param FUN see [kronecker()]
 #' @param make.dimnames see [kronecker()]
 #' @param ... see [kronecker()]
-#' @return if 'X' and 'Y' are 'cgeneric' return a
-#' 'cgeneric', else a 'rgeneric'.
+#' @return if 'X' and 'Y' are `cgeneric`
+#' return a `cgeneric`, else a `rgeneric`.
+NULL
+#> NULL
+
 #' @rdname kronecker
 #' @useDynLib INLAtools
 #' @importFrom utils str
@@ -279,8 +283,6 @@ setMethod(
 
   }
 )
-#' Kronecker (product) between a `cgeneric` model and
-#' a `rgeneric` model as a method for kronecker()
 #' @rdname kronecker
 #' @useDynLib INLAtools
 #' @importFrom utils str
@@ -383,8 +385,6 @@ setMethod(
 
   }
 )
-#' Kronecker (product) between a `rgeneric` model and
-#' a `cgeneric` model as a method for kronecker()
 #' @rdname kronecker
 #' @useDynLib INLAtools
 #' @importFrom utils str
@@ -485,8 +485,6 @@ setMethod(
 
   }
 )
-#' Kronecker (product) between a `rgeneric` model and
-#' a `rgeneric` model as a method for kronecker()
 #' @rdname kronecker
 #' @importFrom utils str
 setMethod(
