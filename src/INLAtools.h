@@ -25,7 +25,6 @@
  *        Thuwal 23955-6900, Saudi Arabia
  */
 
-
 #include <stddef.h>
 #include <stdio.h>
 #include <assert.h>
@@ -37,14 +36,13 @@
 #include <R.h>
 #include <Rdefines.h>
 #include <Rinternals.h>
-#include <R_ext/Rdynload.h> // needed to allow user interrupts
-#include <R_ext/Utils.h> // needed to allow user interrupts
+#include <R_ext/Rdynload.h>	// needed to allow user interrupts
+#include <R_ext/Utils.h>	// needed to allow user interrupts
 #include "cgeneric.h"
 
 #if defined(_OPENMP)
 #include <omp.h>
 #endif
-
 
 #if !defined(Calloc)
 #define Calloc(n_, type_)  (type_ *)calloc((n_), sizeof(type_))
@@ -69,6 +67,7 @@ typedef int fortran_charlen_t;
 #endif
 #define F_ONE ((fortran_charlen_t)1)
 
-SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, SEXP doubles, SEXP chars, SEXP mats, SEXP smats);
+SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
+			       SEXP doubles, SEXP chars, SEXP mats, SEXP smats);
 inla_cgeneric_func_tp inla_cgeneric_generic0;
 inla_cgeneric_func_tp inla_cgeneric_kronecker;

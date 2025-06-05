@@ -29,18 +29,16 @@
 #include <R_ext/Rdynload.h>
 
 static R_CallMethodDef CallEntries[] = {
-    {"inla_cgeneric_element_get", (DL_FUNC) &inla_cgeneric_element_get, 8},
-    {NULL, NULL, 0}
+	{"inla_cgeneric_element_get", (DL_FUNC) & inla_cgeneric_element_get, 8},
+	{NULL, NULL, 0}
 };
-
 
 void
 #ifdef HAVE_VISIBILITY_ATTRIBUTE
-__attribute__ ((visibility ("default")))
+    __attribute__((visibility("default")))
 #endif
-R_init_INLAtools(DllInfo *dll)
+    R_init_INLAtools(DllInfo *dll)
 {
-    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
-    R_useDynamicSymbols(dll, FALSE);
+	R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+	R_useDynamicSymbols(dll, FALSE);
 }
-

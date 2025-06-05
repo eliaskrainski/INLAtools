@@ -27,7 +27,8 @@
 
 #include "INLAtools.h"
 
-SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, SEXP doubles, SEXP chars, SEXP mats, SEXP smats)
+SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
+			       SEXP doubles, SEXP chars, SEXP mats, SEXP smats)
 {
 
 	int ni = 0, nd = 0, nc = 0, nm = 0, nsm = 0, nout = 0;
@@ -37,7 +38,6 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 	if (ntheta[0] > 0) {
 		nth /= ntheta[0];
 	}
-
 	// initial check: mandatory arguments
 	if (isNewList(ints)) {
 		ni = length(ints);
@@ -92,13 +92,15 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 	}
 
 	// get initial info
-	char *CMD = (char *) CHAR(STRING_ELT(Rcmd, 0));
+	char *CMD = (char *)CHAR(STRING_ELT(Rcmd, 0));
 	// n = asInteger(VECTOR_ELT(ints, 0));
 	debug = asInteger(VECTOR_ELT(ints, 1));
 	if (debug > 0) {
 		Rprintf("Rcmd is %s, debug = %d\n", CMD, debug);
 		// Rprintf("n = %d, debug = %d\n", n, debug);
-		Rprintf("ni = %d, nd = %d, nc = %d, nm = %d, nsm = %d, ntheta = %d, nth = %d\n", ni, nd, nc, nm, nsm, ntheta[0], nth);
+		Rprintf
+		    ("ni = %d, nd = %d, nc = %d, nm = %d, nsm = %d, ntheta = %d, nth = %d\n",
+		     ni, nd, nc, nm, nsm, ntheta[0], nth);
 	}
 
 	double *theta = NULL;
@@ -121,7 +123,6 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 			}
 		}
 	}
-
 	// define objects
 	int ilen[ni], clen[nc];
 	inla_cgeneric_data_tp *cgeneric_data = Calloc(1, inla_cgeneric_data_tp);
@@ -139,13 +140,14 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 	for (i = 0; i < ni; i++) {
 		ilen[i] = length(VECTOR_ELT(ints, i));
 		cgeneric_data->ints[i] = Calloc(1, inla_cgeneric_vec_tp);
-		pcaux = (char *) CHAR(STRING_ELT(inames, i));
+		pcaux = (char *)CHAR(STRING_ELT(inames, i));
 		cgeneric_data->ints[i]->name = pcaux;
 		cgeneric_data->ints[i]->len = ilen[i];
 		cgeneric_data->ints[i]->ints = Calloc(ilen[i], int);
 		if (debug > 0) {
 			caux = CHAR(STRING_ELT(inames, i));
-			Rprintf("length(ints[[%d]]), %s, is %d\n", i + 1, caux, ilen[i]);
+			Rprintf("length(ints[[%d]]), %s, is %d\n", i + 1, caux,
+				ilen[i]);
 		}
 		iaux = INTEGER(VECTOR_ELT(ints, i));
 		for (j = 0; j < ilen[i]; j++) {
@@ -161,26 +163,28 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 			dlen[i] = length(VECTOR_ELT(doubles, i));
 			if (debug > 0) {
 				caux = CHAR(STRING_ELT(dnames, i));
-				Rprintf("length(doubles[[%d]]), %s, is %d\n", i + 1, caux, dlen[i]);
+				Rprintf("length(doubles[[%d]]), %s, is %d\n",
+					i + 1, caux, dlen[i]);
 			}
 		}
 		// allocate and collect doubles
 		cgeneric_data->n_doubles = nd;
 		cgeneric_data->doubles = Calloc(nd, inla_cgeneric_vec_tp *);
-		pcaux = (char *) CHAR(STRING_ELT(dnames, 0));
+		pcaux = (char *)CHAR(STRING_ELT(dnames, 0));
 		for (i = 0; i < nd; i++) {
-			cgeneric_data->doubles[i] = Calloc(1, inla_cgeneric_vec_tp);
-			pcaux = (char *) CHAR(STRING_ELT(dnames, i));
+			cgeneric_data->doubles[i] =
+			    Calloc(1, inla_cgeneric_vec_tp);
+			pcaux = (char *)CHAR(STRING_ELT(dnames, i));
 			cgeneric_data->doubles[i]->name = pcaux;
 			cgeneric_data->doubles[i]->len = dlen[i];
-			cgeneric_data->doubles[i]->doubles = Calloc(dlen[i], double);
+			cgeneric_data->doubles[i]->doubles =
+			    Calloc(dlen[i], double);
 			daux = REAL(VECTOR_ELT(doubles, i));
 			for (j = 0; j < dlen[i]; j++) {
 				cgeneric_data->doubles[i]->doubles[j] = daux[j];
 			}
 		}
 	}
-
 	// collect data from chars
 	SEXP cnames = getAttrib(chars, R_NamesSymbol);
 	cgeneric_data->n_chars = nc;
@@ -189,20 +193,23 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 		clen[i] = length(VECTOR_ELT(chars, i));
 		caux = CHAR(STRING_ELT(cnames, i));
 		if (debug > 0) {
-			Rprintf("length(chars[[%d]]), %s, is %d\n", i + 1, caux, clen[i]);
+			Rprintf("length(chars[[%d]]), %s, is %d\n", i + 1, caux,
+				clen[i]);
 		}
 		assert(clen[i] == 1);
 		cgeneric_data->chars[i] = Calloc(1, inla_cgeneric_vec_tp);
-		pcaux = (char *) CHAR(STRING_ELT(cnames, i));
+		pcaux = (char *)CHAR(STRING_ELT(cnames, i));
 		cgeneric_data->chars[i]->name = pcaux;
 		cgeneric_data->chars[i]->len = clen[i];
 		cgeneric_data->chars[i]->chars = Calloc(clen[i] + 1L, char);
 		if (debug > 0) {
-			Rprintf("%d: length(%s) is %d\n", i + 1, cgeneric_data->chars[i]->name, clen[i]);
+			Rprintf("%d: length(%s) is %d\n", i + 1,
+				cgeneric_data->chars[i]->name, clen[i]);
 			Rprintf("%s, ", pcaux);
-			Rprintf("%s :", CHAR(STRING_ELT(VECTOR_ELT(chars, i), 0)));
+			Rprintf("%s :",
+				CHAR(STRING_ELT(VECTOR_ELT(chars, i), 0)));
 		}
-		pcaux = (char *) CHAR(STRING_ELT(VECTOR_ELT(chars, i), 0));
+		pcaux = (char *)CHAR(STRING_ELT(VECTOR_ELT(chars, i), 0));
 		cgeneric_data->chars[i]->chars = pcaux;
 		if (debug > 0) {
 			Rprintf("%s \n", cgeneric_data->chars[i]->chars);
@@ -225,7 +232,7 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 		SEXP mnames = getAttrib(mats, R_NamesSymbol);
 		cgeneric_data->n_mats = nm;
 		cgeneric_data->mats = Calloc(nm, inla_cgeneric_mat_tp *);
-		pcaux = (char *) CHAR(STRING_ELT(mnames, 0));
+		pcaux = (char *)CHAR(STRING_ELT(mnames, 0));
 		for (i = 0; i < nm; i++) {
 			daux = REAL(VECTOR_ELT(mats, i));
 			mnr[i] = daux[0];
@@ -233,10 +240,12 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 			mlen[i] = mnr[i] * mnc[i];
 			if (debug > 0) {
 				caux = CHAR(STRING_ELT(mnames, i));
-				Rprintf("dim(mats[[%d]]), %s, is %d %d\n", i + 1, caux, mnr[i], mnc[i]);
+				Rprintf("dim(mats[[%d]]), %s, is %d %d\n",
+					i + 1, caux, mnr[i], mnc[i]);
 			}
-			cgeneric_data->mats[i] = Calloc(1, inla_cgeneric_mat_tp);
-			pcaux = (char *) CHAR(STRING_ELT(mnames, i));
+			cgeneric_data->mats[i] =
+			    Calloc(1, inla_cgeneric_mat_tp);
+			pcaux = (char *)CHAR(STRING_ELT(mnames, i));
 			cgeneric_data->mats[i]->name = pcaux;
 			cgeneric_data->mats[i]->nrow = mnr[i];
 			cgeneric_data->mats[i]->ncol = mnc[i];
@@ -254,20 +263,22 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 		SEXP smnames = getAttrib(smats, R_NamesSymbol);
 		cgeneric_data->n_smats = nsm;
 		cgeneric_data->smats = Calloc(nsm, inla_cgeneric_smat_tp *);
-		pcaux = (char *) CHAR(STRING_ELT(smnames, 0));
+		pcaux = (char *)CHAR(STRING_ELT(smnames, 0));
 		for (i = 0; i < nsm; i++) {
 			smlen[i] = length(VECTOR_ELT(smats, i));
 			if (debug > 0) {
 				caux = CHAR(STRING_ELT(smnames, i));
-				Rprintf("length(smats[[%d]]), %s, is %d\n", i + 1, caux, smlen[i]);
+				Rprintf("length(smats[[%d]]), %s, is %d\n",
+					i + 1, caux, smlen[i]);
 			}
 			daux = REAL(VECTOR_ELT(smats, i));
 			int offset = 0;
 			smnr[i] = daux[offset++];
 			smnc[i] = daux[offset++];
 			smn[i] = daux[offset++];
-			cgeneric_data->smats[i] = Calloc(1, inla_cgeneric_smat_tp);
-			pcaux = (char *) CHAR(STRING_ELT(smnames, i));
+			cgeneric_data->smats[i] =
+			    Calloc(1, inla_cgeneric_smat_tp);
+			pcaux = (char *)CHAR(STRING_ELT(smnames, i));
 			cgeneric_data->smats[i]->name = pcaux;
 			cgeneric_data->smats[i]->nrow = smnr[i];
 			cgeneric_data->smats[i]->ncol = smnc[i];
@@ -276,10 +287,12 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 			cgeneric_data->smats[i]->j = Calloc(smn[i], int);
 			cgeneric_data->smats[i]->x = Calloc(smn[i], double);
 			for (j = 0; j < smn[i]; j++) {
-				cgeneric_data->smats[i]->i[j] = (int) daux[offset++];
+				cgeneric_data->smats[i]->i[j] =
+				    (int)daux[offset++];
 			}
 			for (j = 0; j < smn[i]; j++) {
-				cgeneric_data->smats[i]->j[j] = (int) daux[offset++];
+				cgeneric_data->smats[i]->j[j] =
+				    (int)daux[offset++];
 			}
 			for (j = 0; j < smn[i]; j++) {
 				cgeneric_data->smats[i]->x[j] = daux[offset++];
@@ -287,12 +300,12 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 		}
 
 	}
-
 	// load lib
 	void *handle;
 	handle = dlopen(cgeneric_shlib, RTLD_LAZY);
 	if (!handle) {
-	  Rf_error("Failed to load shared library '%s': %s", cgeneric_shlib, dlerror());
+		Rf_error("Failed to load shared library '%s': %s",
+			 cgeneric_shlib, dlerror());
 	}
 	inla_cgeneric_func_tp *model_func = NULL;
 	*(void **)(&model_func) = dlsym(handle, cgeneric_model);
@@ -300,7 +313,7 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 
 	if (strcmp(CMD, "graph") == 0) {
 		ret = model_func(INLA_CGENERIC_GRAPH, theta, cgeneric_data);
-		nout = (int) ret[1];
+		nout = (int)ret[1];
 		SEXP ii = PROTECT(allocVector(INTSXP, nout));
 		iaux = INTEGER(ii);
 		for (i = 0; i < nout; i++) {
@@ -316,13 +329,14 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 		SET_VECTOR_ELT(Rret, 1, jj);
 		UNPROTECT(3);
 		if (debug > 0) {
-			Rprintf("graph with n = %d and %d nz\n", (int) ret[0], nout);
+			Rprintf("graph with n = %d and %d nz\n", (int)ret[0],
+				nout);
 		}
 	}
 
 	if (strcmp(CMD, "Q") == 0) {
 		ret = model_func(INLA_CGENERIC_Q, theta, cgeneric_data);
-		nout = (int) ret[1];
+		nout = (int)ret[1];
 		Rret = PROTECT(allocVector(REALSXP, nout));
 		daux = REAL(Rret);
 		for (i = 0; i < nout; i++) {
@@ -343,12 +357,13 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 
 	if (strcmp(CMD, "initial") == 0) {
 		ret = model_func(INLA_CGENERIC_INITIAL, theta, cgeneric_data);
-		nout = (int) ret[0];
+		nout = (int)ret[0];
 		if (debug > 0) {
 			Rprintf("intial: %d elements (%f)\n", nout, ret[0]);
 			if (nout > 0) {
 				for (i = 0; i < nout; i++)
-					Rprintf("theta[%d] = %f\n", i, ret[1 + i]);
+					Rprintf("theta[%d] = %f\n", i,
+						ret[1 + i]);
 			}
 		}
 		if (nout > 0) {
@@ -364,7 +379,9 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, 
 	if (strcmp(CMD, "log_prior") == 0) {
 		Rret = PROTECT(allocVector(REALSXP, ntheta[0]));
 		for (j = 0; j < (ntheta[0]); j++) {
-			ret = model_func(INLA_CGENERIC_LOG_PRIOR, &theta[j * nth], cgeneric_data);
+			ret =
+			    model_func(INLA_CGENERIC_LOG_PRIOR, &theta[j * nth],
+				       cgeneric_data);
 			REAL(Rret)[j] = ret[0];
 		}
 		UNPROTECT(1);
