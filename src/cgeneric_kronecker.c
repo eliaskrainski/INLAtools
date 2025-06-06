@@ -191,8 +191,9 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 			d12cache->handle2 = d12cache->handle1;
 		}
 		*(void **)(&d12cache->model1_func) = dlsym(d12cache->handle1,
-							   &d12cache->dataM1->
-							   chars[0]->chars[0]);
+							   &d12cache->
+							   dataM1->chars[0]->
+							   chars[0]);
 		*(void **)(&d12cache->model2_func) =
 		    dlsym(d12cache->handle2,
 			  &d12cache->dataM2->chars[0]->chars[0]);
@@ -281,8 +282,8 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 						    daux * ret2[2 +
 								data->ints[ni1 +
 									   ni2 +
-									   1]->ints
-								[j]];
+									   1]->
+								ints[j]];
 					}
 				}
 			}

@@ -7,11 +7,10 @@
 #define __BEGIN_DECLS extern "C" {
 #define __END_DECLS }
 #else
-#define __BEGIN_DECLS					       /* empty */
-#define __END_DECLS					       /* empty */
+#define __BEGIN_DECLS		/* empty */
+#define __END_DECLS		/* empty */
 #endif
 __BEGIN_DECLS
-
 /* 
  *
  */
@@ -99,7 +98,7 @@ typedef struct {
 	char *name;
 	int nrow;
 	int ncol;
-	int n;						       /* number of triplets (i,j,x) */
+	int n;			/* number of triplets (i,j,x) */
 	int *i;
 	int *j;
 	double *x;
@@ -165,7 +164,8 @@ typedef struct {
         }
 #endif
 
-typedef double *inla_cgeneric_func_tp(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgeneric_data_tp * data);
+typedef double *inla_cgeneric_func_tp(inla_cgeneric_cmd_tp cmd, double *theta,
+				      inla_cgeneric_data_tp * data);
 
 inla_cgeneric_data_tp *inla_cgeneric_read_data(const char *filename, int debug);
 inla_cgeneric_func_tp inla_cgeneric_iid_model;

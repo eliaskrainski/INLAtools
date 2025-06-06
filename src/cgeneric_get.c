@@ -134,7 +134,7 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 	const char *caux;
 
 	// collect data from ints
-	SEXP inames = getAttrib(ints, R_NamesSymbol);
+	SEXP inames = PROTECT(getAttrib(ints, R_NamesSymbol));
 	cgeneric_data->n_ints = ni;
 	cgeneric_data->ints = Calloc(ni, inla_cgeneric_vec_tp *);
 	for (i = 0; i < ni; i++) {
@@ -154,11 +154,12 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 			cgeneric_data->ints[i]->ints[j] = iaux[j];
 		}
 	}
+	UNPROTECT(1);
 
 	if (nd > 0) {
 		// collect lengths and names from doubles
 		int dlen[nd];
-		SEXP dnames = getAttrib(doubles, R_NamesSymbol);
+		SEXP dnames = PROTECT(getAttrib(doubles, R_NamesSymbol));
 		for (i = 0; i < nd; i++) {
 			dlen[i] = length(VECTOR_ELT(doubles, i));
 			if (debug > 0) {
@@ -184,9 +185,10 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 				cgeneric_data->doubles[i]->doubles[j] = daux[j];
 			}
 		}
+		UNPROTECT(1);
 	}
 	// collect data from chars
-	SEXP cnames = getAttrib(chars, R_NamesSymbol);
+	SEXP cnames = PROTECT(getAttrib(chars, R_NamesSymbol));
 	cgeneric_data->n_chars = nc;
 	cgeneric_data->chars = Calloc(nc, inla_cgeneric_vec_tp *);
 	for (i = 0; i < nc; i++) {
@@ -215,6 +217,7 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 			Rprintf("%s \n", cgeneric_data->chars[i]->chars);
 		}
 	}
+	UNPROTECT(1);
 
 	// check the mandatory strings
 	//  assert(cgeneric_data->chars[0]->name == "model");
@@ -229,7 +232,7 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 	if (nm > 0) {
 		// collect data from mats
 		int mnr[nm], mnc[nm], mlen[nm];
-		SEXP mnames = getAttrib(mats, R_NamesSymbol);
+		SEXP mnames = PROTECT(getAttrib(mats, R_NamesSymbol));
 		cgeneric_data->n_mats = nm;
 		cgeneric_data->mats = Calloc(nm, inla_cgeneric_mat_tp *);
 		pcaux = (char *)CHAR(STRING_ELT(mnames, 0));
@@ -254,13 +257,13 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 				cgeneric_data->mats[i]->x[j] = daux[2 + j];
 			}
 		}
-
+		UNPROTECT(1);
 	}
 
 	if (nsm > 0) {
 		// collect lengths and names from smats
 		int smlen[nsm], smnr[nsm], smnc[nsm], smn[nsm];
-		SEXP smnames = getAttrib(smats, R_NamesSymbol);
+		SEXP smnames = PROTECT(getAttrib(smats, R_NamesSymbol));
 		cgeneric_data->n_smats = nsm;
 		cgeneric_data->smats = Calloc(nsm, inla_cgeneric_smat_tp *);
 		pcaux = (char *)CHAR(STRING_ELT(smnames, 0));
@@ -297,6 +300,7 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 			for (j = 0; j < smn[i]; j++) {
 				cgeneric_data->smats[i]->x[j] = daux[offset++];
 			}
+			UNPROTECT(1);
 		}
 
 	}
@@ -327,11 +331,11 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 		Rret = PROTECT(allocVector(VECSXP, 2));
 		SET_VECTOR_ELT(Rret, 0, ii);
 		SET_VECTOR_ELT(Rret, 1, jj);
-		UNPROTECT(3);
 		if (debug > 0) {
 			Rprintf("graph with n = %d and %d nz\n", (int)ret[0],
 				nout);
 		}
+		UNPROTECT(3);
 	}
 
 	if (strcmp(CMD, "Q") == 0) {
@@ -342,10 +346,10 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 		for (i = 0; i < nout; i++) {
 			daux[i] = ret[2 + i];
 		}
-		UNPROTECT(1);
 		if (debug > 0) {
 			Rprintf("Q with %d nz\n", nout);
 		}
+		UNPROTECT(1);
 	}
 
 	if (strcmp(CMD, "mu") == 0) {
