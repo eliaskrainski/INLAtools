@@ -25,7 +25,8 @@
 #' See details in [INLA::cgeneric()]
 #' @param model object class for what a `cgeneric` method exists.
 #' if it is a character, a specific function will be called,
-#' for example cgeneric("iid", ...") calls cgeneric_iid(...)
+#' for example cgeneric("iid", ...") calls cgeneric_iid(...),
+#' see [cgeneric_iid()] and [cgeneric_generic0()].
 #' @param ... additional arguments passed on to methods
 #' @return  named list of `cgeneric` class containing
 #'  the named list `f` that contain `model` (a character
@@ -50,41 +51,74 @@ cgeneric <- function(model, ...) {
 #' @param useINLAprecomp logical, default is TRUE, indicating if it is to
 #' be used the shared object pre-compiled by INLA.
 #' This is not considered if 'libpath' is provided.
+#' @param pkg character to give the package name, used to build the
+#' libpath (if this is not provided).
 #' @param libpath string, default is NULL, with the path to the shared object.
 #' @param ... additional arguments passed on to methods
 #' @export
 cgeneric.default <- function(model,
                              debug = FALSE,
                              useINLAprecomp = TRUE,
+                             pkg = NULL,
                              libpath = NULL,
                              ...) {
-  ## it uses INLA::inla.cgeneric.define()
+  ## do what INLA::inla.cgeneric.define() does
   if(is.null(libpath)) {
     if (useINLAprecomp) {
-      shlib <- INLA::inla.external.lib("INLAtools")
+	    stopifnot(!is.null(pkg))
+      shlib <- INLA::inla.external.lib(pkg)
     } else {
-      libpath <- system.file("libs", package = "INLAtools")
+      libpath <- system.file("libs", package = pkg)
       if (Sys.info()["sysname"] == "Windows") {
-        shlib <- file.path(libpath, "x64/INLAtools.dll")
+        shlib <- file.path(libpath,
+			   paste0("x64/", pkg, ".dll"))
       } else {
-        shlib <- file.path(libpath, "INLAtools.so")
+        shlib <- file.path(libpath,
+			   paste0(pkg, ".so"))
       }
     }
   } else {
     shlib <- libpath
   }
 
-  args <- list(...)
+  args <- c(model = as.character(model),
+	    debug = as.integer(debug),
+	    shlib = as.character(shlib),
+	    list(...))
   nargs <- names(args)
-  if(any(nargs == ""))
+  if(any(nargs) == "")
     stop("Please name the arguments!")
-  cmodel <- do.call( ## TO DO: make it independent of INLA:::inla.cgeneric.define
-    "inla.cgeneric.define",
-    c(list(model = model,
-           debug = debug,
-           shlib = shlib),
-      list(...))
-  )
+  if(!any(nargs == "n"))
+     stop("Please provid 'n'!")
+  storage.mode(args$n) <- "integer"
+  stopifnot(args$n>=1)
+
+  nM <- length(iM <- which(sapply(args, function(x) is(x, "Matrix"))))
+  nm <- length(im <- which(sapply(args, is.matrix)))
+  ni <- length(ii <- setdiff(which(sapply(args, is.integer)), im))
+  nd <- length(id <- setdiff(which(sapply(args, is.double)), im))
+  nc <- length(ic <- which(sapply(args, is.character)))
+  stopifnot(ni>1)
+  stopifnot(nc>1)
+
+  cmodel <- list(f = list(model = "cgeneric", n=args$n))
+  cmodel$cgeneric <- args[c("model", "shlib", "n", "debug")]
+  cmodel$data <- vector("list", 5L)
+  names(cmodel$data) <- c("ints", "doubles", "characters",
+			  "matrices", "smatrices")
+  cmodel$data$ints <- args[ii]
+  if(nd>0) cmodel$data$doubles <- args[id]
+  cmodel$data$characters <- args[ic]
+  if(nm>0) cmodel$data$matrices <- args[im]
+  if(nM>0) {
+	  cmodel$data$smatrices <- args[iM]
+	  for(i in 1:nM)
+		  cmodel$data$smatrices[[i]] <-
+			  Sparse(cmodel$data$smatrices[[i]])
+  }
+  class(cmodel) <- c("cgeneric",
+		     "inla.cgeneric") ## this is needed in INLA::f()
+  class(cmodel$f$cgeneric) <- class(cmodel)
   return(cmodel)
 }
 #' @describeIn cgeneric
@@ -117,7 +151,8 @@ cgeneric.character <- function(model, ...) {
 #' @seealso [prior.cgeneric()]
 #' @export
 inla.cgeneric.sample <- function(n = 1e4, result, name,
-                                 model, from.theta, simplify = FALSE) {
+                                 model, from.theta,
+                                 simplify = FALSE) {
   stopifnot(!missing(result))
   stopifnot(inherits(result, "inla"))
   stopifnot(!missing(name))

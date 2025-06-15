@@ -7,7 +7,14 @@
 \alias{cgeneric.character}
 \title{A \code{cgeneric} model described in \code{\link[=cgeneric]{cgeneric()}}.}
 \usage{
-\method{cgeneric}{default}(model, debug = FALSE, useINLAprecomp = TRUE, libpath = NULL, ...)
+\method{cgeneric}{default}(
+  model,
+  debug = FALSE,
+  useINLAprecomp = TRUE,
+  pkg = NULL,
+  libpath = NULL,
+  ...
+)
 
 \method{cgeneric}{character}(model, ...)
 }
@@ -22,6 +29,9 @@ Will be used as logical by INLA.}
 \item{useINLAprecomp}{logical, default is TRUE, indicating if it is to
 be used the shared object pre-compiled by INLA.
 This is not considered if 'libpath' is provided.}
+
+\item{pkg}{character to give the package name, used to build the
+libpath (if this is not provided).}
 
 \item{libpath}{string, default is NULL, with the path to the shared object.}
 

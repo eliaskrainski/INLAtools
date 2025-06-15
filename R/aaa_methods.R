@@ -49,3 +49,65 @@ graph <- function(model, optimize) {
 prec <- function(model, theta, optimize) {
   UseMethod("prec")
 }
+#' @describeIn methods
+#' The default precision method
+#' computes the inverse of the variance
+#' @export
+prec.default <- function(model, ...) {
+  v <- vcov(model, ...)
+  return(
+    forwardsolve(
+      backsolve(
+        chol(v)
+      )
+    )
+  )
+}
+#' @describeIn methods
+#' The `vcov` method for sparse matrices
+#' @param object Matrix supposed to be a
+#' sparse precision matrix
+setMethod(
+  "vcov",
+  "Matrix",
+  function(object, ...) {
+    object <- Matrix::Cholesky(object)
+    return(solve(object))
+  }
+)
+#' Define the is.zero method
+#' @param x an R object
+#' @param ... additional arguments
+#' @return logical
+#' @export
+is.zero <- function(x, ...) {
+  UseMethod("is.zero")
+}
+#' @describeIn is.zero
+#' The is.zero.default definition
+#' @export
+is.zero.default <- function(x, ...) {
+  a <- abs(as.numeric(c(x)))
+  if(diff(range(a))<(.Machine$double.eps^0.9)) {
+    tol <- (.Machine$double.eps^0.9)
+  } else {
+    tol <- .Machine$double.eps *
+      max(sqrt(length(a))) * max(a)
+  }
+  return(a < tol)
+}
+#' @describeIn is.zero
+#' The is.zero.matrix definition
+#' @export
+is.zero.matrix <- function(x, ...) {
+  stopifnot(inherits(x, "matrix"))
+  a <- abs(x)
+  if(diff(range(a))<(.Machine$double.eps^0.9)) {
+    tol <- (.Machine$double.eps^0.9)
+  } else {
+    tol <- .Machine$double.eps *
+      max(sqrt(length(a))) * max(a)
+  }
+  return(a < tol)
+}
+

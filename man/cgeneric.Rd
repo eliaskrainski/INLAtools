@@ -10,7 +10,8 @@ cgeneric(model, ...)
 \arguments{
 \item{model}{object class for what a \code{cgeneric} method exists.
 if it is a character, a specific function will be called,
-for example cgeneric("iid", ...") calls cgeneric_iid(...)}
+for example cgeneric("iid", ...") calls cgeneric_iid(...),
+see \code{\link[=cgeneric_iid]{cgeneric_iid()}} and \code{\link[=cgeneric_generic0]{cgeneric_generic0()}}.}
 
 \item{...}{additional arguments passed on to methods}
 }
