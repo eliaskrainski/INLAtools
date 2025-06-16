@@ -39,6 +39,8 @@ and each column as a different case.}
 \item{optimize}{logical indicating if it is to be
 returned only the elements and not as a sparse matrix.}
 
+\item{...}{additional arguments passed on}
+
 \item{object}{Matrix supposed to be a
 sparse precision matrix}
 }

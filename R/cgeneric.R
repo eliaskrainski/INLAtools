@@ -55,6 +55,7 @@ cgeneric <- function(model, ...) {
 #' libpath (if this is not provided).
 #' @param libpath string, default is NULL, with the path to the shared object.
 #' @param ... additional arguments passed on to methods
+#' @importFrom methods is
 #' @export
 cgeneric.default <- function(model,
                              debug = FALSE,

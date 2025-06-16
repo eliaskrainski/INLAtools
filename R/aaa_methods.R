@@ -52,6 +52,7 @@ prec <- function(model, theta, optimize) {
 #' @describeIn methods
 #' The default precision method
 #' computes the inverse of the variance
+#' @param ... additional arguments passed on
 #' @export
 prec.default <- function(model, ...) {
   v <- vcov(model, ...)
