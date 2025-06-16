@@ -46,67 +46,98 @@ cgeneric <- function(model, ...) {
 #' @param model object class for what a `cgeneric` method exists.
 #' E.g., if it is a character, a specific function will be called:
 #'  cgeneric("iid", ...") calls cgeneric_iid(...)
-#' @param debug integer, default is zero, indicating the verbose level.
-#' Will be used as logical by INLA.
-#' @param useINLAprecomp logical, default is TRUE, indicating if it is to
-#' be used the shared object pre-compiled by INLA.
-#' This is not considered if 'libpath' is provided.
-#' @param pkg character to give the package name, used to build the
-#' libpath (if this is not provided).
-#' @param libpath string, default is NULL, with the path to the shared object.
-#' @param ... additional arguments passed on to methods
+#' @param ... additional arguments passed to to methods.
+#' Some arguments can be used to define specific behavior,
+#' such as `debug` (integer, used as verbose in debug),
+#' `useINLAprecomp` (logical, indicating if it is to use
+#' the shared object previously copied and compiled by INLA),
+#' `package` (character used if `useINLAprecomp` is TRUE, with
+#' the package name to build the path) and `libpath` (character,
+#'  with the path to the shared dynamic library object: this
+#'  override `useINLAprecomp` and `package`).
+#' @details
+#' Method for when `model` is a character.
+#' E.g. cgeneric(model = "generic0")
+#' calls [cgeneric_generic0]
 #' @importFrom methods is
+#' @importFrom methods existsFunction
 #' @export
-cgeneric.default <- function(model,
-                             debug = FALSE,
-                             useINLAprecomp = TRUE,
-                             pkg = NULL,
-                             libpath = NULL,
-                             ...) {
+#' @examples
+#' cg <- cgeneric(model = "fake", n = 5, package = "INLAtools")
+#' str(cg)
+cgeneric.character <- function(model, ...) {
+
+  fn <- paste0("cgeneric_", model)
+
+  if(existsFunction(fn)) {
+    return(do.call(what = fn,
+                   args = list(...)))
+  }
+
   ## do what INLA::inla.cgeneric.define() does
-  if(is.null(libpath)) {
-    if (useINLAprecomp) {
-	    stopifnot(!is.null(pkg))
-      shlib <- INLA::inla.external.lib(pkg)
+
+  d.args <- list(...)
+  nargs <- names(d.args)
+  if(any(nargs == ""))
+    stop("Please name the arguments!")
+  if(!any(nargs == "n"))
+    stop("Please provid 'n'!")
+  n <- as.integer(d.args$n)
+  stopifnot(n>=1)
+  d.args <- d.args[setdiff(1:length(d.args),
+                           which(nargs=='n'))]
+
+  if(is.null(d.args$libpath)) {
+    if((!is.null(d.args$useINLAprecomp)) &&
+       d.args$useINLAprecomp) {
+	    stopifnot(!is.null(d.args$package))
+      shlib <- INLA::inla.external.lib(d.args$package)
     } else {
-      libpath <- system.file("libs", package = pkg)
+      libpath <- system.file("libs", package = d.args$package)
       if (Sys.info()["sysname"] == "Windows") {
         shlib <- file.path(libpath,
-			   paste0("x64/", pkg, ".dll"))
+			   paste0("x64/", d.args$package, ".dll"))
       } else {
         shlib <- file.path(libpath,
-			   paste0(pkg, ".so"))
+			   paste0(d.args$package, ".so"))
       }
     }
   } else {
-    shlib <- libpath
+    shlib <- d.args$libpath
   }
 
-  args <- c(model = as.character(model),
-	    debug = as.integer(debug),
-	    shlib = as.character(shlib),
-	    list(...))
-  nargs <- names(args)
-  if(any(nargs) == "")
-    stop("Please name the arguments!")
-  if(!any(nargs == "n"))
-     stop("Please provid 'n'!")
-  storage.mode(args$n) <- "integer"
-  stopifnot(args$n>=1)
+  if(is.null(d.args$debug)) {
+    debug <- FALSE
+  } else {
+    debug <- d.args$debug
+  }
 
-  nM <- length(iM <- which(sapply(args, function(x) is(x, "Matrix"))))
-  nm <- length(im <- which(sapply(args, is.matrix)))
-  ni <- length(ii <- setdiff(which(sapply(args, is.integer)), im))
-  nd <- length(id <- setdiff(which(sapply(args, is.double)), im))
-  nc <- length(ic <- which(sapply(args, is.character)))
+  args <- c(
+    list(model = model,
+         n = as.integer(n),
+	       debug = as.integer(debug),
+	       shlib = as.character(shlib)),
+    d.args)
+
+  nM <- length(iM <- which(
+    sapply(args, function(x)
+      is(x, "Matrix"))))
+  nm <- length(im <- which(
+    sapply(args, is.matrix)))
+  ni <- length(ii <- setdiff(
+    which(sapply(args, is.integer)), im))
+  nd <- length(id <- setdiff(
+    which(sapply(args, is.double)), im))
+  nc <- length(ic <- which(
+    sapply(args, is.character)))
   stopifnot(ni>1)
-  stopifnot(nc>1)
+  stopifnot(ni>1)
 
-  cmodel <- list(f = list(model = "cgeneric", n=args$n))
-  cmodel$cgeneric <- args[c("model", "shlib", "n", "debug")]
+  cmodel <- args[c("model", "shlib", "n", "debug")]
   cmodel$data <- vector("list", 5L)
-  names(cmodel$data) <- c("ints", "doubles", "characters",
-			  "matrices", "smatrices")
+  names(cmodel$data) <- c(
+    "ints", "doubles", "characters",
+    "matrices", "smatrices")
   cmodel$data$ints <- args[ii]
   if(nd>0) cmodel$data$doubles <- args[id]
   cmodel$data$characters <- args[ic]
@@ -119,22 +150,12 @@ cgeneric.default <- function(model,
   }
   class(cmodel) <- c("cgeneric",
 		     "inla.cgeneric") ## this is needed in INLA::f()
-  class(cmodel$f$cgeneric) <- class(cmodel)
+  cmodel <- list(f=list(
+    model = "cgeneric",
+    n = cmodel$n,
+    cgeneric = cmodel))
+  class(cmodel) <- class(cmodel$f$cgeneric)
   return(cmodel)
-}
-#' @describeIn cgeneric
-#' Method for when `model` is a character.
-#' E.g. cgeneric(model = "generic0")
-#' calls [cgeneric_generic0]
-#' @importFrom methods existsFunction
-#' @export
-cgeneric.character <- function(model, ...) {
-  fn <- paste0("cgeneric_", model)
-  if(!existsFunction(fn)) {
-    fn <- "cgeneric.default"
-  }
-  return(do.call(what = fn,
-                 args = list(...)))
 }
 #' Draw samples from hyperparameters of a `cgeneric`
 #' model component from an `inla` output, like

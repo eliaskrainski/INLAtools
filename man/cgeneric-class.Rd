@@ -3,19 +3,9 @@
 \docType{class}
 \name{cgeneric-class}
 \alias{cgeneric-class}
-\alias{cgeneric.default}
 \alias{cgeneric.character}
 \title{A \code{cgeneric} model described in \code{\link[=cgeneric]{cgeneric()}}.}
 \usage{
-\method{cgeneric}{default}(
-  model,
-  debug = FALSE,
-  useINLAprecomp = TRUE,
-  pkg = NULL,
-  libpath = NULL,
-  ...
-)
-
 \method{cgeneric}{character}(model, ...)
 }
 \arguments{
@@ -23,29 +13,30 @@
 E.g., if it is a character, a specific function will be called:
 cgeneric("iid", ...") calls cgeneric_iid(...)}
 
-\item{debug}{integer, default is zero, indicating the verbose level.
-Will be used as logical by INLA.}
-
-\item{useINLAprecomp}{logical, default is TRUE, indicating if it is to
-be used the shared object pre-compiled by INLA.
-This is not considered if 'libpath' is provided.}
-
-\item{pkg}{character to give the package name, used to build the
-libpath (if this is not provided).}
-
-\item{libpath}{string, default is NULL, with the path to the shared object.}
-
-\item{...}{additional arguments passed on to methods}
+\item{...}{additional arguments passed to to methods.
+Some arguments can be used to define specific behavior,
+such as \code{debug} (integer, used as verbose in debug),
+\code{useINLAprecomp} (logical, indicating if it is to use
+the shared object previously copied and compiled by INLA),
+\code{package} (character used if \code{useINLAprecomp} is TRUE, with
+the package name to build the path) and \code{libpath} (character,
+with the path to the shared dynamic library object: this
+override \code{useINLAprecomp} and \code{package}).}
 }
 \description{
 A \code{cgeneric} model described in \code{\link[=cgeneric]{cgeneric()}}.
 }
-\section{Functions}{
-\itemize{
-\item \code{cgeneric(default)}: This calls \code{\link[INLA:cgeneric]{INLA::inla.cgeneric.define()}}
-
-\item \code{cgeneric(character)}: Method for when \code{model} is a character.
+\details{
+Method for when \code{model} is a character.
 E.g. cgeneric(model = "generic0")
 calls \link{cgeneric_generic0}
+}
+\section{Functions}{
+\itemize{
+\item \code{cgeneric(character)}: This calls \code{\link[INLA:cgeneric]{INLA::inla.cgeneric.define()}}
 
 }}
+\examples{
+cg <- cgeneric(model = "fake", n = 5, package = "INLAtools")
+str(cg)
+}
