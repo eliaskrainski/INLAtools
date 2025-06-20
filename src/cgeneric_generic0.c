@@ -27,8 +27,10 @@
 
 #include "INLAtools.h"
 
-double *inla_cgeneric_generic0(inla_cgeneric_cmd_tp cmd, double *theta,
-			       inla_cgeneric_data_tp *data)
+double *inla_cgeneric_generic0(
+    inla_cgeneric_cmd_tp cmd,
+    double *theta,
+    inla_cgeneric_data_tp *data)
 {
 
 	// Q = \tau*R
@@ -43,8 +45,8 @@ double *inla_cgeneric_generic0(inla_cgeneric_cmd_tp cmd, double *theta,
 //      int debug = data->ints[1]->ints[0];
 
 	int fixed = 1;
-	if ((data->doubles[0]->doubles[1] > 0) & (data->doubles[0]->doubles[1] <
-						  1)) {
+	if ((data->doubles[0]->doubles[1] > 0) &
+     (data->doubles[0]->doubles[1] < 1)) {
 		fixed = 0;
 	}
 

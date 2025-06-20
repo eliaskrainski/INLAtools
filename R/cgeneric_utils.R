@@ -46,12 +46,12 @@ cgeneric_get <- function(model,
         ntheta = 0L
       }
     } else {
-      storage.mode(theta) <- "double"
       if(inherits(theta, "matrix")) {
         ntheta <- as.integer(ncol(theta))
       } else {
         ntheta <- 1L
       }
+      theta <- as.numeric(theta)
     }
 
     if(length(cmd) == 1) {
@@ -239,7 +239,6 @@ graph.cgeneric <- function(model, optimize) {
   if(missing(optimize)) {
     optimize <- FALSE
   }
-  stopifnot(is.logical(optimize))
   return(cgeneric_get(
     model, "graph",
     optimize = optimize))
@@ -251,6 +250,8 @@ prec.cgeneric <- function(model, theta, optimize) {
   if(missing(optimize)) {
     optimize <- FALSE
   }
-  stopifnot(is.logical(optimize))
-  cgeneric_get(model, cmd = "Q", theta = theta, optimize = optimize)
+  cgeneric_get(model,
+               cmd = "Q",
+               theta = theta,
+               optimize = optimize)
 }

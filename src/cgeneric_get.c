@@ -27,8 +27,9 @@
 
 #include "INLAtools.h"
 
-SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
-			       SEXP doubles, SEXP chars, SEXP mats, SEXP smats)
+SEXP inla_cgeneric_element_get(
+    SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
+    SEXP doubles, SEXP chars, SEXP mats, SEXP smats)
 {
 
 	int ni = 0, nd = 0, nc = 0, nm = 0, nsm = 0, nout = 0;
@@ -105,6 +106,9 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 
 	double *theta = NULL;
 	if (!isNull(Stheta)) {
+	  if(!isReal(Stheta)) {
+	    Rprintf("Expected REAL for 'theta'!");
+	  }
 		theta = REAL(Stheta);
 		if (debug) {
 			Rprintf("theta: ");
@@ -360,7 +364,10 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 	}
 
 	if (strcmp(CMD, "initial") == 0) {
-		ret = model_func(INLA_CGENERIC_INITIAL, theta, cgeneric_data);
+		ret = model_func(
+		  INLA_CGENERIC_INITIAL,
+		  theta,
+		  cgeneric_data);
 		nout = (int)ret[0];
 		if (debug > 0) {
 			Rprintf("intial: %d elements (%f)\n", nout, ret[0]);
@@ -383,9 +390,10 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 	if (strcmp(CMD, "log_prior") == 0) {
 		Rret = PROTECT(allocVector(REALSXP, ntheta[0]));
 		for (j = 0; j < (ntheta[0]); j++) {
-			ret =
-			    model_func(INLA_CGENERIC_LOG_PRIOR, &theta[j * nth],
-				       cgeneric_data);
+			ret = model_func(
+			  INLA_CGENERIC_LOG_PRIOR,
+			  &theta[j * nth],
+           cgeneric_data);
 			REAL(Rret)[j] = ret[0];
 		}
 		UNPROTECT(1);

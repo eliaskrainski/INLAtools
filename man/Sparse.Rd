@@ -25,6 +25,5 @@ matrix. Applied after \code{na.rm}.}
 To store in i,j,x sparse matrix format
 }
 \note{
-The original code is in inla.as.sparse()
-function of the 'INLA' package.
+The original code is INLA::inla.as.sparse()
 }

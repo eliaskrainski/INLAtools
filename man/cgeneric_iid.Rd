@@ -5,14 +5,7 @@
 \title{The \link{cgeneric_iid} uses the \link{cgeneric_generic0}
 with the structure matrix as the identity.}
 \usage{
-cgeneric_iid(
-  n,
-  param,
-  constr = FALSE,
-  debug = FALSE,
-  useINLAprecomp = TRUE,
-  libpath = NULL
-)
+cgeneric_iid(n, param, constr = FALSE, debug = FALSE)
 }
 \arguments{
 \item{n}{integer required to specify the model size}
@@ -25,15 +18,6 @@ deviation of the process if scale = TRUE. See details.}
 
 \item{constr}{logical indicating if it is to add a
 sum-to-zero constraint. Default is TRUE.}
-
-\item{debug}{integer, default is zero, indicating the verbose level.
-Will be used as logical by INLA.}
-
-\item{useINLAprecomp}{logical, default is TRUE, indicating if it is to
-be used the shared object pre-compiled by INLA.
-This is not considered if 'libpath' is provided.}
-
-\item{libpath}{string, default is NULL, with the path to the shared object.}
 }
 \description{
 The \link{cgeneric_iid} uses the \link{cgeneric_generic0}

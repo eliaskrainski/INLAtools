@@ -111,4 +111,3 @@ is.zero.matrix <- function(x, ...) {
   }
   return(a < tol)
 }
-

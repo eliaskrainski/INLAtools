@@ -5,15 +5,7 @@
 \title{Build an \code{cgeneric} object for a \code{generic0} model.
 See details.}
 \usage{
-cgeneric_generic0(
-  R,
-  param,
-  constr = TRUE,
-  scale = TRUE,
-  debug = FALSE,
-  useINLAprecomp = TRUE,
-  libpath = NULL
-)
+cgeneric_generic0(R, param, constr = TRUE, scale = TRUE, debug = FALSE)
 }
 \arguments{
 \item{R}{the structure matrix for the model definition.}
@@ -30,14 +22,8 @@ sum-to-zero constraint. Default is TRUE.}
 \item{scale}{logical indicating if it is to scale
 the model. See detais.}
 
-\item{debug}{integer, default is zero, indicating the verbose level.
-Will be used as logical by INLA.}
-
-\item{useINLAprecomp}{logical, default is TRUE, indicating if it is to
-be used the shared object pre-compiled by INLA.
-This is not considered if 'libpath' is provided.}
-
-\item{libpath}{string, default is NULL, with the path to the shared object.}
+\item{...}{additional arguments passed on to
+\code{\link[=cgeneric]{cgeneric()}}.}
 }
 \value{
 a \code{cgeneric} object, see \code{\link[=cgeneric]{cgeneric()}}.

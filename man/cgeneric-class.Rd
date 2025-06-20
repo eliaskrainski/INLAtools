@@ -4,14 +4,36 @@
 \name{cgeneric-class}
 \alias{cgeneric-class}
 \alias{cgeneric.character}
+\alias{cgeneric_libpath}
 \title{A \code{cgeneric} model described in \code{\link[=cgeneric]{cgeneric()}}.}
 \usage{
-\method{cgeneric}{character}(model, ...)
+\method{cgeneric}{character}(
+  model,
+  debug = FALSE,
+  package,
+  useINLAprecomp = TRUE,
+  libpath = NULL,
+  ...
+)
+
+cgeneric_libpath(fName, package, useINLAprecomp = FALSE, debug = FALSE)
 }
 \arguments{
 \item{model}{object class for what a \code{cgeneric} method exists.
 E.g., if it is a character, a specific function will be called:
 cgeneric("iid", ...") calls cgeneric_iid(...)}
+
+\item{debug}{integer, used as verbose in debug.}
+
+\item{package}{character giving the name of the package
+that contains the \code{cgeneric} model.}
+
+\item{useINLAprecomp}{logical, indicating if it is to use
+the shared object previously copied and compiled by INLA.}
+
+\item{libpath}{character, to inform the full path to the
+shared dynamic library object (this override the
+arguments \code{useINLAprecomp} and \code{package}).}
 
 \item{...}{additional arguments passed to to methods.
 Some arguments can be used to define specific behavior,
@@ -22,6 +44,12 @@ the shared object previously copied and compiled by INLA),
 the package name to build the path) and \code{libpath} (character,
 with the path to the shared dynamic library object: this
 override \code{useINLAprecomp} and \code{package}).}
+
+\item{fName}{character with the name of the function
+used to build the \code{cgeneric} model.}
+}
+\value{
+character containing the path to the shared lib
 }
 \description{
 A \code{cgeneric} model described in \code{\link[=cgeneric]{cgeneric()}}.
@@ -34,6 +62,8 @@ calls \link{cgeneric_generic0}
 \section{Functions}{
 \itemize{
 \item \code{cgeneric(character)}: This calls \code{\link[INLA:cgeneric]{INLA::inla.cgeneric.define()}}
+
+\item \code{cgeneric_libpath()}: Get the shared lib path to use in a \code{cgeneric} model
 
 }}
 \examples{

@@ -46,6 +46,14 @@ cgeneric <- function(model, ...) {
 #' @param model object class for what a `cgeneric` method exists.
 #' E.g., if it is a character, a specific function will be called:
 #'  cgeneric("iid", ...") calls cgeneric_iid(...)
+#' @param debug integer, used as verbose in debug.
+#' @param useINLAprecomp logical, indicating if it is to use
+#' the shared object previously copied and compiled by INLA.
+#' @param package character giving the name of the package
+#' that contains the `cgeneric` model.
+#' @param libpath character, to inform the full path to the
+#'  shared dynamic library object (this override the
+#'  arguments `useINLAprecomp` and `package`).
 #' @param ... additional arguments passed to to methods.
 #' Some arguments can be used to define specific behavior,
 #' such as `debug` (integer, used as verbose in debug),
@@ -65,18 +73,46 @@ cgeneric <- function(model, ...) {
 #' @examples
 #' cg <- cgeneric(model = "fake", n = 5, package = "INLAtools")
 #' str(cg)
-cgeneric.character <- function(model, ...) {
+cgeneric.character <- function(
+    model,
+    debug = FALSE,
+    package,
+    useINLAprecomp = TRUE,
+    libpath = NULL,
+    ...) {
 
-  fn <- paste0("cgeneric_", model)
+  ## some "convention" here:
+  if(length(grep("cgeneric_", model))==0) {
+    model <- paste0("cgeneric_", model)
+  }
+  if(any(model %in%
+         paste0("cgeneric_",
+                c("iid", "generic0", "libpath")))) {
+    if(debug) {
+      cat("call", model, "\n")
+    }
+    return(do.call(
+      what = model,
+      args = c(
+        list(debug = debug),
+        list(...)
+      )
+    ))
+  }
 
-  if(existsFunction(fn)) {
-    return(do.call(what = fn,
-                   args = list(...)))
+  if(is.null(libpath)) {
+    libpath <- cgeneric_libpath(
+      fName = model,
+      debug = debug,
+      package = package,
+      useINLAprecomp = useINLAprecomp
+    )
   }
 
   ## do what INLA::inla.cgeneric.define() does
 
   d.args <- list(...)
+ ## d.args <- eval(as.list(match.call())[-c(1:2)])
   nargs <- names(d.args)
   if(any(nargs == ""))
     stop("Please name the arguments!")
@@ -87,36 +123,11 @@ cgeneric.character <- function(model, ...) {
   d.args <- d.args[setdiff(1:length(d.args),
                            which(nargs=='n'))]
 
-  if(is.null(d.args$libpath)) {
-    if((!is.null(d.args$useINLAprecomp)) &&
-       d.args$useINLAprecomp) {
-	    stopifnot(!is.null(d.args$package))
-      shlib <- INLA::inla.external.lib(d.args$package)
-    } else {
-      libpath <- system.file("libs", package = d.args$package)
-      if (Sys.info()["sysname"] == "Windows") {
-        shlib <- file.path(libpath,
-			   paste0("x64/", d.args$package, ".dll"))
-      } else {
-        shlib <- file.path(libpath,
-			   paste0(d.args$package, ".so"))
-      }
-    }
-  } else {
-    shlib <- d.args$libpath
-  }
-
-  if(is.null(d.args$debug)) {
-    debug <- FALSE
-  } else {
-    debug <- d.args$debug
-  }
-
   args <- c(
     list(model = model,
          n = as.integer(n),
 	       debug = as.integer(debug),
-	       shlib = as.character(shlib)),
+	       shlib = as.character(libpath)),
     d.args)
 
   nM <- length(iM <- which(
@@ -133,6 +144,15 @@ cgeneric.character <- function(model, ...) {
   stopifnot(ni>1)
   stopifnot(ni>1)
 
+  if(debug) {
+    cat("The cgeneric model data contains:\n",
+        ni, "ints",
+        nc, "characters",
+        nd, "doubles",
+        nm, "matrices, and",
+        nM, "smatrices\n")
+  }
+
   cmodel <- args[c("model", "shlib", "n", "debug")]
   cmodel$data <- vector("list", 5L)
   names(cmodel$data) <- c(
@@ -141,12 +161,28 @@ cgeneric.character <- function(model, ...) {
   cmodel$data$ints <- args[ii]
   if(nd>0) cmodel$data$doubles <- args[id]
   cmodel$data$characters <- args[ic]
-  if(nm>0) cmodel$data$matrices <- args[im]
+  if(nm>0) {
+    cmodel$data$matrices <- args[im]
+    for(i in 1:nm) {
+      cmodel$data$matrices[[i]] <-
+        c(dim(cmodel$data$matrices[[i]]),
+          cmodel$data$matrices[[i]])
+    }
+  }
   if(nM>0) {
 	  cmodel$data$smatrices <- args[iM]
-	  for(i in 1:nM)
-		  cmodel$data$smatrices[[i]] <-
-			  Sparse(cmodel$data$smatrices[[i]])
+	  for(i in 1:nM) {
+	    smi <- Sparse(cmodel$data$smatrices[[i]])
+	    idx <- which(smi@i <= smi@j)
+	    ord <- order(smi@i[idx])
+	    nnz <- length(idx)
+	    cmodel$data$smatrices[[i]] <- c(
+	      nrow(smi), ncol(smi), nnz,
+	      smi@i[idx][ord],
+	      smi@j[idx][ord],
+	      smi@x[idx][ord]
+	    )
+	  }
   }
   class(cmodel) <- c("cgeneric",
 		     "inla.cgeneric") ## this is needed in INLA::f()
@@ -156,6 +192,56 @@ cgeneric.character <- function(model, ...) {
     cgeneric = cmodel))
   class(cmodel) <- class(cmodel$f$cgeneric)
   return(cmodel)
+}
+#' @describeIn cgeneric
+#' Get the shared lib path to use in a `cgeneric` model
+#' @param fName character with the name of the function
+#' used to build the `cgeneric` model.
+#' @returns character containing the path to the shared lib
+cgeneric_libpath <- function(
+    fName,
+    package,
+    useINLAprecomp = FALSE,
+    debug = FALSE) {
+
+  if(missing(package)) {
+    package <- attr(
+      findAndGetFunction(
+      fName = fName,
+      debug = debug
+    ), "package")
+  }
+
+  if(useINLAprecomp) {
+    ## INLA::inla.external.lib(), without the substitute
+    INLAdir <- dirname(
+      findAndGetFunction(
+        fName = "inla.call.builtin",
+        package = "INLA")())
+    shlib <- normalizePath(paste0(
+      INLAdir, "/external/", package,
+      "/lib", package, ".so"))
+    if(debug) {
+      cat("INLA compiled shared lib at:\n", shlib)
+    }
+  } else {
+    libpath <- system.file("libs",
+                           package = package)
+    if (Sys.info()["sysname"] == "Windows") {
+      shlib <- file.path(libpath,
+                         paste0("x64/", package, ".dll"))
+    } else {
+      shlib <- file.path(libpath,
+                         paste0(package, ".so"))
+    }
+    if(debug) {
+      cat(package, "compiled shared lib at:\n", shlib)
+    }
+  }
+  if(!is.null(attr(package, "function"))) {
+    attr(shlib, "function") <- attr(package, "function")
+  }
+  return(shlib)
 }
 #' Draw samples from hyperparameters of a `cgeneric`
 #' model component from an `inla` output, like

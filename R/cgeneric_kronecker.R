@@ -51,15 +51,16 @@ setMethod(
 
     model <- "inla_cgeneric_kronecker"
     if (is.null(libpath)) {
-      if (useINLAprecomp) {
-        libpath <- INLA::inla.external.lib("INLAtools")
+      if(useINLAprecomp) {
+        libpath <- cgeneric_libpath(
+          package = "graphpcor", ## it is there
+          useINLAprecomp = TRUE,
+          debug = debug)
       } else {
-        libpath <- system.file("libs", package = "INLAtools")
-        if (Sys.info()["sysname"] == "Windows") {
-          libpath <- file.path(libpath, "x64/INLAtools.dll")
-        } else {
-          libpath <- file.path(libpath, "INLAtools.so")
-        }
+        libpath <- cgeneric_libpath(
+          package = "INLAtools",
+          useINLAprecomp = FALSE,
+          debug = debug)
       }
     }
 
@@ -245,8 +246,8 @@ setMethod(
         )
       )
 
-    class(ret) <- "cgeneric"
-    class(ret$f$cgeneric) <- "cgeneric"
+    class(ret) <- c("cgeneric", "inla.cgeneric")
+    class(ret$f$cgeneric) <- class(ret)
 
     if(is.null(X$f$extraconstr)) {
       if(is.null(Y$f$extraconstr)) {
@@ -379,8 +380,8 @@ setMethod(
         )
       )
     )
-    class(rmodel) <- "rgeneric"
-    class(rmodel$f$rgeneric) <- "rgeneric"
+    class(rmodel) <- c("rgeneric", "inla.rgeneric")
+    class(rmodel$f$rgeneric) <- class(rmodel)
     return(rmodel)
 
   }
@@ -479,8 +480,8 @@ setMethod(
         )
       )
     )
-    class(rmodel) <- "rgeneric"
-    class(rmodel$f$rgeneric) <- "rgeneric"
+    class(rmodel) <- c("rgeneric", "inla.rgeneric")
+    class(rmodel$f$rgeneric) <- class(rmodel)
     return(rmodel)
 
   }
