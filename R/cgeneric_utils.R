@@ -54,6 +54,23 @@ cgeneric_get <- function(model,
       theta <- as.numeric(theta)
     }
 
+  ## split smatrix into list elements
+  nsm <- length(cgdata$smatrices)
+  if(nsm>0) {
+    for(i in 1:nsm) {
+      smi <- cgdata$smatrices[[i]]
+      mi <- as.integer(smi[3])
+      cgdata$smatrices[[i]] <- list(
+        nr = as.integer(smi[1]),
+        nc = as.integer(smi[2]),
+        m = mi,
+        i = as.integer(smi[3+1:mi]),
+        j = as.integer(smi[3+mi+1:mi]),
+        x = smi[3+2*mi+1:mi]
+      )
+    }
+  }
+
     if(length(cmd) == 1) {
       ret <- .Call(
         "inla_cgeneric_element_get",
