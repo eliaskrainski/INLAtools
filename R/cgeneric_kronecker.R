@@ -249,35 +249,18 @@ setMethod(
     class(ret) <- c("cgeneric", "inla.cgeneric")
     class(ret$f$cgeneric) <- class(ret)
 
-    if(is.null(X$f$extraconstr)) {
-      if(is.null(Y$f$extraconstr)) {
-        if(debug)
-          cat("No extraconstr!\n")
-      } else {
-        c2 <- Y$f$extraconstr
-        ret$f$extraconstr <- list(
-          A = kronecker(diag(X$f$n), c2$A),
-          e = rep(c2$e, X$f$n)
-        )
-      }
-    } else {
-      c1 <- X$f$extraconstr
-      if(is.null(Y$f$extraconstr)) {
-        ret$f$extraconstr <- list(
-          A = kronecker(c1$A, diag(Y$f$n)),
-          e = rep(c1$e, each = Y$f$n)
-        )
-      } else {
-        c2 <- Y$f$extraconstr
-        ret$f$extraconstr <- list(
-          A = rbind(
-            kronecker(c1$A, diag(ncol(c2$A))),
-            kronecker(diag(ncol(c1$A)), c2$A)
-          ),
-          e = c(rep(c1$e, each = ncol(c2$A)),
-                rep(c2$e, ncol(c1$A)))
-        )
-      }
+    if((!is.null(X$f$extraconstr)) |
+       (!is.null(Y$f$extraconstr))) {
+        ret$f$extraconstr <-
+          kronecker_extraconstr(
+            X$f$extraconstr,
+            Y$f$extraconstr,
+            X$f$n, Y$f$n
+          )
+        if(debug) {
+          cat(nrow(ret$f$extraconstr),
+              " 'extraconstr' built!\n")
+        }
     }
 
     return(ret)
@@ -380,6 +363,19 @@ setMethod(
         )
       )
     )
+    if((!is.null(X$f$extraconstr)) |
+       (!is.null(Y$f$extraconstr))) {
+      rmodel$f$extraconstr <-
+        kronecker_extraconstr(
+          X$f$extraconstr,
+          Y$f$extraconstr,
+          X$f$n, Y$f$n
+        )
+      if(debug) {
+        cat(nrow(rmodel$f$extraconstr),
+            " 'extraconstr' built\n")
+      }
+    }
     class(rmodel) <- c("rgeneric", "inla.rgeneric")
     class(rmodel$f$rgeneric) <- class(rmodel)
     return(rmodel)
@@ -480,6 +476,19 @@ setMethod(
         )
       )
     )
+    if((!is.null(X$f$extraconstr)) |
+       (!is.null(Y$f$extraconstr))) {
+      rmodel$f$extraconstr <-
+        kronecker_extraconstr(
+          X$f$extraconstr,
+          Y$f$extraconstr,
+          X$f$n, Y$f$n
+        )
+      if(debug) {
+        cat(nrow(rmodel$f$extraconstr),
+            " 'extraconstr' built!\n")
+      }
+    }
     class(rmodel) <- c("rgeneric", "inla.rgeneric")
     class(rmodel$f$rgeneric) <- class(rmodel)
     return(rmodel)
@@ -562,10 +571,63 @@ setMethod(
       return(ret)
     }
 
-    return(INLA::inla.rgeneric.define(
+    rmodel <- INLA::inla.rgeneric.define(
       model = kmodel,
       optimize = TRUE
-    ))
+    )
+
+    if((!is.null(X$f$extraconstr)) |
+       (!is.null(Y$f$extraconstr))) {
+      rmodel$f$extraconstr <-
+        kronecker_extraconstr(
+          X$f$extraconstr,
+          Y$f$extraconstr,
+          X$f$n, Y$f$n
+        )
+      if(debug) {
+        cat(nrow(rmodel$f$extraconstr),
+            " 'extraconstr' built!\n")
+      }
+    }
+    class(rmodel) <- c("rgeneric", "inla.rgeneric")
+    class(rmodel$f$rgeneric) <- class(rmodel)
 
   }
 )
+#' Kronecker (product) between `extraconstr`,
+#' implemented for [kronecker()] methods.
+#' @name extraconstr
+#' @param c1,c2 named list with two elements:
+#' `A` and `e`, where `nrow(A)` should be equal
+#' to `length(e)`. This is an extraconstr.
+#' @param n1,n2 integer with each model's length
+#' @returns extraconstr
+kronecker_extraconstr <- function(c1, c2, n1, n2) {
+  if(is.null(c1)) {
+    if(is.null(c2)) {
+      return(NULL)
+    } else {
+      ret <- list(
+        A = kronecker(diag(n1), c2$A),
+        e = rep(c2$e, n1)
+      )
+    }
+  } else {
+    if(is.null(c2)) {
+      ret <- list(
+        A = kronecker(c1$A, diag(n2)),
+        e = rep(c1$e, each = n2)
+      )
+    } else {
+      ret <- list(
+        A = rbind(
+          kronecker(c1$A, diag(ncol(c2$A))),
+          kronecker(diag(ncol(c1$A)), c2$A)
+        ),
+        e = c(rep(c1$e, each = ncol(c2$A)),
+              rep(c2$e, ncol(c1$A)))
+      )
+    }
+  }
+  return(ret)
+}
