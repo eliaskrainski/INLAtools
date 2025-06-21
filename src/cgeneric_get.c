@@ -280,9 +280,8 @@ SEXP inla_cgeneric_element_get(
 			cgeneric_data->smats[i]->i = INTEGER(VECTOR_ELT(VECTOR_ELT(smats, i), 3));
 			cgeneric_data->smats[i]->j = INTEGER(VECTOR_ELT(VECTOR_ELT(smats, i), 4));
 			cgeneric_data->smats[i]->x = REAL(VECTOR_ELT(VECTOR_ELT(smats, i), 5));
-			UNPROTECT(1);
 		}
-
+		UNPROTECT(1);
 	}
 	// load shlib
 	void *handle;

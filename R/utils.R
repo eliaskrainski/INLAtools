@@ -112,22 +112,23 @@ findAndGetFunction <- function(fName, package, debug = FALSE) {
     }
   }
 
-  ## try non-exported
-  for(i in 1:length(pkgs)) {
-    afn <- paste0(pkgs[i], ":::", fName)
-    efn <- try(eval(str2lang(afn)), silent = TRUE)
-    if(is.function(efn)) {
-      package <- pkgs[i]
-      if(debug) {
-        cat(fName, "non-exported from", package, "!\n")
+  if(is.null(package)) {
+    ## try non-exported
+    for(i in 1:length(pkgs)) {
+      afn <- paste0(pkgs[i], ":::", fName)
+      efn <- try(eval(str2lang(afn)), silent = TRUE)
+      if(is.function(efn)) {
+        package <- pkgs[i]
+        if(debug) {
+          cat(fName, "non-exported from", package, "!\n")
+        }
+        break
       }
-      break
     }
   }
 
   if(is.null(package)) {
-    stop("No 'package' containing", fName,
-         "was found, among the tried ones!")
+    stop("Function not found in the tried packages!")
   }
 
   attr(efn, "package") <- package
