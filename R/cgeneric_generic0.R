@@ -16,8 +16,8 @@
 #' sum-to-zero constraint. Default is TRUE.
 #' @param scale logical indicating if it is to scale
 #' the model. See detais.
-#' @param ... additional arguments passed on to
-#' [cgeneric()].
+#' @param ... arguments (debug,useINLAprecomp,libpath)
+#' passed on to [cgeneric()].
 #' @details
 #' The precision matrix is defined as
 #'  \deqn{Q = \tau R}
@@ -56,7 +56,7 @@ cgeneric_generic0 <-
            param,
            constr = TRUE,
            scale = TRUE,
-           debug = FALSE) {
+           ...) {
 
     stopifnot(param[1]>0)
     if(is.na(param[2])) {
@@ -72,6 +72,12 @@ cgeneric_generic0 <-
 
     idx <- which(R@i <= R@j)
 
+    dotArgs <- list(...)
+    if(is.null(dotArgs$debug)) {
+      debug <- FALSE
+    } else {
+      debug <- dotArgs$debug
+    }
     if(debug) {
       print(str(list(
         ii = R@i,
@@ -96,10 +102,22 @@ cgeneric_generic0 <-
     ord <- order(R@i[idx])
     nnz <- length(idx)
 
-    libpath <- cgeneric_libpath(
-      package = "graphpcor",
-      useINLAprecomp = TRUE,
-      debug = debug)
+    if(is.null(dotArgs$useINLAprecomp)) {
+      useINLAprecomp <- TRUE
+    } else {
+      useINLAprecomp <- dotArgs$useINLAprecomp
+    }
+    if(useINLAprecomp) {
+      libpath <- cgeneric_libpath(
+        package = "graphpcor",
+        useINLAprecomp = TRUE,
+        debug = debug)
+    } else {
+      libpath <- cgeneric_libpath(
+        package = "INLAtools",
+        useINLAprecomp = FALSE,
+        debug = debug)
+    }
 
     the_model <- do.call(
       what = "cgeneric",
@@ -109,8 +127,6 @@ cgeneric_generic0 <-
         param=param,
         Rgraph = R,
         debug = debug,
-        package = "graphpcor",
-        useINLAprecomp = TRUE,
         libpath = libpath
       )
     )
@@ -125,22 +141,24 @@ cgeneric_generic0 <-
     return(the_model)
 
   }
+#' @describeIn cgeneric_generic0
 #' The [cgeneric_iid] uses the [cgeneric_generic0]
 #' with the structure matrix as the identity.
 #' @param n integer required to specify the model size
-#' @inheritParams cgeneric_generic0
 #' @importFrom Matrix Diagonal
 #' @export
 cgeneric_iid <-
   function(n,
            param,
            constr = FALSE,
-           debug = FALSE) {
-    cgeneric_generic0(
-      R = Diagonal(n = n,
-                   x = rep(1, n)),
-      param = param,
-      constr = constr,
-      debug = debug)
-}
+           ...) {
+    do.call(
+      what = "cgeneric_generic0",
+      args = list(
+        R = Diagonal(n = n, x = rep(1, n)),
+        param = param,
+        constr = constr,
+        ...)
+    )
+  }
 

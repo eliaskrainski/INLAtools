@@ -201,7 +201,7 @@ cgeneric.character <- function(
 cgeneric_libpath <- function(
     fName,
     package,
-    useINLAprecomp = FALSE,
+    useINLAprecomp = TRUE,
     debug = FALSE) {
 
   if(missing(package)) {

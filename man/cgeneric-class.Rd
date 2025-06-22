@@ -16,7 +16,7 @@
   ...
 )
 
-cgeneric_libpath(fName, package, useINLAprecomp = FALSE, debug = FALSE)
+cgeneric_libpath(fName, package, useINLAprecomp = TRUE, debug = FALSE)
 }
 \arguments{
 \item{model}{object class for what a \code{cgeneric} method exists.

@@ -2,10 +2,13 @@
 % Please edit documentation in R/cgeneric_generic0.R
 \name{cgeneric_generic0}
 \alias{cgeneric_generic0}
+\alias{cgeneric_iid}
 \title{Build an \code{cgeneric} object for a \code{generic0} model.
 See details.}
 \usage{
-cgeneric_generic0(R, param, constr = TRUE, scale = TRUE, debug = FALSE)
+cgeneric_generic0(R, param, constr = TRUE, scale = TRUE, ...)
+
+cgeneric_iid(n, param, constr = FALSE, ...)
 }
 \arguments{
 \item{R}{the structure matrix for the model definition.}
@@ -22,8 +25,10 @@ sum-to-zero constraint. Default is TRUE.}
 \item{scale}{logical indicating if it is to scale
 the model. See detais.}
 
-\item{...}{additional arguments passed on to
-\code{\link[=cgeneric]{cgeneric()}}.}
+\item{...}{arguments (debug,useINLAprecomp,libpath)
+passed on to \code{\link[=cgeneric]{cgeneric()}}.}
+
+\item{n}{integer required to specify the model size}
 }
 \value{
 a \code{cgeneric} object, see \code{\link[=cgeneric]{cgeneric()}}.
@@ -52,6 +57,12 @@ Therefore, when the model is scaled,
 \eqn{\tau} is the marginal precision,
 otherwise \eqn{\tau} is the conditional precision.
 }
+\section{Functions}{
+\itemize{
+\item \code{cgeneric_iid()}: The \link{cgeneric_iid} uses the \link{cgeneric_generic0}
+with the structure matrix as the identity.
+
+}}
 \examples{
 ## structured precision matrix model definition
 R <- Matrix(toeplitz(c(2,-1,0,0,0)))

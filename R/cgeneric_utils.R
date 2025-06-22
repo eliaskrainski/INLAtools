@@ -270,7 +270,7 @@ prec.cgeneric <- function(model, theta, optimize) {
 #' par(old.par)
 #'
 prior.cgeneric <- function(model, theta) {
-  return(cgeneric_get(mode = model,
+  return(cgeneric_get(model = model,
                       cmd = "log_prior",
                       theta = theta))
 }
