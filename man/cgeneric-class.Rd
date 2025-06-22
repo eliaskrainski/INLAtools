@@ -66,7 +66,3 @@ calls \link{cgeneric_generic0}
 \item \code{cgeneric_libpath()}: Get the shared lib path to use in a \code{cgeneric} model
 
 }}
-\examples{
-cg <- cgeneric(model = "fake", n = 5, package = "INLAtools")
-str(cg)
-}

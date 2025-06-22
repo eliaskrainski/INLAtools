@@ -127,11 +127,9 @@ upperPadding <-
       if (relative) {
         xx <- apply(xx, 2, function(x) {
           r <- which(x != 0)
-          ## o <- table(factor(graph@i[r]+1L, 1:nrow(graph)))
           return(list(
             r = r, x = x[r]
           ))
-          ##                    o=as.integer(o)))
         })
       }
       return(list(graph = graph, xx = xx))

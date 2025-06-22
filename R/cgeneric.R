@@ -70,9 +70,6 @@ cgeneric <- function(model, ...) {
 #' @importFrom methods is
 #' @importFrom methods existsFunction
 #' @export
-#' @examples
-#' cg <- cgeneric(model = "fake", n = 5, package = "INLAtools")
-#' str(cg)
 cgeneric.character <- function(
     model,
     debug = FALSE,
@@ -172,15 +169,10 @@ cgeneric.character <- function(
   if(nM>0) {
 	  cmodel$data$smatrices <- args[iM]
 	  for(i in 1:nM) {
-	    smi <- Sparse(cmodel$data$smatrices[[i]])
-	    idx <- which(smi@i <= smi@j)
-	    ord <- order(smi@i[idx])
-	    nnz <- length(idx)
+	    smi <- upperPadding(cmodel$data$smatrices[[i]])
 	    cmodel$data$smatrices[[i]] <- c(
-	      nrow(smi), ncol(smi), nnz,
-	      smi@i[idx][ord],
-	      smi@j[idx][ord],
-	      smi@x[idx][ord]
+	      dim(smi), length(smi@x),
+	      smi@i, smi@j, smi@x
 	    )
 	  }
   }

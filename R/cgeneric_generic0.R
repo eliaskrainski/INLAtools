@@ -108,10 +108,7 @@ cgeneric_generic0 <-
       useINLAprecomp <- dotArgs$useINLAprecomp
     }
     if(useINLAprecomp) {
-      libpath <- cgeneric_libpath(
-        package = "graphpcor",
-        useINLAprecomp = TRUE,
-        debug = debug)
+      libpath <- INLA:::inla.external.lib("graphpcor")
     } else {
       libpath <- cgeneric_libpath(
         package = "INLAtools",
