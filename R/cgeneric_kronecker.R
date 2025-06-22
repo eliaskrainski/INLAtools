@@ -49,7 +49,7 @@ setMethod(
       libpath <- mcall$libpath
     }
 
-    model <- "inla_cgeneric_kronecker"
+    cmodel <- "inla_cgeneric_kronecker"
     if (is.null(libpath)) {
       if(useINLAprecomp) {
         libpath <- cgeneric_libpath(
@@ -172,14 +172,17 @@ setMethod(
         model = "cgeneric",
         n = as.integer(N),
         cgeneric = list(
-          model = model,
+          model = cmodel,
           shlib = libpath,
           n = as.integer(N),
-          debug = as.integer(debug),
-          data = list()
+          debug = as.integer(debug)
         )
       )
     )
+    ret$f$cgeneric$data <- vector("list", 5L)
+    names(ret$f$cgeneric$data) <- c(
+      "ints", "doubles", "characters",
+      "matrices", "smatrices")
 
     ## data size for each model
     ndata1 <- sapply(
@@ -211,27 +214,31 @@ setMethod(
           )
         )
 
-    ret$f$cgeneric$data$doubles <-
-      c(
-        X$f$cgeneric$data$doubles,
-        Y$f$cgeneric$data$doubles
-      )
+      if((ndata1[2]>0) | (ndata2[2]>0)) {
+        ret$f$cgeneric$data$doubles <-
+          c(
+            X$f$cgeneric$data$doubles,
+            Y$f$cgeneric$data$doubles
+          )
+      }
 
-    ret$f$cgeneric$data$characters <-
+      ret$f$cgeneric$data$characters <-
       c(
         list(
-          model = model,
+          model = cmodel,
           shlib = libpath
         ),
         X$f$cgeneric$data$characters,
         Y$f$cgeneric$data$characters
       )
 
-    ret$f$cgeneric$data$matrices <-
-      c(
-        X$f$cgeneric$data$matrices,
-        Y$f$cgeneric$data$matrices
-      )
+      if((ndata1[4]>0) | (ndata2[4]>0)) {
+        ret$f$cgeneric$data$matrices <-
+          c(
+            X$f$cgeneric$data$matrices,
+            Y$f$cgeneric$data$matrices
+          )
+      }
 
     ret$f$cgeneric$data$smatrices <-
       c(

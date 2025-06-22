@@ -118,9 +118,18 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 #pragma omp critical (Name_5bd4b7198feb5550e84446518f90d47072338c18)
 #endif
 
+
 		assert(!strcasecmp(data->ints[1]->name, "debug"));	// this will always be the case
 		assert(!strcasecmp(data->ints[ni1 + 1]->name, "debug"));	// this will always be the case
-		//    int debug = (data->ints[1]->ints[0] | data->ints[ni1 + 1]->ints[0]);
+		int debug = (data->ints[1]->ints[0] | data->ints[ni1 + 1]->ints[0]);
+
+		if(debug) {
+		  printf("i %d d %d c %d m %d sM %d M1 %d\n",
+           ni1, nd1, nc1, nm1, nsm1, M1);
+		  printf("i %d d %d c %d m %d sM %d M2 %d\n",
+           ni2, nd2, nc2, nm2, nsm2, M2);
+		  printf("n %d, M %d\n", n, M);
+		}
 
 		assert(!strcasecmp(data->ints[ni1 + ni2]->name, "idx1u"));	// this will always be the case
 		assert(!strcasecmp(data->ints[ni1 + ni2 + 1]->name, "idx2u"));	// this will always be the case
