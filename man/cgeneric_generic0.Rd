@@ -55,9 +55,9 @@ otherwise \eqn{\tau} is the conditional precision.
 \examples{
 ## structured precision matrix model definition
 R <- Matrix(toeplitz(c(2,-1,0,0,0)))
-mR <- cgeneric("generic0", R = R,
-  scale = FALSE, param = c(1, 0.05),
-  useINLAprecomp = FALSE)
+R
+mR <- cgeneric(
+  "generic0", R = R, param = c(1, 0.05), scale = FALSE)
 graph(mR)
 prec(mR, theta = 0)
 }

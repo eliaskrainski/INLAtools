@@ -1,16 +1,16 @@
-#' A `cgeneric` model described in [cgeneric()].
+#' The `cgeneric` class for [cgeneric()].
 setClass(
   "cgeneric",
-  slots = c(f="list"),
+  slots = c(f = "list"),
   validity = function(object) {
     all(c("model", "n", "cgeneric") %in%
           names(object$f))
   }
 )
-#' `rgeneric` class to define a [INLA::rgeneric()] latent model
+#' The `rgeneric` class for [rgeneric()].
 setClass(
   "rgeneric",
-  slots = c(f="list"),
+  slots = c(f = "list"),
   validity = function(object) {
     all(c("model", "n", "rgeneric") %in%
           names(object$f))

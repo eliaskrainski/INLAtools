@@ -206,7 +206,7 @@ cgeneric_libpath <- function(
 
   if(missing(package)) {
     package <- attr(
-      findAndGetFunction(
+      findGetFunction(
       fName = fName,
       debug = debug
     ), "package")
@@ -215,14 +215,15 @@ cgeneric_libpath <- function(
   if(useINLAprecomp) {
     ## INLA::inla.external.lib(), without the substitute
     INLAdir <- dirname(
-      findAndGetFunction(
+      findGetFunction(
         fName = "inla.call.builtin",
         package = "INLA")())
     shlib <- normalizePath(paste0(
       INLAdir, "/external/", package,
       "/lib", package, ".so"))
     if(debug) {
-      cat("INLA compiled shared lib at:\n", shlib)
+      cat("INLA compiled shared lib at:\n",
+          shlib, "\n")
     }
   } else {
     libpath <- system.file("libs",
@@ -235,7 +236,8 @@ cgeneric_libpath <- function(
                          paste0(package, ".so"))
     }
     if(debug) {
-      cat(package, "compiled shared lib at:\n", shlib)
+      cat(package, "compiled shared lib at:\n",
+          shlib, "\n")
     }
   }
   if(!is.null(attr(package, "function"))) {

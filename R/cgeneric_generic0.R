@@ -46,9 +46,9 @@
 #' @examples
 #' ## structured precision matrix model definition
 #' R <- Matrix(toeplitz(c(2,-1,0,0,0)))
-#' mR <- cgeneric("generic0", R = R,
-#'   scale = FALSE, param = c(1, 0.05),
-#'   useINLAprecomp = FALSE)
+#' R
+#' mR <- cgeneric(
+#'   "generic0", R = R, param = c(1, 0.05), scale = FALSE)
 #' graph(mR)
 #' prec(mR, theta = 0)
 cgeneric_generic0 <-
@@ -96,7 +96,10 @@ cgeneric_generic0 <-
     ord <- order(R@i[idx])
     nnz <- length(idx)
 
-    libpath <- INLA::inla.external.lib("graphpcor")
+    libpath <- cgeneric_libpath(
+      package = "graphpcor",
+      useINLAprecomp = TRUE,
+      debug = debug)
 
     the_model <- do.call(
       what = "cgeneric",

@@ -5,7 +5,7 @@
 \alias{cgeneric-class}
 \alias{cgeneric.character}
 \alias{cgeneric_libpath}
-\title{A \code{cgeneric} model described in \code{\link[=cgeneric]{cgeneric()}}.}
+\title{The \code{cgeneric} class for \code{\link[=cgeneric]{cgeneric()}}.}
 \usage{
 \method{cgeneric}{character}(
   model,
@@ -52,7 +52,7 @@ used to build the \code{cgeneric} model.}
 character containing the path to the shared lib
 }
 \description{
-A \code{cgeneric} model described in \code{\link[=cgeneric]{cgeneric()}}.
+The \code{cgeneric} class for \code{\link[=cgeneric]{cgeneric()}}.
 }
 \details{
 Method for when \code{model} is a character.

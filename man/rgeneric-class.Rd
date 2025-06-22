@@ -8,7 +8,7 @@
 \alias{initial.inla.rgeneric}
 \alias{mu.inla.rgeneric}
 \alias{prior.inla.rgeneric}
-\title{\code{rgeneric} class to define a \code{\link[INLA:rgeneric]{INLA::rgeneric()}} latent model}
+\title{The \code{rgeneric} class for \code{\link[=rgeneric]{rgeneric()}}.}
 \usage{
 \method{graph}{inla.rgeneric}(model, ...)
 
@@ -29,7 +29,7 @@ If 'theta' is not supplied, initial will be taken.}
 \item{theta}{the parameter.}
 }
 \description{
-\code{rgeneric} class to define a \code{\link[INLA:rgeneric]{INLA::rgeneric()}} latent model
+The \code{rgeneric} class for \code{\link[=rgeneric]{rgeneric()}}.
 }
 \section{Functions}{
 \itemize{

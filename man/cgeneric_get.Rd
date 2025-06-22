@@ -4,9 +4,9 @@
 \alias{cgeneric_get}
 \alias{initial.cgeneric}
 \alias{mu.cgeneric}
-\alias{prior.cgeneric}
 \alias{graph.cgeneric}
 \alias{prec.cgeneric}
+\alias{prior.cgeneric}
 \title{\code{cgeneric_get} is an internal function used by
 \code{graph}, \code{pred}, \code{initial}, \code{mu} or \code{prior}
 methods for \code{cgeneric}.}
@@ -22,11 +22,11 @@ cgeneric_get(
 
 \method{mu}{cgeneric}(model, theta)
 
-\method{prior}{cgeneric}(model, theta)
-
 \method{graph}{cgeneric}(model, optimize)
 
 \method{prec}{cgeneric}(model, theta, optimize)
+
+\method{prior}{cgeneric}(model, theta)
 }
 \arguments{
 \item{model}{a \code{cgeneric} object.}
@@ -57,14 +57,15 @@ The functions listed below are for each \code{cmd} case.
 
 \item \code{mu(cgeneric)}: Evaluate the mean for an \code{cgeneric} model.
 
-\item \code{prior(cgeneric)}: Evaluate the prior for an \code{cgeneric} model
-
 \item \code{graph(cgeneric)}: Retrieve the graph of an \code{cgeneric} object
 
 \item \code{prec(cgeneric)}: Retrieve the precision of an \code{cgeneric} object
 
+\item \code{prior(cgeneric)}: Evaluate the prior for an \code{cgeneric} model
+
 }}
 \examples{
+
 old.par <- par(no.readonly = TRUE)
 
 ## Setting the prior parameters
@@ -109,10 +110,10 @@ plot(function(x) dexp(x, lamb),
    add = TRUE, lty = 2, col = 2)
 rug(smedian, lwd = 3, col = 3)
 rug(smean, lwd = 3, col = 4)
+
 par(old.par)
+
 }
 \seealso{
 check the examples in \code{\link[=cgeneric_generic0]{cgeneric_generic0()}}
-
-\code{\link[=cgeneric_generic0]{cgeneric_generic0()}}
 }
