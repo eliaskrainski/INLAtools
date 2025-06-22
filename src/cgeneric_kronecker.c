@@ -50,7 +50,7 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 	// Q2 is the precision for M2
 
 	// cmd: length 1 string
-	// theta: {theta1, theta2}
+	// theta: {theta1, theta[d12cache->nth1]}
 	// data: {data1, data2}, but data1->ints[0]->ints[0...10] contains
 	// n1, ni1, nd1, nc1, nm1, nsm1, m1,
 	// ni2, nd2, nc2, nm2, nsm2, m2, n, M}
@@ -199,15 +199,14 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 		} else {
 			d12cache->handle2 = d12cache->handle1;
 		}
-		*(void **)(&d12cache->model1_func) = dlsym(d12cache->handle1,
-							   &d12cache->dataM1->
-							   chars[0]->chars[0]);
+		*(void **)(&d12cache->model1_func) =
+		  dlsym(d12cache->handle1,
+          &d12cache->dataM1->chars[0]->chars[0]);
 		*(void **)(&d12cache->model2_func) =
-		    dlsym(d12cache->handle2,
-			  &d12cache->dataM2->chars[0]->chars[0]);
-		d12cache->nth1 =
-		    (int)d12cache->model1_func(INLA_CGENERIC_INITIAL, NULL,
-					       d12cache->dataM1)[0];
+		dlsym(d12cache->handle2,
+        &d12cache->dataM2->chars[0]->chars[0]);
+		d12cache->nth1 = (int)d12cache->model1_func(
+		  INLA_CGENERIC_INITIAL, NULL, d12cache->dataM1)[0];
 
 		data->cache = (void *)d12cache;
 	}
