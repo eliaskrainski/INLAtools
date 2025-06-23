@@ -65,11 +65,6 @@ double *inla_cgeneric_generic0(inla_cgeneric_cmd_tp cmd,
 	assert(N == Rgraph->nrow);
 	assert(N == Rgraph->ncol);
 	int M = Rgraph->n;
-	/*
-	   if (debug > 99) {
-	   printf("M = %d\n", M);
-	   }
-	 */
 
 	switch (cmd) {
 
@@ -146,11 +141,7 @@ double *inla_cgeneric_generic0(inla_cgeneric_cmd_tp cmd,
 				double u = data->doubles[0]->doubles[0];
 				double a = data->doubles[0]->doubles[1];
 				double l = -log(a) / u;
-/*
- 			if (debug > 99) {
-				printf("th %f, u %f, a %f and l %f\n", theta[0], u, a, l);
-			}
-*/
+
 				if (u <= 0) {
 					ret[0] = 0.0;
 				} else {
