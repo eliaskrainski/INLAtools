@@ -17,5 +17,5 @@ packageCheck(name, minimum_version, quietly = FALSE)
 To check package version and load
 }
 \note{
-The original code is inlabru:::check_package_version_and_load()
+Original in inlabru package function check_package_version_and_load
 }

@@ -193,7 +193,7 @@ cgeneric.character <- function(
 cgeneric_libpath <- function(
     fName,
     package,
-    useINLAprecomp = TRUE,
+    useINLAprecomp = FALSE,
     debug = FALSE) {
 
   if(missing(package)) {
@@ -204,15 +204,24 @@ cgeneric_libpath <- function(
     ), "package")
   }
 
+  nbit <- 8 * .Machine$sizeof.pointer
   if(useINLAprecomp) {
-    ## INLA::inla.external.lib(), without the substitute
-    INLAdir <- dirname(
-      findGetFunction(
-        fName = "inla.call.builtin",
-        package = "INLA")())
-    shlib <- normalizePath(paste0(
-      INLAdir, "/external/", package,
-      "/lib", package, ".so"))
+    OS <- .Platform$OS.type
+    if(OS=="unix") {
+      OSb <- paste0("linux/", nbit, "bit/")
+      if(!is.na(file.info("/Library")$isdir)) {
+        OSb <- paste0("mac/", nbit, "bit/")
+      }
+      if(Sys.info()[["machine"]] == "arm64") {
+        OSb <- "mac.arm64"
+      }
+    } else {
+      OSb <- paste0(OS, "/", nbit, "bit/")
+    }
+    shlib <- paste0(
+      find.package("INLA"), OSb,
+      "external/", package,
+      "/lib", package, ".so")
     if(debug) {
       cat("INLA compiled shared lib at:\n",
           shlib, "\n")
@@ -221,8 +230,9 @@ cgeneric_libpath <- function(
     libpath <- system.file("libs",
                            package = package)
     if (Sys.info()["sysname"] == "Windows") {
-      shlib <- file.path(libpath,
-                         paste0("x64/", package, ".dll"))
+      shlib <- file.path(
+        libpath,
+        paste0("x", nbit, "/", package, ".dll"))
     } else {
       shlib <- file.path(libpath,
                          paste0(package, ".so"))
@@ -232,10 +242,7 @@ cgeneric_libpath <- function(
           shlib, "\n")
     }
   }
-  if(!is.null(attr(package, "function"))) {
-    attr(shlib, "function") <- attr(package, "function")
-  }
-  return(shlib)
+  return(normalizePath(shlib))
 }
 #' Draw samples from hyperparameters of a `cgeneric`
 #' model component from an `inla` output, like

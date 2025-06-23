@@ -1,4 +1,3 @@
-library(INLA)
 library(INLAtools)
 
 ## first dim
@@ -13,10 +12,10 @@ R1
 
 ## 2nd dim
 (n2 <- nrow(
-     R2 <- inla.as.sparse(sparseMatrix(
+     R2 <- sparseMatrix(
          i = c(1L, 1L, 2L, 2L, 2L, 3L, 3L),
          j = c(1L, 2L, 1L, 2L, 3L, 3L, 2L),
-         x = c(2,-1, -1,3,-1, 4, -1)))
+         x = c(2,-1, -1,3,-1, 4, -1))
  ))
 R2
 
@@ -34,54 +33,60 @@ cg2 <- cgeneric(
     param = c(1, NA)) ## fix sigma, simga = 1
 
 ## Kronecker of cgeneric models 1 and 2
-cg12 <- kronecker(cg1, cg2, useINLAprecomp = FALSE)
+cg12 <- kronecker(cg1, cg2)
 
-all.equal(inla.as.sparse(R12),
-          inla.as.sparse(prec(cg12, theta = 0)))
+all.equal(Sparse(R12),
+          Sparse(prec(cg12, theta = 0)))
 
-## create fake data to call inla()
-data2 <- as.data.frame(
-    expand.grid(i1 = 1:n1,
-                i2 = 1:n2)
-)
-## additional index (combined i1 and i2)
-data2$ii <- 1:nrow(data2)
-## no data
-data2$y <- rep(NA, nrow(data2))
+if("INLA" %in% loadedNamespaces()) {
 
-(n1*n2)==nrow(data2)
+    ## create fake data to call inla()
+    data2 <- as.data.frame(
+        expand.grid(i1 = 1:n1,
+                    i2 = 1:n2)
+    )
+    ## additional index (combined i1 and i2)
+    data2$ii <- 1:nrow(data2)
+    ## no data
+    data2$y <- rep(NA, nrow(data2))
 
-R1
-head(data2,5)
+    (n1*n2)==nrow(data2)
 
-m1f <- y ~ 0 +
-    f(ii, model = 'generic0', Cmatrix = R12)
+    R1
+    head(data2,5)
 
-hfix <- list(prec = list(initial = 10, fixed = TRUE))
+    m1f <- y ~ 0 +
+        f(ii, model = 'generic0', Cmatrix = R12)
 
-fit1 <- inla(
-    formula = m1f, 
-    data = data2,
-    control.mode = list(theta = 0, fixed = TRUE),
-    control.family = list(hyper = hfix)
-)
+    hfix <- list(prec = list(initial = 10, fixed = TRUE))
 
-all.equal(inla.as.sparse(R12),
-          inla.as.sparse(prec(fit1)))
+    fit1 <- INLA::inla(
+        formula = m1f,
+        data = data2,
+        control.mode = list(theta = 0, fixed = TRUE),
+        control.family = list(hyper = hfix),
+        control.compute = list(config = TRUE)
+    )
 
-m2f <- y ~ 0 + 
-    f(i2, model = 'generic0', Cmatrix = R2,
-      group = i1,
-      control.group = list(
-          model = 'besag', graph = inla.read.graph(R1),
-          scale.model = FALSE))
+    all.equal(Sparse(R12),
+              Sparse(prec(fit1)))
 
-fit2 <- inla(
-    formula = m2f, 
-    data = data2,
-    control.mode = list(theta = 0, fixed = TRUE),
-    control.family = list(hyper = hfix)
-)
+    m2f <- y ~ 0 +
+        f(i2, model = 'generic0', Cmatrix = R2,
+          group = i1,
+          control.group = list(
+              model = 'besag', graph = G1,
+              scale.model = FALSE))
 
-all.equal(inla.as.sparse(R12),
-          inla.as.sparse(prec(fit2)))
+    fit2 <- INLA::inla(
+        formula = m2f,
+        data = data2,
+        control.mode = list(theta = 0, fixed = TRUE),
+        control.family = list(hyper = hfix),
+        control.compute = list(config = TRUE)
+    )
+
+    all.equal(Sparse(R12),
+              Sparse(prec(fit2)))
+
+}

@@ -40,15 +40,14 @@
 #' spatial modelling. Spatial Statistics, vol. 8, p. 39-51.
 #' @return a `cgeneric` object, see [cgeneric()].
 #' @seealso [prior.cgeneric()]
-#' @useDynLib INLAtools
 #' @importFrom methods as
 #' @export
 #' @examples
 #' ## structured precision matrix model definition
 #' R <- Matrix(toeplitz(c(2,-1,0,0,0)))
 #' R
-#' mR <- cgeneric(
-#'   "generic0", R = R, param = c(1, 0.05), scale = FALSE)
+#' mR <- cgeneric("generic0", R = R,
+#'   param = c(1, 0.05), scale = FALSE)
 #' graph(mR)
 #' prec(mR, theta = 0)
 cgeneric_generic0 <-
@@ -65,26 +64,20 @@ cgeneric_generic0 <-
     stopifnot(param[2]>=0)
     stopifnot(param[2]<=1)
 
-    R <- Sparse(R)
-
-    n <- as.integer(nrow(R))
-    stopifnot(n>0)
-
-    idx <- which(R@i <= R@j)
-
     dotArgs <- list(...)
     if(is.null(dotArgs$debug)) {
       debug <- FALSE
     } else {
       debug <- dotArgs$debug
     }
+
+    R <- upperPadding(R)
     if(debug) {
-      print(str(list(
-        ii = R@i,
-        jj = R@j,
-        idx = idx
-      )))
+      print(str(R))
     }
+
+    n <- as.integer(nrow(R))
+    stopifnot(n>0)
 
     if(scale) {
       Rs <- try(
@@ -99,16 +92,16 @@ cgeneric_generic0 <-
       }
     }
 
-    ord <- order(R@i[idx])
-    nnz <- length(idx)
-
     if(is.null(dotArgs$useINLAprecomp)) {
-      useINLAprecomp <- TRUE
+      useINLAprecomp <- FALSE
     } else {
       useINLAprecomp <- dotArgs$useINLAprecomp
     }
     if(useINLAprecomp) {
-      libpath <- INLA:::inla.external.lib("graphpcor")
+     libpath <- cgeneric_libpath(
+       package = "graphpcor",
+       useINLAprecomp = TRUE,
+       debug = debug)
     } else {
       libpath <- cgeneric_libpath(
         package = "INLAtools",
@@ -155,6 +148,7 @@ cgeneric_iid <-
         R = Diagonal(n = n, x = rep(1, n)),
         param = param,
         constr = constr,
+        scale = FALSE,
         ...)
     )
   }

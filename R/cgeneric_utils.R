@@ -228,7 +228,7 @@ prec.cgeneric <- function(model, theta, optimize) {
 #' prior.par <- c(1, 0.5) # P(sigma > 1) = 0.5
 #' cmodel <- cgeneric(
 #'   model = "iid", n = 10,
-#'   param = c(prior.par), useINLAprecomp = FALSE)
+#'   param = prior.par)
 #'
 #' ## prior summaries: sigma and log-precision
 #' (lamb <- -log(prior.par[2])/prior.par[1])

@@ -39,7 +39,7 @@ setMethod(
     }
 
     if(is.null(mcall$useINLAprecomp)) {
-      useINLAprecomp = TRUE
+      useINLAprecomp = FALSE
     } else {
       useINLAprecomp = mcall$useINLAprecomp
     }

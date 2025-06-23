@@ -3,7 +3,7 @@
 #' @param minimum_version character with the minimum required version
 #' @param quietly logical indicating if messages shall be printed
 #' @note
-#' The original code is inlabru:::check_package_version_and_load()
+#' Original in inlabru package function check_package_version_and_load
 #' @export
 packageCheck <- function(name, minimum_version, quietly = FALSE) {
   version <- tryCatch(utils::packageVersion(name),
