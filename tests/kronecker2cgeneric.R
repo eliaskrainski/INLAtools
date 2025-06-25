@@ -1,6 +1,8 @@
+## Q = \tau (R2 \otimes R1)
+
 library(INLAtools)
 
-## first dim
+## first
 (n1 <- nrow(
      G1 <- sparseMatrix(
          i = c(2, 3, 1, 4, 1, 4, 5, 2, 3, 3),
@@ -10,7 +12,7 @@ library(INLAtools)
 R1 <- Diagonal(n = n1, x = colSums(G1)) - G1
 R1
 
-## 2nd dim
+## 2nd 
 (n2 <- nrow(
      R2 <- sparseMatrix(
          i = c(1L, 1L, 2L, 2L, 2L, 3L, 3L),

@@ -1,7 +1,8 @@
+## Q = \tau (R3 \otimes R2 \otimes R1)
 
 library(INLAtools)
 
-## first dim
+## first 
 G1 <- sparseMatrix(
     i = c(2, 3, 1, 4, 1, 4, 2, 3),
     j = c(1, 1, 2, 2, 3, 3, 4, 4),
@@ -9,13 +10,14 @@ G1 <- sparseMatrix(
 R1 <- Diagonal(n = nrow(G1), x = colSums(G1)) - 0.9*G1
 R1
 
-## 2nd dim
+## 2nd
 R2 <- sparseMatrix(
     i = c(1L, 1L, 2L, 2L, 2L, 3L, 3L),
     j = c(1L, 2L, 1L, 2L, 3L, 3L, 2L),
     x = c(2,-1, -1,3,-1, 4, -1))
 R2
 
+## 3rd
 (r <- 0.9)
 R3 <- sparseMatrix(
     i = c(1:3, 1:2, 2:3),
@@ -32,15 +34,15 @@ c(n1 <- nrow(R1),
 cg1 <- cgeneric(
     model = "generic0", R = R1,
     constr = FALSE, scale = FALSE,
-    param = c(1, 0.5))
+    param = c(1, 0.5)) ## P(sigma>1)=0.5
 cg2 <- cgeneric(
     model = "generic0", R = R2,
     constr = FALSE, scale = FALSE,
-    param = c(1, NA)) ## fixed to 1
+    param = c(1, NA)) ## sigma fixed to 1
 cg3 <- cgeneric(
     model = "generic0", R = R3,
     constr = FALSE, scale = FALSE,
-    param = c(1, NA)) ## fixed to 1
+    param = c(1, NA)) ## sigma fixed to 1
 
 ## kronecker 2x1
 cg21 <- kronecker(cg2, cg1)
