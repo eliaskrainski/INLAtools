@@ -1,4 +1,6 @@
-#' The `cgeneric` class for [cgeneric()].
+#' The `cgeneric` class organize data needed
+#' to work with Gaussian Markov Random Fields - GMRF,
+#' defined as a C interface for `INLA`.
 setClass(
   "cgeneric",
   slots = c(f = "list"),
@@ -7,7 +9,9 @@ setClass(
           names(object$f))
   }
 )
-#' The `rgeneric` class for [rgeneric()].
+#' The `rgeneric` class organize data needed
+#' to work with Gaussian Markov Random Fields - GMRF,
+#' defined as a R interface for `INLA`.
 setClass(
   "rgeneric",
   slots = c(f = "list"),

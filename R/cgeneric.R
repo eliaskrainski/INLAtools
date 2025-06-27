@@ -1,13 +1,11 @@
-#' @title Defines a GMRF model to be used with the
-#' C interface for `INLA` as a latent model.
+#' @rdname cgeneric-class
 #' @description
-#' This prepare data for the C type to organize data needed
-#' for building latent models which are characterized
-#' from given model parameters \eqn{\theta} and the
-#' the following model elements.
+#' A GMRF is defined from model parameters \eqn{\theta} that
+#' would parametrize a (sparse) precision matrix.
+#'
+#' The elements of a GMR are:
 #'  *  `graph` to define the non-zero precision matrix pattern.
 #'  only the upper triangle including the diagonal is needed.
-#'  The order should be by line.
 #'  * `Q` vector where the
 #'     * first element (N) is the size of the matrix,
 #'     * second element (M) is the number of non-zero
@@ -21,8 +19,10 @@
 #'    * remaining elements should be the initials for the model parameters.
 #'  * `log.norm.const` log of the normalizing constant.
 #'  * `log.prior` log of the prior for the model parameters.
-#'
-#' See details in [INLA::cgeneric()]
+#' @note
+#' The `graph` and `Q` non-zero pattern should match,
+#' its elements should be ordered by row,
+#'and only its upper part stored.
 #' @param model object class for what a `cgeneric` method exists.
 #' if it is a character, a specific function will be called,
 #' for example cgeneric("iid", ...") calls cgeneric_iid(...),
@@ -41,11 +41,10 @@
 cgeneric <- function(model, ...) {
   UseMethod("cgeneric")
 }
-#' @describeIn cgeneric
-#' This calls [INLA::inla.cgeneric.define()]
+#' @rdname cgeneric-class
 #' @param model object class for what a `cgeneric` method exists.
-#' E.g., if it is a character, a specific function will be called:
-#'  cgeneric("iid", ...") calls cgeneric_iid(...)
+#' E.g., if it is a character, a specific function will be called.
+#' E.g. cgeneric("iid", ...") calls cgeneric_iid(...).
 #' @param debug integer, used as verbose in debug.
 #' @param useINLAprecomp logical, indicating if it is to use
 #' the shared object previously copied and compiled by INLA.
@@ -63,12 +62,7 @@ cgeneric <- function(model, ...) {
 #' the package name to build the path) and `libpath` (character,
 #'  with the path to the shared dynamic library object: this
 #'  override `useINLAprecomp` and `package`).
-#' @details
-#' Method for when `model` is a character.
-#' E.g. cgeneric(model = "generic0")
-#' calls [cgeneric_generic0]
 #' @importFrom methods is
-#' @importFrom methods existsFunction
 #' @export
 cgeneric.character <- function(
     model,
@@ -185,11 +179,12 @@ cgeneric.character <- function(
   class(cmodel) <- class(cmodel$f$cgeneric)
   return(cmodel)
 }
-#' @describeIn cgeneric
-#' Get the shared lib path to use in a `cgeneric` model
-#' @param fName character with the name of the function
-#' used to build the `cgeneric` model.
-#' @returns character containing the path to the shared lib
+#' @rdname cgeneric-class
+#' @param fName character with the name of the `cgeneric`
+#' builder function. This argumen is used by `cgeneric_libpath`
+#' to build the shared lib path.
+#' @returns `cgeneric_libpath' returns a character with
+#' the path to the shared lib.
 cgeneric_libpath <- function(
     fName,
     package,

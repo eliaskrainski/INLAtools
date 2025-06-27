@@ -26,6 +26,8 @@ Description: Contain code to work with latent Gaussian
   A Kronecker product method is also implemented to 
   work with the four possible combinations between 
   a 'cgeneric' and a 'rgeneric' model.
+URL: https://github.com/eliaskrainski/INLAtools
+BugReports: https://github.com/eliaskrainski/INLAtools/issues
 Additional_repositories: https://inla.r-inla-download.org/R/testing
 License: GPL (>=2) 
 Encoding: UTF-8

@@ -133,9 +133,14 @@ upperPadding <-
         })
       }
       return(list(graph = graph, xx = xx))
-    } else {
-      M <- upperPadding(list(M))
-      M$graph@x <- drop(M$xx)
-      return(M$graph)
     }
-  }
+    if(is(M, "Matrix")|is(M,"matrix")) {
+      M <- Sparse(M, ...)
+      uo <- .uof(M)
+      M@i <- M@i[uo]
+      M@j <- M@j[uo]
+      M@x <- M@x[uo]
+      return(M)
+    }
+    return(M)
+}
