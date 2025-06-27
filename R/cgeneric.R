@@ -208,13 +208,13 @@ cgeneric_libpath <- function(
         OSb <- paste0("mac/", nbit, "bit/")
       }
       if(Sys.info()[["machine"]] == "arm64") {
-        OSb <- "mac.arm64"
+        OSb <- "mac.arm64/"
       }
     } else {
       OSb <- paste0(OS, "/", nbit, "bit/")
     }
     shlib <- paste0(
-      find.package("INLA"), OSb,
+      find.package("INLA"), "/bin/", OSb,
       "external/", package,
       "/lib", package, ".so")
     if(debug) {
