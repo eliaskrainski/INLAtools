@@ -15,7 +15,7 @@ cgeneric(model, ...)
 \method{cgeneric}{character}(
   model,
   debug = FALSE,
-  package,
+  package = NULL,
   useINLAprecomp = TRUE,
   libpath = NULL,
   ...

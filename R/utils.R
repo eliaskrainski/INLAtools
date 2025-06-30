@@ -49,45 +49,45 @@ packageCheck <- function(name, minimum_version, quietly = FALSE) {
 #' @export
 findGetFunction <- function(fName, package, debug = FALSE) {
 
-  if(missing(package)) {
+  if(missing(package)||is.null(package)) {
     pkgs <- .packages()
   } else {
     pkgs <- package
-    package <- NULL
   }
 
+  pkgFound <- NULL
   ## first try exported
   for(i in 1:length(pkgs)) {
     afn <- paste0(pkgs[i], "::", fName)
     efn <- try(eval(str2lang(afn)), silent = TRUE)
     if(is.function(efn)) {
-      package <- pkgs[i]
+      pkgFound <- pkgs[i]
       if(debug) {
-        cat("Found", fName, "in", package, "!\n")
+        cat("Found", fName, "in", pkgFound, "!\n")
       }
       break
     }
   }
 
-  if(is.null(package)) {
+  if(is.null(pkgFound)) {
     ## try non-exported
     for(i in 1:length(pkgs)) {
       afn <- paste0(pkgs[i], ":::", fName)
       efn <- try(eval(str2lang(afn)), silent = TRUE)
       if(is.function(efn)) {
-        package <- pkgs[i]
+        pkgFound <- pkgs[i]
         if(debug) {
-          cat(fName, "non-exported from", package, "!\n")
+          cat(fName, "non-exported from", pkgFound, "!\n")
         }
         break
       }
     }
   }
 
-  if(is.null(package)) {
+  if(is.null(pkgFound)) {
     stop("Function not found in the tried packages!")
   }
 
-  attr(efn, "package") <- package
+  attr(efn, "package") <- pkgFound
   return(efn)
 }

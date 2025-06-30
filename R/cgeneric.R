@@ -67,7 +67,7 @@ cgeneric <- function(model, ...) {
 cgeneric.character <- function(
     model,
     debug = FALSE,
-    package,
+    package = NULL,
     useINLAprecomp = TRUE,
     libpath = NULL,
     ...) {
@@ -89,9 +89,49 @@ cgeneric.character <- function(
         list(...)
       )
     ))
+  } else {
+
+    out <- try(do.call(
+      what = model,
+      args = c(
+        list(debug = debug,
+             package = package,
+             useINLAprecomp = useINLAprecomp,
+             libpath = libpath),
+        list(...)
+      )
+    ), silent = TRUE)
+
+    if((inherits(out, "cgeneric")) |
+       (inherits(out, "inla.cgeneric"))) {
+      return(out)
+    }
+
+    fn <- findGetFunction(
+      fName = model,
+      package = package,
+      debug = debug
+    )
+    if(is.function(fn)) {
+      out <- try(do.call(
+        what = fn,
+        args = c(
+          list(debug = debug,
+               package = package,
+               useINLAprecomp = useINLAprecomp,
+               libpath = libpath),
+          list(...)
+        )
+      ), silent = TRUE)
+
+      if((inherits(out, "cgeneric")) |
+         (inherits(out, "inla.cgeneric"))) {
+        return(out)
+      }
+    }
   }
 
-  if(is.null(libpath)) {
+  if(missing(libpath) || is.null(libpath)) {
     libpath <- cgeneric_libpath(
       fName = model,
       debug = debug,
@@ -191,7 +231,7 @@ cgeneric_libpath <- function(
     useINLAprecomp = FALSE,
     debug = FALSE) {
 
-  if(missing(package)) {
+  if(missing(package) || is.null(package)) {
     package <- attr(
       findGetFunction(
       fName = fName,
