@@ -110,7 +110,7 @@ cgeneric_generic0 <-
     }
 
     the_model <- do.call(
-      what = "cgeneric",
+      what = "cgenericBuilder",
       args = list(
         model = "inla_cgeneric_generic0",
         n=as.integer(n),

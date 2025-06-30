@@ -5,6 +5,8 @@
 \alias{cgeneric-class}
 \alias{cgeneric}
 \alias{cgeneric.character}
+\alias{cgeneric.function}
+\alias{cgenericBuilder}
 \alias{cgeneric_libpath}
 \title{The \code{cgeneric} class organize data needed
 to work with Gaussian Markov Random Fields - GMRF,
@@ -12,31 +14,21 @@ defined as a C interface for \code{INLA}.}
 \usage{
 cgeneric(model, ...)
 
-\method{cgeneric}{character}(
-  model,
-  debug = FALSE,
-  package = NULL,
-  useINLAprecomp = TRUE,
-  libpath = NULL,
-  ...
-)
+\method{cgeneric}{character}(model, ...)
 
-cgeneric_libpath(fName, package, useINLAprecomp = FALSE, debug = FALSE)
+\method{cgeneric}{`function`}(model, ...)
+
+cgenericBuilder(...)
+
+cgeneric_libpath(debug, package, useINLAprecomp)
 }
 \arguments{
 \item{model}{object class for what a \code{cgeneric} method exists.
 E.g., if it is a character, a specific function will be called.
 E.g. cgeneric("iid", ...") calls cgeneric_iid(...).}
 
-\item{...}{additional arguments passed to to methods.
-Some arguments can be used to define specific behavior,
-such as \code{debug} (integer, used as verbose in debug),
-\code{useINLAprecomp} (logical, indicating if it is to use
-the shared object previously copied and compiled by INLA),
-\code{package} (character used if \code{useINLAprecomp} is TRUE, with
-the package name to build the path) and \code{libpath} (character,
-with the path to the shared dynamic library object: this
-override \code{useINLAprecomp} and \code{package}).}
+\item{...}{arguments passed from the
+\code{\link[=cgeneric]{cgeneric()}} methods.}
 
 \item{debug}{integer, used as verbose in debug.}
 
@@ -45,14 +37,6 @@ that contains the \code{cgeneric} model.}
 
 \item{useINLAprecomp}{logical, indicating if it is to use
 the shared object previously copied and compiled by INLA.}
-
-\item{libpath}{character, to inform the full path to the
-shared dynamic library object (this override the
-arguments \code{useINLAprecomp} and \code{package}).}
-
-\item{fName}{character with the name of the \code{cgeneric}
-builder function. This argumen is used by \code{cgeneric_libpath}
-to build the shared lib path.}
 }
 \value{
 named list of \code{cgeneric} class containing
@@ -63,9 +47,7 @@ data needed to define the model. Each element on
 ...$f$cgeneric is also a named list containing
 \code{ints}, \code{doubles}, \code{characters}, \code{matrices}
 and \code{smatrices}.
-
-`cgeneric_libpath' returns a character with
-the path to the shared lib.
+cgeneric_libpath returns character with the path to the shared lib.
 }
 \description{
 A GMRF is defined from model parameters \eqn{\theta} that
