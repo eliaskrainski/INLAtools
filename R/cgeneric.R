@@ -28,15 +28,22 @@
 #' for example cgeneric("iid", ...") calls cgeneric_iid(...),
 #' see [cgeneric_iid()] and [cgeneric_generic0()].
 #' @param ... additional arguments passed on to methods
-#' @returns  named list of `cgeneric` class containing
-#'  the named list `f` that contain `model` (a character
-#'  always equal to `cgeneric`), `n` (integer)
-#'  and `cgeneric` as a named list that contains the
+#' @returns a method to build a `cgeneric` should return
+#' a named list of `cgeneric` class that contains a
+#'  named list `f` that contains (at least):
+#'  * `model` a character always equal to `cgeneric`,
+#'  * `n` an integer greater than 0, and
+#'  * `cgeneric` as a named list that contains the
 #'  data needed to define the model. Each element on
 #'  ...$f$cgeneric is also a named list containing
 #'  `ints`, `doubles`, `characters`, `matrices`
 #'  and `smatrices`.
-#'  cgeneric_libpath returns character with the path to the shared lib.
+#'  * (possible) `extraconstr` as a named list with: `A` as a
+#'   `n` times `k` matrix and `e` as a length `k` vector.
+#'  * (possible) `bm_mapper` (TO DO) mapper for `inlabru` package.
+#'
+#'  The `cgeneric_libpath` function returns a `character`
+#'  with the path to the shared lib.
 #' @seealso [INLA::cgeneric()] and [methods()]
 #' @export
 cgeneric <- function(model, ...) {
@@ -46,15 +53,17 @@ cgeneric <- function(model, ...) {
 #' @param model object class for what a `cgeneric` method exists.
 #' E.g., if it is a character, a specific function will be called.
 #' E.g. cgeneric("iid", ...") calls cgeneric_iid(...).
-#' @param ... additional arguments passed to to methods.
-#' Some arguments can be used to define specific behavior,
-#' such as `debug` (integer, used as verbose in debug),
-#' `useINLAprecomp` (logical, indicating if it is to use
-#' the shared object previously copied and compiled by INLA),
-#' `package` (character used if `useINLAprecomp` is TRUE, with
-#' the package name to build the path) and `libpath` (character,
-#'  with the path to the shared dynamic library object: this
-#'  override `useINLAprecomp` and `package`).
+#' @param ... arguments passed from the
+#' [cgeneric()] methods. FIt should include
+#' `n` and `debug`. For `cgenericBuild` it should
+#'  `model` as a character string with the name of the
+#'  C function and `shlib` as the path to the
+#'  shared object containing such function.
+#'  If `shlib` is not provided it can be built
+#'  using `inla_libpath` from the arguments,
+#'  `package` (character with the R package containing it),
+#'  `useINLAprecomp` (logical to indicate if `INLA` contains it
+#'  and to use it).
 #' @importFrom methods is
 #' @export
 cgeneric.character <- function(
@@ -111,8 +120,6 @@ cgeneric.function <- function(
   return(out)
 }
 #' @rdname cgeneric-class
-#' @param ... arguments passed from the
-#' [cgeneric()] methods.
 #' @export
 cgenericBuilder <- function(
     ...) {
@@ -131,7 +138,7 @@ cgenericBuilder <- function(
     stop("Please provid 'shlib'!")
   if(!any(nargs == "model"))
     stop("Please provid 'model'!")
-  stopifnot(n>=1)
+  stopifnot(dotArgs$n>=1)
   ind <- pmatch(c("n", "debug"),
                 names(dotArgs))
   dotArgs <- c(list(

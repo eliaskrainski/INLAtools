@@ -9,9 +9,7 @@
 \alias{initial.rgeneric}
 \alias{mu.rgeneric}
 \alias{prior.rgeneric}
-\title{The \code{rgeneric} class organize data needed
-to work with Gaussian Markov Random Fields - GMRF,
-defined as a R interface for \code{INLA}.}
+\title{Organize data for the latent GMRF R interface for \code{INLA}.}
 \usage{
 rgeneric(model, debug = FALSE, compile = TRUE, optimize = TRUE, ...)
 
@@ -44,9 +42,7 @@ If 'theta' is not supplied, initial will be taken.}
 \code{rgeneric}/ \code{inla.rgeneric} object.
 }
 \description{
-The \code{rgeneric} class organize data needed
-to work with Gaussian Markov Random Fields - GMRF,
-defined as a R interface for \code{INLA}.
+Organize data for the latent GMRF R interface for \code{INLA}.
 }
 \section{Functions}{
 \itemize{

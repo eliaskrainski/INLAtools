@@ -1,17 +1,23 @@
-#' The `cgeneric` class organize data needed
-#' to work with Gaussian Markov Random Fields - GMRF,
-#' defined as a C interface for `INLA`.
+#' Organize data for the latent GMRF C interface for `INLA`.
 setClass(
   "cgeneric",
   slots = c(f = "list"),
   validity = function(object) {
-    all(c("model", "n", "cgeneric") %in%
-          names(object$f))
+    d <- b <- FALSE
+    a <- all(c("model", "n", "cgeneric") %in%
+               names(object$f))
+    if(a) {
+      b <- all(c("model", "shlib", "n", "debug", "data")
+               %in% names(object$f$cgeneric))
+    }
+    if(a & b) {
+      d <- all(c("ints", "doubles", "characters", "matrices", "smatrices")
+               %in% names(object$f$cgeneric$data))
+    }
+    a & b & d
   }
 )
-#' The `rgeneric` class organize data needed
-#' to work with Gaussian Markov Random Fields - GMRF,
-#' defined as a R interface for `INLA`.
+#' Organize data for the latent GMRF R interface for `INLA`.
 setClass(
   "rgeneric",
   slots = c(f = "list"),

@@ -8,9 +8,7 @@
 \alias{cgeneric.function}
 \alias{cgenericBuilder}
 \alias{cgeneric_libpath}
-\title{The \code{cgeneric} class organize data needed
-to work with Gaussian Markov Random Fields - GMRF,
-defined as a C interface for \code{INLA}.}
+\title{Organize data for the latent GMRF C interface for \code{INLA}.}
 \usage{
 cgeneric(model, ...)
 
@@ -28,7 +26,16 @@ E.g., if it is a character, a specific function will be called.
 E.g. cgeneric("iid", ...") calls cgeneric_iid(...).}
 
 \item{...}{arguments passed from the
-\code{\link[=cgeneric]{cgeneric()}} methods.}
+\code{\link[=cgeneric]{cgeneric()}} methods. FIt should include
+\code{n} and \code{debug}. For \code{cgenericBuild} it should
+\code{model} as a character string with the name of the
+C function and \code{shlib} as the path to the
+shared object containing such function.
+If \code{shlib} is not provided it can be built
+using \code{inla_libpath} from the arguments,
+\code{package} (character with the R package containing it),
+\code{useINLAprecomp} (logical to indicate if \code{INLA} contains it
+and to use it).}
 
 \item{debug}{integer, used as verbose in debug.}
 
@@ -39,15 +46,24 @@ that contains the \code{cgeneric} model.}
 the shared object previously copied and compiled by INLA.}
 }
 \value{
-named list of \code{cgeneric} class containing
-the named list \code{f} that contain \code{model} (a character
-always equal to \code{cgeneric}), \code{n} (integer)
-and \code{cgeneric} as a named list that contains the
+a method to build a \code{cgeneric} should return
+a named list of \code{cgeneric} class that contains a
+named list \code{f} that contains (at least):
+\itemize{
+\item \code{model} a character always equal to \code{cgeneric},
+\item \code{n} an integer greater than 0, and
+\item \code{cgeneric} as a named list that contains the
 data needed to define the model. Each element on
 ...$f$cgeneric is also a named list containing
 \code{ints}, \code{doubles}, \code{characters}, \code{matrices}
 and \code{smatrices}.
-cgeneric_libpath returns character with the path to the shared lib.
+\item (possible) \code{extraconstr} as a named list with: \code{A} as a
+\code{n} times \code{k} matrix and \code{e} as a length \code{k} vector.
+\item (possible) \code{bm_mapper} (TO DO) mapper for \code{inlabru} package.
+}
+
+The \code{cgeneric_libpath} function returns a \code{character}
+with the path to the shared lib.
 }
 \description{
 A GMRF is defined from model parameters \eqn{\theta} that
