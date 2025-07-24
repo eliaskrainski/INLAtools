@@ -25,7 +25,7 @@ sum-to-zero constraint. Default is TRUE.}
 \item{scale}{logical indicating if it is to scale
 the model. See detais.}
 
-\item{...}{arguments (debug,useINLAprecomp,libpath)
+\item{...}{arguments (debug,useINLAprecomp,shlib)
 passed on to \code{\link[=cgeneric]{cgeneric()}}.}
 
 \item{n}{integer required to specify the model size}

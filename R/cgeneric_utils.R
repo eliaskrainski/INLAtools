@@ -32,28 +32,6 @@ cgeneric_get <- function(model,
   stopifnot(!is.null(cgdata$ints))
   stopifnot(!is.null(cgdata$characters))
 
-  cmds <- c("graph", "Q", "initial", "mu", "log_prior")
-  cmd <- match.arg(cmd,
-                   cmds,
-                   several.ok = TRUE)
-  stopifnot(length(cmd)>0)
-
-  if(missing(theta)) {
-    if(cmd %in% c("Q", "log_prior")) {
-      stop("Please provide 'theta'!")
-    } else {
-      theta <- NULL
-      ntheta = 0L
-    }
-  } else {
-    if(inherits(theta, "matrix")) {
-      ntheta <- as.integer(ncol(theta))
-    } else {
-      ntheta <- 1L
-    }
-    theta <- as.numeric(theta)
-  }
-
   ## from Version 0.0.3.902 (and src/cgeneric_get.c)
   ## split each sparse matrix into list elements:
   ## nr, nc, m, i, j, x
@@ -71,6 +49,42 @@ cgeneric_get <- function(model,
         x = smi[3+2*mi+1:mi]
       )
     }
+  }
+
+  cmds <- c("graph", "Q", "initial", "mu", "log_prior")
+  cmd <- match.arg(cmd,
+                   cmds,
+                   several.ok = TRUE)
+  stopifnot(length(cmd)>0)
+
+  if(missing(theta)) {
+    if(cmd %in% c("Q", "log_prior")) {
+      initheta <- .Call(
+        "inla_cgeneric_element_get",
+        "initial",
+        NULL,
+        as.integer(1),
+        cgdata$ints,
+        cgdata$doubles,
+        cgdata$characters,
+        cgdata$matrices,
+        cgdata$smatrices,
+        PACKAGE = "INLAtools"
+      )
+      if(length(initheta)>0) {
+        stop("Please provide 'theta'!")
+      }
+    } else {
+      theta <- NULL
+      ntheta = 0L
+    }
+  } else {
+    if(inherits(theta, "matrix")) {
+      ntheta <- as.integer(ncol(theta))
+    } else {
+      ntheta <- 1L
+    }
+    theta <- as.numeric(theta)
   }
 
   if(length(cmd) == 1) {
@@ -206,6 +220,9 @@ graph.cgeneric <- function(model, optimize) {
 #' Retrieve the precision of an `cgeneric` object
 #' @export
 prec.cgeneric <- function(model, theta, optimize) {
+  if(missing(theta)) {
+    theta <- NULL
+  }
   if(missing(optimize)) {
     optimize <- FALSE
   }

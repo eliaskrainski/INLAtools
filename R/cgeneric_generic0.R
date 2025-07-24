@@ -16,7 +16,7 @@
 #' sum-to-zero constraint. Default is TRUE.
 #' @param scale logical indicating if it is to scale
 #' the model. See detais.
-#' @param ... arguments (debug,useINLAprecomp,libpath)
+#' @param ... arguments (debug,useINLAprecomp,shlib)
 #' passed on to [cgeneric()].
 #' @details
 #' The precision matrix is defined as
@@ -98,12 +98,12 @@ cgeneric_generic0 <-
       useINLAprecomp <- dotArgs$useINLAprecomp
     }
     if(useINLAprecomp) {
-     libpath <- cgeneric_libpath(
+     shlib <- cgeneric_shlib(
        package = "graphpcor",
        useINLAprecomp = TRUE,
        debug = debug)
     } else {
-      libpath <- cgeneric_libpath(
+      shlib <- cgeneric_shlib(
         package = "INLAtools",
         useINLAprecomp = FALSE,
         debug = debug)
@@ -117,7 +117,7 @@ cgeneric_generic0 <-
         param=param,
         Rgraph = R,
         debug = debug,
-        libpath = libpath
+        shlib = shlib
       )
     )
 

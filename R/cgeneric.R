@@ -42,7 +42,7 @@
 #'   `n` times `k` matrix and `e` as a length `k` vector.
 #'  * (possible) `bm_mapper` (TO DO) mapper for `inlabru` package.
 #'
-#'  The `cgeneric_libpath` function returns a `character`
+#'  The `cgeneric_shlib` function returns a `character`
 #'  with the path to the shared lib.
 #' @seealso [INLA::cgeneric()] and [methods()]
 #' @export
@@ -60,7 +60,7 @@ cgeneric <- function(model, ...) {
 #'  C function and `shlib` as the path to the
 #'  shared object containing such function.
 #'  If `shlib` is not provided it can be built
-#'  using `inla_libpath` from the arguments,
+#'  using `inla_shlib` from the arguments,
 #'  `package` (character with the R package containing it),
 #'  `useINLAprecomp` (logical to indicate if `INLA` contains it
 #'  and to use it).
@@ -78,8 +78,8 @@ cgeneric.character <- function(
   }
   if(any(model %in%
          paste0("cgeneric_",
-                c("iid", "generic0", "libpath")))) {
-    if(debug) {
+                c("iid", "generic0", "shlib")))) {
+    if(!is.null(dotArgs$debug) && dotArgs$debug) {
       cat("call", model, "\n")
     }
     return(do.call(
@@ -216,7 +216,7 @@ cgenericBuilder <- function(
 #' @param package character giving the name of the package
 #' that contains the `cgeneric` model.
 #' @export
-cgeneric_libpath <- function(
+cgeneric_shlib <- function(
     debug,
     package,
     useINLAprecomp) {
@@ -224,13 +224,14 @@ cgeneric_libpath <- function(
   if(missing(package) || is.null(package)) {
     stop("please provid package!")
   }
-
-  if(missing(debug))
+  if(missing(debug)) {
     debug <- FALSE
-  if(missing(useINLAprecomp))
+  }
+  if(missing(useINLAprecomp)) {
     useINLAprecomp <- TRUE
+  }
 
-  nbit <- 8 * .Machine$sizeof.pointer
+  nbit <- 8 * (.Machine$sizeof.pointer)
   if(useINLAprecomp) {
     OS <- .Platform$OS.type
     if(OS=="unix") {
@@ -253,14 +254,14 @@ cgeneric_libpath <- function(
           shlib, "\n")
     }
   } else {
-    libpath <- system.file("libs",
-                           package = package)
+    shlib <- system.file("libs",
+                         package = package)
     if (Sys.info()["sysname"] == "Windows") {
       shlib <- file.path(
-        libpath,
+        shlib,
         paste0("x", nbit, "/", package, ".dll"))
     } else {
-      shlib <- file.path(libpath,
+      shlib <- file.path(shlib,
                          paste0(package, ".so"))
     }
     if(debug) {

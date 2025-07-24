@@ -7,7 +7,7 @@
 \alias{cgeneric.character}
 \alias{cgeneric.function}
 \alias{cgenericBuilder}
-\alias{cgeneric_libpath}
+\alias{cgeneric_shlib}
 \title{Organize data for the latent GMRF C interface for \code{INLA}.}
 \usage{
 cgeneric(model, ...)
@@ -18,7 +18,7 @@ cgeneric(model, ...)
 
 cgenericBuilder(...)
 
-cgeneric_libpath(debug, package, useINLAprecomp)
+cgeneric_shlib(debug, package, useINLAprecomp)
 }
 \arguments{
 \item{model}{object class for what a \code{cgeneric} method exists.
@@ -32,7 +32,7 @@ E.g. cgeneric("iid", ...") calls cgeneric_iid(...).}
 C function and \code{shlib} as the path to the
 shared object containing such function.
 If \code{shlib} is not provided it can be built
-using \code{inla_libpath} from the arguments,
+using \code{inla_shlib} from the arguments,
 \code{package} (character with the R package containing it),
 \code{useINLAprecomp} (logical to indicate if \code{INLA} contains it
 and to use it).}
@@ -62,7 +62,7 @@ and \code{smatrices}.
 \item (possible) \code{bm_mapper} (TO DO) mapper for \code{inlabru} package.
 }
 
-The \code{cgeneric_libpath} function returns a \code{character}
+The \code{cgeneric_shlib} function returns a \code{character}
 with the path to the shared lib.
 }
 \description{

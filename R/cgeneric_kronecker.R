@@ -43,21 +43,21 @@ setMethod(
     } else {
       useINLAprecomp = mcall$useINLAprecomp
     }
-    if(is.null(mcall$libpath)) {
-      libpath <- NULL
+    if(is.null(mcall$shlib)) {
+      shlib <- NULL
     } else {
-      libpath <- mcall$libpath
+      shlib <- mcall$shlib
     }
 
     cmodel <- "inla_cgeneric_kronecker"
-    if (is.null(libpath)) {
+    if (is.null(shlib)) {
       if(useINLAprecomp) {
-        libpath <- cgeneric_libpath(
+        shlib <- cgeneric_shlib(
           package = "graphpcor", ## it is there
           useINLAprecomp = TRUE,
           debug = debug)
       } else {
-        libpath <- cgeneric_libpath(
+        shlib <- cgeneric_shlib(
           package = "INLAtools",
           useINLAprecomp = FALSE,
           debug = debug)
@@ -173,7 +173,7 @@ setMethod(
         n = as.integer(N),
         cgeneric = list(
           model = cmodel,
-          shlib = libpath,
+          shlib = shlib,
           n = as.integer(N),
           debug = as.integer(debug)
         )
@@ -226,7 +226,7 @@ setMethod(
       c(
         list(
           model = cmodel,
-          shlib = libpath
+          shlib = shlib
         ),
         X$f$cgeneric$data$characters,
         Y$f$cgeneric$data$characters
