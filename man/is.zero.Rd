@@ -4,6 +4,7 @@
 \alias{is.zero}
 \alias{is.zero.default}
 \alias{is.zero.matrix}
+\alias{is.zero.Matrix}
 \title{Define the is.zero method}
 \usage{
 is.zero(x, ...)
@@ -11,6 +12,8 @@ is.zero(x, ...)
 \method{is.zero}{default}(x, ...)
 
 \method{is.zero}{matrix}(x, ...)
+
+\method{is.zero}{Matrix}(x, ...)
 }
 \arguments{
 \item{x}{an R object}
@@ -28,5 +31,7 @@ Define the is.zero method
 \item \code{is.zero(default)}: The is.zero.default definition
 
 \item \code{is.zero(matrix)}: The is.zero.matrix definition
+
+\item \code{is.zero(Matrix)}: The is.zero.Matrix definition
 
 }}

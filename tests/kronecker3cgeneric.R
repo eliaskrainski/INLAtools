@@ -61,7 +61,7 @@ R321 <- kronecker(R3, R21)
 all.equal(Sparse(R321),
           Sparse(cg321Q))
 
-if("INLA" %in% loadedNamespaces()) {
+if(require(INLA)) {
 
     dataf <- as.data.frame(
     expand.grid(i1 = 1:n1,
@@ -99,8 +99,10 @@ if("INLA" %in% loadedNamespaces()) {
 
     Q1 <- prec(fit1)
 
-    all.equal(Sparse(R321),
-              Sparse(Q1))
+    print(
+        all.equal(Sparse(R321),
+                  Sparse(Q1))
+    )
 
     ## 'fit' cg321
     m321 <- y ~ 0 + f(iii, model=cg321)
@@ -115,7 +117,9 @@ if("INLA" %in% loadedNamespaces()) {
 
     Q2 <- prec(fit2)
 
-    all.equal(Sparse(R321),
-              Sparse(Q2))
+    print(
+        all.equal(Sparse(R321),
+                  Sparse(Q2))
+    )
 
 }

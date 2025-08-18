@@ -40,7 +40,7 @@ cg12 <- kronecker(cg1, cg2)
 all.equal(Sparse(R12),
           Sparse(prec(cg12, theta = 0)))
 
-if("INLA" %in% loadedNamespaces()) {
+if(require(INLA)) {
 
     ## create fake data to call inla()
     data2 <- as.data.frame(
@@ -88,7 +88,9 @@ if("INLA" %in% loadedNamespaces()) {
         control.compute = list(config = TRUE)
     )
 
-    all.equal(Sparse(R12),
-              Sparse(prec(fit2)))
+    print(
+        all.equal(Sparse(R12),
+                  Sparse(prec(fit2)))
+    )
 
 }

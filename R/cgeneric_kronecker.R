@@ -606,9 +606,13 @@ setMethod(
 #' @name extraconstr
 #' @param c1,c2 named list with two elements:
 #' `A` and `e`, where `nrow(A)` should be equal
-#' to `length(e)`. This is an extraconstr.
-#' @param n1,n2 integer with each model's length
-#' @returns extraconstr
+#' to `length(e)`. These are constraint definitions.
+#' @param n1,n2 integer with each model's length.
+#' @returns The constraint definition for the
+#' whole latent model built from the Kronecker product.
+#' A length two named list. 'A' a matrix and
+#' 'e' a vector where nrow(A)=length(e) and
+#' ncol(A)=(n1*n2).
 kronecker_extraconstr <- function(c1, c2, n1, n2) {
   if(is.null(c1)) {
     if(is.null(c2)) {

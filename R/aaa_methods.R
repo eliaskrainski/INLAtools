@@ -102,12 +102,13 @@ is.zero.default <- function(x, ...) {
 #' @export
 is.zero.matrix <- function(x, ...) {
   stopifnot(inherits(x, "matrix"))
-  a <- abs(x)
-  if(diff(range(a))<(.Machine$double.eps^0.9)) {
-    tol <- (.Machine$double.eps^0.9)
-  } else {
-    tol <- .Machine$double.eps *
-      max(sqrt(length(a))) * max(a)
-  }
-  return(a < tol)
+  return(matrix(is.zero(as.numeric(c(x))),
+                nrow(x), ncol(x)))
+}
+#' @describeIn is.zero
+#' The is.zero.Matrix definition
+#' @export
+is.zero.Matrix <- function(x, ...) {
+  stopifnot(inherits(x, "Matrix"))
+  is.zero(as.matrix(x))
 }

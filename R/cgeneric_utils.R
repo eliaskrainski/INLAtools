@@ -155,12 +155,14 @@ cgeneric_get <- function(model,
   if(any(cmd == "Q")) {
     if(any(cmd == "graph")) {
       ij <- ret$graph
-      ret$graph <- Matrix::sparseMatrix(
-        i = ret$graph[[1]] + 1L,
-        j = ret$graph[[2]] + 1L,
-        x = rep(1, length(ret$graph[[1]])),
-        symmetric = TRUE,
-        repr = "T"
+      ret$graph <- Sparse(
+        Matrix::sparseMatrix(
+          i = ret$graph[[1]] + 1L,
+          j = ret$graph[[2]] + 1L,
+          x = rep(1, length(ret$graph[[1]])),
+          symmetric = TRUE,
+          repr = "T"
+        )
       )
       x <- ret$Q
       ret$Q <- ret$graph
@@ -178,12 +180,14 @@ cgeneric_get <- function(model,
         cgdata$smatrices,
         PACKAGE = "INLAtools"
       )
-      ret$Q <- Matrix::sparseMatrix(
-        i = ij[[1]] + 1L,
-        j = ij[[2]] + 1L,
-        x = ret$Q,
-        symmetric = TRUE,
-        repr = "T"
+      ret$Q <- Sparse(
+        Matrix::sparseMatrix(
+          i = ij[[1]] + 1L,
+          j = ij[[2]] + 1L,
+          x = ret$Q,
+          symmetric = TRUE,
+          repr = "T"
+        )
       )
     }
   }

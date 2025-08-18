@@ -11,12 +11,16 @@ kronecker_extraconstr(c1, c2, n1, n2)
 \arguments{
 \item{c1, c2}{named list with two elements:
 \code{A} and \code{e}, where \code{nrow(A)} should be equal
-to \code{length(e)}. This is an extraconstr.}
+to \code{length(e)}. These are constraint definitions.}
 
-\item{n1, n2}{integer with each model's length}
+\item{n1, n2}{integer with each model's length.}
 }
 \value{
-extraconstr
+The constraint definition for the
+whole latent model built from the Kronecker product.
+A length two named list. 'A' a matrix and
+'e' a vector where nrow(A)=length(e) and
+ncol(A)=(n1*n2).
 }
 \description{
 Kronecker (product) between \code{extraconstr},
