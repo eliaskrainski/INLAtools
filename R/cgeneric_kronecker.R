@@ -599,6 +599,7 @@ setMethod(
     class(rmodel) <- c("rgeneric", "inla.rgeneric")
     class(rmodel$f$rgeneric) <- class(rmodel)
 
+    return(rmodel)
   }
 )
 #' Kronecker (product) between `extraconstr`,
