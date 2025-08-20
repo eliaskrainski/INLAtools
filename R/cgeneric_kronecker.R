@@ -8,6 +8,7 @@
 #' @param ... see [kronecker()]
 #' @return if 'X' and 'Y' are `cgeneric`
 #' return a `cgeneric`, else a `rgeneric`.
+#' @importFrom inlabru bru_get_mapper
 NULL
 #> NULL
 
@@ -167,17 +168,24 @@ setMethod(
     )
 
     ## initial data
-    ret <- list(
-      f = list(
-        model = "cgeneric",
-        n = as.integer(N),
-        cgeneric = list(
-          model = cmodel,
-          shlib = shlib,
+    ret <- structure(
+      list(
+        f = list(
+          model = "cgeneric",
           n = as.integer(N),
-          debug = as.integer(debug)
+          cgeneric = structure(
+            list(
+              model = cmodel,
+              shlib = shlib,
+              n = as.integer(N),
+              debug = as.integer(debug)
+            ),
+            # inla.cgeneric is needed to support INLA before August 2025
+            class = c("inla.cgeneric.f", "inla.cgeneric")
+          )
         )
-      )
+      ),
+      class = c("cgeneric", "inla.cgeneric")
     )
     ret$f$cgeneric$data <- vector("list", 5L)
     names(ret$f$cgeneric$data) <- c(
@@ -253,9 +261,6 @@ setMethod(
         )
       )
 
-    class(ret) <- c("cgeneric", "inla.cgeneric")
-    class(ret$f$cgeneric) <- class(ret)
-
     if((!is.null(X$f$extraconstr)) |
        (!is.null(Y$f$extraconstr))) {
         ret$f$extraconstr <-
@@ -270,8 +275,18 @@ setMethod(
         }
     }
 
-    return(ret)
+    # Note: kron(X,Y) gives X-major ordering (the X-index varies slowly, the
+    # Y-index varies quickly), which requires the mappers to be in reverse
+    # order, multi(Y,X):
+    ret$mapper <-
+      inlabru::bm_multi(
+        list(
+          inlabru::bru_get_mapper(Y),
+          inlabru::bru_get_mapper(X)
+        )
+      )
 
+    return(ret)
   }
 )
 #' @rdname kronecker
@@ -356,20 +371,28 @@ setMethod(
     }
 
     ### follows INLA:::inla.rgeneric.define() but no assign env
-    rmodel <- list(
-      f = list(
-        model = "rgeneric",
-        n = n,
-        rgeneric = list(
-          definition =
-            compiler::cmpfun(
-              kmodel,
-              options = list(optimize = 3L)),
-          debug = debug,
-          optimize = TRUE
+    rmodel <- structure(
+      list(
+        f = list(
+          model = "rgeneric",
+          n = n,
+          rgeneric = structure(
+            list(
+              definition =
+                compiler::cmpfun(
+                  kmodel,
+                  options = list(optimize = 3L)),
+              debug = debug,
+              optimize = TRUE
+            ),
+            # inla.rgeneric is needed to support INLA before August 2025
+            class = c("inla.rgeneric.f", "inla.rgeneric")
+          )
         )
-      )
+      ),
+      class = c("rgeneric", "inla.rgeneric")
     )
+
     if((!is.null(X$f$extraconstr)) |
        (!is.null(Y$f$extraconstr))) {
       rmodel$f$extraconstr <-
@@ -383,10 +406,19 @@ setMethod(
             " 'extraconstr' built\n")
       }
     }
-    class(rmodel) <- c("rgeneric", "inla.rgeneric")
-    class(rmodel$f$rgeneric) <- class(rmodel)
-    return(rmodel)
 
+    # Note: kron(X,Y) gives X-major ordering (the X-index varies slowly, the
+    # Y-index varies quickly), which requires the mappers to be in reverse
+    # order, multi(Y,X):
+    rmodel$mapper <-
+      inlabru::bm_multi(
+        list(
+          inlabru::bru_get_mapper(Y),
+          inlabru::bru_get_mapper(X)
+        )
+      )
+
+    return(rmodel)
   }
 )
 #' @rdname kronecker
@@ -469,20 +501,28 @@ setMethod(
     }
 
     ### follows INLA:::inla.rgeneric.define() but no assign env
-    rmodel <- list(
-      f = list(
-        model = "rgeneric",
-        n = n,
-        rgeneric = list(
-          definition =
-            compiler::cmpfun(
-              kmodel,
-              options = list(optimize = 3L)),
-          debug = debug,
-          optimize = TRUE
+    rmodel <- structure(
+      list(
+        f = list(
+          model = "rgeneric",
+          n = n,
+          rgeneric = structure(
+            list(
+              definition =
+                compiler::cmpfun(
+                  kmodel,
+                  options = list(optimize = 3L)),
+              debug = debug,
+              optimize = TRUE
+            ),
+            # inla.rgeneric is needed to support INLA before August 2025
+            class = c("inla.rgeneric.f", "inla.rgeneric")
+          )
         )
-      )
+      ),
+      class = c("rgeneric", "inla.rgeneric")
     )
+
     if((!is.null(X$f$extraconstr)) |
        (!is.null(Y$f$extraconstr))) {
       rmodel$f$extraconstr <-
@@ -496,10 +536,19 @@ setMethod(
             " 'extraconstr' built!\n")
       }
     }
-    class(rmodel) <- c("rgeneric", "inla.rgeneric")
-    class(rmodel$f$rgeneric) <- class(rmodel)
-    return(rmodel)
 
+    # Note: kron(X,Y) gives X-major ordering (the X-index varies slowly, the
+    # Y-index varies quickly), which requires the mappers to be in reverse
+    # order, multi(Y,X):
+    rmodel$mapper <-
+      inlabru::bm_multi(
+        list(
+          inlabru::bru_get_mapper(Y),
+          inlabru::bru_get_mapper(X)
+        )
+      )
+
+    return(rmodel)
   }
 )
 #' @rdname kronecker
@@ -582,6 +631,7 @@ setMethod(
       model = kmodel,
       optimize = TRUE
     )
+    class(rmodel) <- c("rgeneric", class(rmodel))
 
     if((!is.null(X$f$extraconstr)) |
        (!is.null(Y$f$extraconstr))) {
@@ -596,8 +646,17 @@ setMethod(
             " 'extraconstr' built!\n")
       }
     }
-    class(rmodel) <- c("rgeneric", "inla.rgeneric")
-    class(rmodel$f$rgeneric) <- class(rmodel)
+
+    # Note: kron(X,Y) gives X-major ordering (the X-index varies slowly, the
+    # Y-index varies quickly), which requires the mappers to be in reverse
+    # order, multi(Y,X):
+    rmodel$mapper <-
+      inlabru::bm_multi(
+        list(
+          inlabru::bru_get_mapper(Y),
+          inlabru::bru_get_mapper(X)
+        )
+      )
 
     return(rmodel)
   }

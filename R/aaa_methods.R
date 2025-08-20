@@ -89,11 +89,11 @@ is.zero <- function(x, ...) {
 #' @export
 is.zero.default <- function(x, ...) {
   a <- abs(as.numeric(c(x)))
-  if(diff(range(a))<(.Machine$double.eps^0.9)) {
+  if(diff(range(a, na.rm = TRUE))<(.Machine$double.eps^0.9)) {
     tol <- (.Machine$double.eps^0.9)
   } else {
     tol <- .Machine$double.eps *
-      max(sqrt(length(a))) * max(a)
+      max(sqrt(length(a))) * max(a, na.rm = TRUE)
   }
   return(a < tol)
 }

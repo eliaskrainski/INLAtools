@@ -1,7 +1,7 @@
 Package: INLAtools
 Type: Package
 Title: Functionalities for the 'INLA' Package
-Version: 0.0.4.904
+Version: 0.0.4.905
 Maintainer: Elias Teixeira Krainski <eliaskrainski@gmail.com>
 Authors@R: c(
  person(given = c("Elias"),
@@ -36,7 +36,8 @@ NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 4.3),
-    Matrix
+    Matrix,
+    inlabru (>= 2.13.0.9005)
 Imports:
     methods,
     utils

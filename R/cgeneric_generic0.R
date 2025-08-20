@@ -59,7 +59,7 @@ cgeneric_generic0 <-
 
     stopifnot(param[1]>0)
     if(is.na(param[2])) {
-      param[2] = 0.0
+      param[2] <- 0.0
     }
     stopifnot(param[2]>=0)
     stopifnot(param[2]<=1)

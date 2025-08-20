@@ -4,6 +4,7 @@
 \name{rgeneric-class}
 \alias{rgeneric-class}
 \alias{rgeneric}
+\alias{rgeneric.default}
 \alias{graph.rgeneric}
 \alias{prec.rgeneric}
 \alias{initial.rgeneric}
@@ -12,6 +13,8 @@
 \title{Organize data for the latent GMRF R interface for \code{INLA}.}
 \usage{
 rgeneric(model, debug = FALSE, compile = TRUE, optimize = TRUE, ...)
+
+\method{rgeneric}{default}(model, debug = FALSE, compile = TRUE, optimize = TRUE, ...)
 
 \method{graph}{rgeneric}(model, ...)
 
@@ -43,6 +46,8 @@ If 'theta' is not supplied, initial will be taken.}
 }
 \description{
 Organize data for the latent GMRF R interface for \code{INLA}.
+
+The rgeneric default method.
 }
 \section{Functions}{
 \itemize{
