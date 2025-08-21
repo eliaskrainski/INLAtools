@@ -89,11 +89,12 @@ is.zero <- function(x, ...) {
 #' @export
 is.zero.default <- function(x, ...) {
   a <- abs(as.numeric(c(x)))
-  if(diff(range(a, na.rm = TRUE))<(.Machine$double.eps^0.9)) {
+  ab <- range(a, na.rm = TRUE)
+  if(diff(ab)<(.Machine$double.eps^0.9)) {
     tol <- (.Machine$double.eps^0.9)
   } else {
     tol <- .Machine$double.eps *
-      max(sqrt(length(a))) * max(a, na.rm = TRUE)
+      max(sqrt(length(a))) * ab[2]
   }
   return(a < tol)
 }
@@ -102,7 +103,7 @@ is.zero.default <- function(x, ...) {
 #' @export
 is.zero.matrix <- function(x, ...) {
   stopifnot(inherits(x, "matrix"))
-  return(matrix(is.zero(as.numeric(c(x))),
+  return(matrix(is.zero.default(x),
                 nrow(x), ncol(x)))
 }
 #' @describeIn is.zero
