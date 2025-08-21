@@ -120,6 +120,25 @@ cgeneric.function <- function(
     )
   return(out)
 }
+
+
+#' @describeIn cgeneric-class Returns the model object unchanged.
+#' @export
+cgeneric.cgeneric <- function(model, ...) {
+  return(model)
+}
+
+#' @describeIn cgeneric-class Converts a regular `inla.cgeneric` object to `cgeneric`.
+#' @export
+cgeneric.inla.cgeneric <- function(model, ...) {
+  # TODO: Is it enough to just add the "cgeneric" class name, or does the object need to be
+  # regenerated/modified as well?
+  warning("TODO: check whether basic inla.cgeneric objects fulfil the assumptions of the cgeneric class")
+  class(model) <- c("cgeneric", class(model))
+  return(model)
+}
+
+
 #' @rdname cgeneric-class
 #' @export
 cgenericBuilder <- function(

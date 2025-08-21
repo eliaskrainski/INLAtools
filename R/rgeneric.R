@@ -18,7 +18,7 @@ rgeneric <- function(model,
 }
 #' The rgeneric default method.
 #' @rdname rgeneric-class
-#' @param model the model defined as a function.
+#' @param model For the default method, the model defined as a function.
 #' See the 'rgeneric' vignette from the INLA package.
 #' @export
 rgeneric.default <- function(model,
@@ -26,7 +26,7 @@ rgeneric.default <- function(model,
                              compile = TRUE,
                              optimize = TRUE,
                              ...) {
-## it uses INLA::inla.rgeneric.define()
+  ## it uses INLA::inla.rgeneric.define()
 
   rmodel <- INLA::inla.rgeneric.define(
     model = model,
@@ -39,6 +39,20 @@ rgeneric.default <- function(model,
   class(rmodel) <- c("rgeneric", class(rmodel))
   return(rmodel)
 }
+
+#' @describeIn rgeneric-class Returns the model object unchanged.
+#' @export
+rgeneric.rgeneric <- function(model, ...) {
+  return(model)
+}
+
+#' @describeIn rgeneric-class Converts a regular `inla.rgeneric` object to `rgeneric`.
+#' @export
+rgeneric.inla.rgeneric <- function(model, ...) {
+  class(model) <- c("rgeneric", class(model))
+  return(model)
+}
+
 #' @describeIn rgeneric-class
 #' The graph method for 'rgeneric'
 #' @param model a `rgeneric` model object

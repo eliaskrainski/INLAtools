@@ -5,6 +5,8 @@
 \alias{rgeneric-class}
 \alias{rgeneric}
 \alias{rgeneric.default}
+\alias{rgeneric.rgeneric}
+\alias{rgeneric.inla.rgeneric}
 \alias{graph.rgeneric}
 \alias{prec.rgeneric}
 \alias{initial.rgeneric}
@@ -15,6 +17,10 @@
 rgeneric(model, debug = FALSE, compile = TRUE, optimize = TRUE, ...)
 
 \method{rgeneric}{default}(model, debug = FALSE, compile = TRUE, optimize = TRUE, ...)
+
+\method{rgeneric}{rgeneric}(model, ...)
+
+\method{rgeneric}{inla.rgeneric}(model, ...)
 
 \method{graph}{rgeneric}(model, ...)
 
@@ -51,6 +57,10 @@ The rgeneric default method.
 }
 \section{Functions}{
 \itemize{
+\item \code{rgeneric(rgeneric)}: Returns the model object unchanged.
+
+\item \code{rgeneric(inla.rgeneric)}: Converts a regular \code{inla.rgeneric} object to \code{rgeneric}.
+
 \item \code{graph(rgeneric)}: The graph method for 'rgeneric'
 
 \item \code{prec(rgeneric)}: The precision method for an \code{rgeneric} object.

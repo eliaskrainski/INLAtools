@@ -6,6 +6,8 @@
 \alias{cgeneric}
 \alias{cgeneric.character}
 \alias{cgeneric.function}
+\alias{cgeneric.cgeneric}
+\alias{cgeneric.inla.cgeneric}
 \alias{cgenericBuilder}
 \alias{cgeneric_shlib}
 \title{Organize data for the latent GMRF C interface for \code{INLA}.}
@@ -15,6 +17,10 @@ cgeneric(model, ...)
 \method{cgeneric}{character}(model, ...)
 
 \method{cgeneric}{`function`}(model, ...)
+
+\method{cgeneric}{cgeneric}(model, ...)
+
+\method{cgeneric}{inla.cgeneric}(model, ...)
 
 cgenericBuilder(...)
 
@@ -92,6 +98,13 @@ whose order shall follow the graph definition.
 \item \code{log.prior} log of the prior for the model parameters.
 }
 }
+\section{Functions}{
+\itemize{
+\item \code{cgeneric(cgeneric)}: Returns the model object unchanged.
+
+\item \code{cgeneric(inla.cgeneric)}: Converts a regular \code{inla.cgeneric} object to \code{cgeneric}.
+
+}}
 \note{
 The \code{graph} and \code{Q} non-zero pattern should match,
 its elements should be ordered by row,

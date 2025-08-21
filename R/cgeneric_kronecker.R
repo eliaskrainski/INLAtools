@@ -702,3 +702,61 @@ kronecker_extraconstr <- function(c1, c2, n1, n2) {
   }
   return(ret)
 }
+
+
+#' @title Combine two or more `cgeneric` or `rgeneric` models
+#' @description Constructs a multiple kronecker product model from a list of model
+#' objects. The resulting model contains a corresponding [inlabru::bm_multi()]
+#' mapper. This can be used as an alternative to a binary tree of kronecker
+#' product models.
+#' @param models A list of `cgeneric` or `rgeneric` models, optionally with names
+#' @details The last model in the list has the slowest index variation, and the
+#'   first model has the fastest index variation. This matches the latent
+#'   variable ordering of standard `INLA:f()` model components with
+#'   `(main, group, replicate)`.
+#' @param \dots Arguments passed on to every `kronecker()` call.
+#' @returns A 'cgeneric' or 'rgeneric' model object, containing a
+#'   multi-kronecker product model, with a corresponding [inlabru::bm_multi()]
+#'   mapper.
+#' @rdname multi_generic_model
+#' @export
+#' @examples
+#' R1 <- Matrix(crossprod(diff(diag(4))))
+#' m1 <- cgeneric("generic0", R = R1, param = c(1, NA),
+#'   scale = FALSE, useINLAprecomp = FALSE)
+#' R2 <- Matrix(crossprod(diff(diag(3))))
+#' m2 <- cgeneric("generic0", R = R2, param = c(1, NA),
+#'   scale = FALSE, useINLAprecomp = FALSE)
+#' m3 <- cgeneric("iid", n = 2, param = c(1, 0.5),
+#'   useINLAprecomp = FALSE)
+#' multi123 <- multi_generic_model(
+#'   list(m1 = m1, m2 = m2, m3 = m3),
+#'   useINLAprecomp = FALSE
+#' )
+#' print(multi123$mapper)
+#' prec(multi123, theta = 0.0)
+multi_generic_model <- function(models, ...) {
+  stopifnot(is.list(models))
+  stopifnot(length(models) >= 1L)
+
+  models <- lapply(models, function(model) {
+    if (inherits(model, c("rgeneric", "inla.rgeneric"))) {
+      rgeneric(model)
+    } else if (inherits(model, c("cgeneric", "inla.cgeneric"))) {
+      cgeneric(model)
+    } else {
+      stop("Each 'models' element must be convertible to class 'cgeneric' or 'rgeneric'")
+    }
+  })
+
+  ret <- models[[1]]
+  for (i in seq_along(models)[-1]) {
+    ret <- Matrix::kronecker(models[[i]], ret, ...)
+  }
+
+  ret[["mapper"]] <- inlabru::bm_multi(
+    lapply(models, inlabru::bru_get_mapper)
+  )
+
+  return(ret)
+}
