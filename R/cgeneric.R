@@ -110,6 +110,7 @@ cgeneric.character <- function(
 
 }
 #' @rdname cgeneric-class
+#' @export
 cgeneric.function <- function(
     model,
     ...) {
@@ -200,14 +201,20 @@ cgenericBuilder <- function(
 	    )
 	  }
   }
-  class(cmodel) <- c("cgeneric",
-		     "inla.cgeneric") ## this is needed in INLA::f()
-  cmodel <- list(f=list(
-    model = "cgeneric",
-    n = cmodel$n,
-    cgeneric = cmodel))
-  class(cmodel) <- class(cmodel$f$cgeneric)
-  return(cmodel)
+  class(cmodel) <- c("inla.cgeneric.f", ## this is needed in INLA::f() from August 2025
+                     "inla.cgeneric") ##  this is needed for older INLA
+  cmodel_wrapper <- structure(
+    list(
+      f = list(
+        model = "cgeneric",
+        n = as.integer(cmodel$n),
+        cgeneric = cmodel
+      ),
+      mapper = inlabru::bm_index(cmodel$n)
+    ),
+    class = c("cgeneric", "inla.cgeneric")
+  )
+  return(cmodel_wrapper)
 }
 #' @rdname cgeneric-class
 #' @param debug integer, used as verbose in debug.
@@ -222,7 +229,7 @@ cgeneric_shlib <- function(
     useINLAprecomp) {
 
   if(missing(package) || is.null(package)) {
-    stop("please provid package!")
+    stop("please provide package!")
   }
   if(missing(debug)) {
     debug <- FALSE

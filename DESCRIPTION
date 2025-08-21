@@ -36,7 +36,8 @@ NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 4.3),
-    Matrix
+    Matrix,
+    inlabru (>= 2.13.0.9005)
 Imports:
     methods,
     utils

@@ -17,7 +17,7 @@ rgeneric <- function(model,
   UseMethod("rgeneric")
 }
 #' The rgeneric default method.
-#' @rdname rgeneric
+#' @rdname rgeneric-class
 #' @param model the model defined as a function.
 #' See the 'rgeneric' vignette from the INLA package.
 #' @export
@@ -36,11 +36,10 @@ rgeneric.default <- function(model,
     ...
   )
 
-  class(rmodel) <- c("rgeneric", "inla.rgeneric")
-  class(rmodel$f$rgeneric) <- class(rmodel)
+  class(rmodel) <- c("rgeneric", class(rmodel))
   return(rmodel)
 }
-#' @describeIn rgeneric
+#' @describeIn rgeneric-class
 #' The graph method for 'rgeneric'
 #' @param model a `rgeneric` model object
 #' @param ... additional arguments
@@ -52,7 +51,7 @@ graph.rgeneric <- function(model, ...) {
                 cmd = "graph")
     ))
 }
-#' @describeIn rgeneric
+#' @describeIn rgeneric-class
 #' The precision method for an `rgeneric` object.
 #' @param ... additional parameter such as 'theta'
 #' If 'theta' is not supplied, initial will be taken.
@@ -74,7 +73,7 @@ prec.rgeneric <- function(model, ...) {
                 theta = theta)
   ))
 }
-#' @describeIn rgeneric
+#' @describeIn rgeneric-class
 #' The initial method for 'rgeneric'
 #' @export
 initial.rgeneric <- function(model) {
@@ -84,7 +83,7 @@ initial.rgeneric <- function(model) {
                 cmd = "initial")
   ))
 }
-#' @describeIn rgeneric
+#' @describeIn rgeneric-class
 #' The mu method for 'rgeneric'
 #' @export
 mu.rgeneric <- function(model, theta) {
@@ -101,7 +100,7 @@ mu.rgeneric <- function(model, theta) {
                 theta = theta)
   ))
 }
-#' @describeIn rgeneric
+#' @describeIn rgeneric-class
 #' The prior metho for 'rgeneric'
 #' @param theta the parameter.
 #' @export
