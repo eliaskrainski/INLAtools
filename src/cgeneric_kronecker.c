@@ -25,7 +25,7 @@
  *        Thuwal 23955-6900, Saudi Arabia
  */
 
-#include "INLAtools.h"
+#include "inlaINLAtools.h"
 
 typedef struct {
 	inla_cgeneric_data_tp *dataM1;

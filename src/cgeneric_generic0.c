@@ -25,7 +25,7 @@
  *        Thuwal 23955-6900, Saudi Arabia
  */
 
-#include "INLAtools.h"
+#include "inlaINLAtools.h"
 
 double *inla_cgeneric_generic0(inla_cgeneric_cmd_tp cmd,
 			       double *theta, inla_cgeneric_data_tp *data)
