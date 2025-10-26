@@ -69,7 +69,9 @@ typedef size_t fortran_charlen_t;
 #else
 typedef int fortran_charlen_t;
 #endif
+
 #define F_ONE ((fortran_charlen_t)1)
+
 #if !defined(INLA_EXTERNAL_PACKAGE)
 SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 			       SEXP doubles, SEXP chars, SEXP mats, SEXP smats);
