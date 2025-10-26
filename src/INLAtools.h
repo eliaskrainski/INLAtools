@@ -33,11 +33,13 @@
 #include <string.h>
 #include <strings.h>
 #include <dlfcn.h>
+#if !defined(INLA_EXTERNAL_PACKAGE)
 #include <R.h>
 #include <Rdefines.h>
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>	// needed to allow user interrupts
 #include <R_ext/Utils.h>	// needed to allow user interrupts
+#endif
 #include "cgeneric.h"
 
 #if defined(_OPENMP)
