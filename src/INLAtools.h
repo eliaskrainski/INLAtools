@@ -32,8 +32,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#if defined(INLA_EXTERNAL_PACKAGE)
+#include <ltdl.h>
+#else 
 #include <dlfcn.h>
-#if !defined(INLA_EXTERNAL_PACKAGE)
 #include <R.h>
 #include <Rdefines.h>
 #include <Rinternals.h>

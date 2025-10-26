@@ -30,8 +30,13 @@
 typedef struct {
 	inla_cgeneric_data_tp *dataM1;
 	inla_cgeneric_data_tp *dataM2;
+#if defined(INLA_EXTERNAL_PACKAGE)
+        lt_dlhandle handle1;
+        lt_dlhandle handle2;
+#else
 	void *handle1;
 	void *handle2;
+#endif
 	inla_cgeneric_func_tp *model1_func;
 	inla_cgeneric_func_tp *model2_func;
 	int nth1;
@@ -163,41 +168,53 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 		if (nsm2 > 0) {
 		    d12cache->dataM2->smats = &data->smats[nsm1];
 		}
-
-		d12cache->handle1 =
-		    dlopen(&d12cache->dataM1->chars[1]->chars[0], RTLD_LAZY);
+#if defined(INLA_EXTERNAL_PACKAGE) 
+	      	static int ck_ltdl_init = 1;
+                if (ck_ltdl_init) {
+                        lt_dlinit();
+		}
+		ltdl_init = 0;
+		d12cache->handle1 = lt_dlopen(&d12cache->dataM1->chars[1]->chars[0]);
+#else
+		d12cache->handle1 =  dlopen(&d12cache->dataM1->chars[1]->chars[0], RTLD_LAZY);
+#endif
 		if (!d12cache->handle1) {
 #if defined(INLA_EXTERNAL_PACKAGE)
 		    fprintf(stderr,"\n\n\t*** ERROR *** Failed to load shared library '%s': %s\n\n",
-			    &d12cache->dataM1->chars[1]->chars[0], dlerror());
+			    &d12cache->dataM1->chars[1]->chars[0], lt_dlerror());
 		    abort();
 #else		    
 		    Rf_error("Failed to load shared library '%s': %s",
-			     &d12cache->dataM1->chars[1]->chars[0],
-			     dlerror());
+			     &d12cache->dataM1->chars[1]->chars[0],  dlerror());
 #endif
 		}
 		if (strcmp(&d12cache->dataM1->chars[1]->chars[0],
 			   &d12cache->dataM2->chars[1]->chars[0]) != 0) {
-		    d12cache->handle2 =
-			dlopen(&d12cache->dataM2->chars[1]->chars[0],
-			       RTLD_LAZY);
+#if defined(INLA_EXTERNAL_PACKAGE) 
+			d12cache->handle2 = lt_dlopen(&d12cache->dataM2->chars[1]->chars[0]);
+#else			
+		    d12cache->handle2 = dlopen(&d12cache->dataM2->chars[1]->chars[0],  RTLD_LAZY);
+#endif
 		    if (!d12cache->handle2) {
 #if defined(INLA_EXTERNAL_PACKAGE)
 			fprintf(stderr,"\n\n\t*** ERROR *** Failed to load shared library '%s': %s\n\n",
-				&d12cache->dataM2->chars[0]->chars[0], dlerror());
+				&d12cache->dataM2->chars[0]->chars[0], lt_dlerror());
 			abort();
 #else
 			Rf_error("Failed to load shared library '%s': %s",
-				 &d12cache->dataM2->chars[0]->chars[0],
-				 dlerror());
+				 &d12cache->dataM2->chars[0]->chars[0],	 dlerror());
 #endif
 		    }
 		} else {
 		    d12cache->handle2 = d12cache->handle1;
 		}
+#if defined(INLA_EXTERNAL_PACKAGE)
+		*(void **)(&d12cache->model1_func) = lt_dlsym(d12cache->handle1, &d12cache->dataM1->chars[0]->chars[0]);
+		*(void **)(&d12cache->model2_func) = lt_dlsym(d12cache->handle2, &d12cache->dataM2->chars[0]->chars[0]);
+#else
 		*(void **)(&d12cache->model1_func) = dlsym(d12cache->handle1, &d12cache->dataM1->chars[0]->chars[0]);
 		*(void **)(&d12cache->model2_func) = dlsym(d12cache->handle2, &d12cache->dataM2->chars[0]->chars[0]);
+#endif
 		d12cache->nth1 = (int)d12cache->model1_func(INLA_CGENERIC_INITIAL, NULL, d12cache->dataM1)[0];
 		data->cache = (void *)d12cache;
 	    }
@@ -265,17 +282,10 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 
 			if ((nu1 > 0) & (nu2 > 0)) {
 				for (i = 0; i < nu1; i++) {
-					daux =
-					    ret1[2 +
-						 data->ints[ni1 +
-							    ni2]->ints[i]];
+					daux =  ret1[2 + data->ints[ni1 + ni2]->ints[i]];
 					for (j = 0; j < nu2; j++) {
 						retE[k++] =
-						    daux * ret2[2 +
-								data->ints[ni1 +
-									   ni2 +
-									   1]->ints
-								[j]];
+						    daux * ret2[2 + data->ints[ni1 + ni2 +1]->ints[j]];
 					}
 				}
 			}
@@ -303,12 +313,10 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 			// return c(M, initials)
 			// where M is the number of hyperparameters
 
-			ret1 =
-			    d12cache->model1_func(INLA_CGENERIC_INITIAL,
-						  NULL, d12cache->dataM1);
-			ret2 =
-			    d12cache->model2_func(INLA_CGENERIC_INITIAL,
-						  NULL, d12cache->dataM2);
+			ret1 = d12cache->model1_func(INLA_CGENERIC_INITIAL,
+	      				NULL, d12cache->dataM1);
+			ret2 = d12cache->model2_func(INLA_CGENERIC_INITIAL,
+	      				NULL, d12cache->dataM2);
 
 			int nth1 = (int)ret1[0], nth2 = (int)ret2[0];
 
@@ -349,12 +357,19 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 
 	case INLA_CGENERIC_QUIT:
 		{
+#if defined(INLA_EXTERNAL_PACKAGE)
+			lt_dlclose(d12cache->handle1);
+			if (strcmp(&d12cache->dataM1->chars[1]->chars[0],
+			           &d12cache->dataM2->chars[1]->chars[0]) != 0) {
+				lt_dlclose(d12cache->handle2);
+			}
+#else
 			dlclose(d12cache->handle1);
-			if (strcmp
-			    (&d12cache->dataM1->chars[1]->chars[0],
-			     &d12cache->dataM2->chars[1]->chars[0]) != 0) {
+			if (strcmp(&d12cache->dataM1->chars[1]->chars[0],
+			           &d12cache->dataM2->chars[1]->chars[0]) != 0) {
 				dlclose(d12cache->handle2);
 			}
+#endif
 			free(d12cache);
 		}
 	default:
