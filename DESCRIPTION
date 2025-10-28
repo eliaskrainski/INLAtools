@@ -1,7 +1,7 @@
 Package: INLAtools
 Type: Package
 Title: Functionalities for the 'INLA' Package
-Version: 0.0.4.907
+Version: 0.0.4.908
 Maintainer: Elias Teixeira Krainski <eliaskrainski@gmail.com>
 Authors@R: c(
  person(given = c("Elias"),
@@ -31,7 +31,7 @@ BugReports: https://github.com/eliaskrainski/INLAtools/issues
 Additional_repositories: https://inla.r-inla-download.org/R/testing
 License: GPL (>=2) 
 Encoding: UTF-8
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
 Depends:
@@ -42,5 +42,5 @@ Imports:
     methods,
     utils
 Suggests:
-    INLA (>= 24.02.09)
+    INLA (>= 25.10.28)
 BuildVignettes: true

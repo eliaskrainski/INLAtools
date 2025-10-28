@@ -40,7 +40,7 @@ setMethod(
     }
 
     if(is.null(mcall$useINLAprecomp)) {
-      useINLAprecomp = FALSE
+      useINLAprecomp = TRUE
     } else {
       useINLAprecomp = mcall$useINLAprecomp
     }
@@ -50,11 +50,15 @@ setMethod(
       shlib <- mcall$shlib
     }
 
+    INLAvcheck <- packageCheck("INLA", "25-10-28")
+
     cmodel <- "inla_cgeneric_kronecker"
     if (is.null(shlib)) {
       if(useINLAprecomp) {
         shlib <- cgeneric_shlib(
-          package = "graphpcor", ## it is there
+          package = ifelse(is.na(INLAvcheck),
+                           "graphpcor", ## it is there
+                           "INLAtools"),
           useINLAprecomp = TRUE,
           debug = debug)
       } else {
