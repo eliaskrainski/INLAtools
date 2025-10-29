@@ -1,7 +1,7 @@
 Package: INLAtools
 Type: Package
 Title: Functionalities for the 'INLA' Package
-Version: 0.0.4.908
+Version: 0.0.4.909
 Maintainer: Elias Teixeira Krainski <eliaskrainski@gmail.com>
 Authors@R: c(
  person(given = c("Elias"),
@@ -9,6 +9,9 @@ Authors@R: c(
         email = "eliaskrainski@gmail.com",
         role = c("cre", "aut", "cph"),
         comment = c(ORCID = "0000-0002-7063-2615")),
+ person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
+        role = c("aut"),
+        comment = c(ORCID = "0000-0002-5833-2011")),
  person(given = "Haavard",
         family = "Rue’",
         role = "aut",

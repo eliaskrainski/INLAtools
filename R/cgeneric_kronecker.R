@@ -698,9 +698,9 @@ kronecker_extraconstr <- function(c1, c2, n1, n2) {
         A = rbind(
           kronecker(c1$A, diag(ncol(c2$A))),
           kronecker(diag(ncol(c1$A)), c2$A)
-        ),
+        )[-1, , drop = FALSE], ## remove one redundant
         e = c(rep(c1$e, each = ncol(c2$A)),
-              rep(c2$e, ncol(c1$A)))
+              rep(c2$e, ncol(c1$A)))[-1] ## rm 1
       )
     }
   }
