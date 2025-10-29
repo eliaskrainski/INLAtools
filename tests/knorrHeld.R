@@ -58,14 +58,14 @@ if(require(INLA)) {
     fit.prop$summary.fixed[, c(1,2,3,5)]
     fit.prop$summary.hyperpar[, c(1,2,3,5)]
     
-### K-H type IV
+### Knorr-Held (2000) type IV with model = 'generic0' (constrained)
     tgraph <- sparseMatrix(i=c(2:nt, 1:(nt-1)),
                            j=c(1:(nt-1), 2:nt), x=1)
     model0 <- update(
         model00,
         .~.+f(space, model = 'bym2', graph = graph.file) +
             f(time, model = 'bym2', graph = tgraph))
-    fit.kh4 <- inla.knmodels(
+    fit.g0c <- inla.knmodels(
         formula = model0, data = stdf, 
         family = 'poisson', E = expected, 
         control.st = list(
@@ -73,11 +73,11 @@ if(require(INLA)) {
             graph = graph.file, type = 4),
         control.compute = list(dic = TRUE, waic = TRUE, cpo = TRUE))
     
-    fit.kh4$cpu.used
-    fit.kh4$summary.fixed[, c(1,2,3,5)]
-    fit.kh4$summary.hyper[, c(1,2,3,5)]
+    fit.g0c$cpu.used
+    fit.g0c$summary.fixed[, c(1,2,3,5)]
+    fit.g0c$summary.hyper[, c(1,2,3,5)]
     
-    
+### Knorr-Held (2000) type IV with Kronecker of two cgeneric 'generic0' models
     Rt <- Diagonal(n = nt, x = c(1, rep(2, nt-2), 1)) -tgraph
     ct <- cgeneric("generic0", R = Rt, param = c(1, NA))
     
@@ -94,37 +94,37 @@ if(require(INLA)) {
     
     image(prec(kh4cg, theta = 0))
     
-    fit.kh4cg <- inla(
+    fit.k2cg0 <- inla(
         formula = update(model0, .~.+f(spacetime, model = kh4cg)), 
         data = stdf, family = 'poisson', E = expected,
         control.compute = list(dic = TRUE, waic = TRUE, cpo = TRUE))
     
-    fit.kh4cg$cpu.used
-    fit.kh4cg$summary.fixed[, c(1,2,3,5)]
-    fit.kh4cg$summary.hyper[, c(1,2,3,5)]
+    fit.k2cg0$cpu.used
+    fit.k2cg0$summary.fixed[, c(1,2,3,5)]
+    fit.k2cg0$summary.hyper[, c(1,2,3,5)]
     
-    grep("constraints", fit.kh4$logfile, value = TRUE)
-    grep("constraints", fit.kh4cg$logfile, value = TRUE)
+    grep("constraints", fit.g0c$logfile, value = TRUE)
+    grep("constraints", fit.k2cg0$logfile, value = TRUE)
 
-    grep("fn-calls", fit.kh4$logfile, value = TRUE)
-    grep("fn-calls", fit.kh4cg$logfile, value = TRUE)
+    grep("fn-calls", fit.g0c$logfile, value = TRUE)
+    grep("fn-calls", fit.k2cg0$logfile, value = TRUE)
     
-    rbind(fit.kh4$mode$theta, fit.kh4cg$mode$theta)
+    rbind(fit.g0c$mode$theta, fit.k2cg0$mode$theta)
     
     par(mfrow = c(3,4), mar = c(4, 4, 1, 1), mgp = c(3, 1, 0), las = 1, bty = "n")
     for(k in 1:4) {
         plot(fit.prop$marginals.fixed[[k]], type = 'l', lty = 2,
              xlab = names(fit.prop$marginals.fixed)[k], ylab = "density")
-        lines(fit.kh4$marginals.fixed[[k]], lwd = 2)
-        lines(fit.kh4cg$marginals.fixed[[k]], lty = 3, lwd = 2, col = 2)
+        lines(fit.g0c$marginals.fixed[[k]], lwd = 2)
+        lines(fit.k2cg0$marginals.fixed[[k]], lty = 3, lwd = 2, col = 2)
     }
     for(k in 1:5) {
-        plot(fit.kh4$marginals.hyperpar[[k]], type = 'l', lwd = 2,
-             xlab = names(fit.kh4$marginals.hyperpar)[k], ylab = "density")
+        plot(fit.g0c$marginals.hyperpar[[k]], type = 'l', lwd = 2,
+             xlab = names(fit.g0c$marginals.hyperpar)[k], ylab = "density")
         if(k<5) {
-            lines(fit.kh4cg$marginals.hyperpar[[k]], lty = 3, lwd = 2, col = 2)
+            lines(fit.k2cg0$marginals.hyperpar[[k]], lty = 3, lwd = 2, col = 2)
         } else {
-            lines(inla.tmarginal(exp, fit.kh4cg$marginals.hyperpar[[k]]),
+            lines(inla.tmarginal(exp, fit.k2cg0$marginals.hyperpar[[k]]),
                   lty = 3, lwd = 2, col = 2)
         }
     }
@@ -134,30 +134,30 @@ if(require(INLA)) {
     
     
     rbind(fit.prop$summary.hyperpar[1, , drop = FALSE],
-          fit.kh4$summary.hyperpar[5, , drop = FALSE],
-          fit.kh4cg$summary.hyperpar[5, , drop = FALSE]
+          fit.g0c$summary.hyperpar[5, , drop = FALSE],
+          fit.k2cg0$summary.hyperpar[5, , drop = FALSE]
           )
     
     cor(cbind(proper = fit.prop$summary.random$space$mean,
-              kh4 = fit.kh4$summary.random$spacetime$mean,
-              k4 = fit.kh4$summary.random$spacetime$mean))
+              kh4 = fit.g0c$summary.random$spacetime$mean,
+              k4 = fit.g0c$summary.random$spacetime$mean))
     
-    gcv <- lapply(list(proper = fit.prop, kh4 = fit.kh4, kh4cg = fit.kh4cg),
+    gcv <- lapply(list(proper = fit.prop, kh4 = fit.g0c, kh4cg = fit.k2cg0),
                   inla.group.cv, num.level.sets = 10)
 
 ### compare some statistics
     rbind(mlik = c(proper = fit.prop$mlik[1],
-                   kh4 = fit.kh4$mlik[1],
-                   kh4 = fit.kh4cg$mlik[1]),
+                   kh4 = fit.g0c$mlik[1],
+                   kh4 = fit.k2cg0$mlik[1]),
           dic = c(fit.prop$dic$dic,
-                  fit.kh4$dic$dic,
-                  fit.kh4cg$dic$dic),
+                  fit.g0c$dic$dic,
+                  fit.k2cg0$dic$dic),
           waic = c(fit.prop$waic$waic,
-                   fit.kh4$waic$waic,
-                   fit.kh4cg$waic$waic),
+                   fit.g0c$waic$waic,
+                   fit.k2cg0$waic$waic),
           cpo = c(-sum(log(fit.prop$cpo$cpo)),
-                  -sum(log(fit.kh4$cpo$cpo)),
-                  -sum(log(fit.kh4cg$cpo$cpo))),
+                  -sum(log(fit.g0c$cpo$cpo)),
+                  -sum(log(fit.k2cg0$cpo$cpo))),
           gcv = sapply(gcv, function(x) -sum(log(x$cv))))
 
 }
