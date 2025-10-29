@@ -113,7 +113,7 @@ if(require(INLA)) {
     
     par(mfrow = c(3,4), mar = c(4, 4, 1, 1), mgp = c(3, 1, 0), las = 1, bty = "n")
     for(k in 1:4) {
-        plot(fit.prop$marginals.fixed[[k1]], type = 'l', lty = 2,
+        plot(fit.prop$marginals.fixed[[k]], type = 'l', lty = 2,
              xlab = names(fit.prop$marginals.fixed)[k], ylab = "density")
         lines(fit.kh4$marginals.fixed[[k]], lwd = 2)
         lines(fit.kh4cg$marginals.fixed[[k]], lty = 3, lwd = 2, col = 2)
