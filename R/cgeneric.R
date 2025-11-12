@@ -207,7 +207,7 @@ cgenericBuilder <- function(
     for(i in 1:nm) {
       cmodel$data$matrices[[i]] <-
         c(dim(cmodel$data$matrices[[i]]),
-          cmodel$data$matrices[[i]])
+          t(cmodel$data$matrices[[i]])) ## columnwise...
     }
   }
   if(nM>0) {

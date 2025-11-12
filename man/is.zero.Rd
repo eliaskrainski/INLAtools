@@ -7,18 +7,19 @@
 \alias{is.zero.Matrix}
 \title{Define the is.zero method}
 \usage{
-is.zero(x, ...)
+is.zero(x, tol)
 
-\method{is.zero}{default}(x, ...)
+\method{is.zero}{default}(x, tol)
 
-\method{is.zero}{matrix}(x, ...)
+\method{is.zero}{matrix}(x, tol)
 
-\method{is.zero}{Matrix}(x, ...)
+\method{is.zero}{Matrix}(x, tol)
 }
 \arguments{
 \item{x}{an R object}
 
-\item{...}{additional arguments}
+\item{tol}{numeric to be used as (absolute) tolerance.
+if missing (default) it will consider \code{x==0}.}
 }
 \value{
 logical

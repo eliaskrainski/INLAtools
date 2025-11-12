@@ -36,19 +36,19 @@ Sparse <- function(A,
   if (na.rm) {
     x.na <- is.na(A@x)
     if (any(x.na)) {
-      idx.na <- which(x.na)
-      A@x <- A@x[-idx.na]
-      A@i <- A@i[-idx.na]
-      A@j <- A@j[-idx.na]
+      idx.ok1 <- which(!x.na)
+      A@x <- A@x[idx.ok1]
+      A@i <- A@i[idx.ok1]
+      A@j <- A@j[idx.ok1]
     }
   }
   if (zeros.rm) {
-    x.zero <- is.zero(A@x) ## changed from original
+    x.zero <- (A@x==0.0) ## as in the original
     if (any(x.zero)) {
-      idx.zero <- which(x.zero)
-      A@x <- A@x[-idx.zero]
-      A@i <- A@i[-idx.zero]
-      A@j <- A@j[-idx.zero]
+      idx.ok2 <- which(!x.zero)
+      A@x <- A@x[idx.ok2]
+      A@i <- A@i[idx.ok2]
+      A@j <- A@j[idx.ok2]
     }
   }
   return(A)
