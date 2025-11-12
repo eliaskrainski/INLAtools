@@ -17,11 +17,14 @@ Authors@R: c(
         role = "aut",
         comment = c(ORCID = "0000-0002-0222-1881"))
         )
-Description: Contain code to work with latent Gaussian
-  Markov random field (GMRF) models. Queries for the 
-  'cgeneric' interface, specified as a way to implement
-  new GMRF models to be fitted as model components
-  in the 'INLA' package (<https://www.r-inla.org>).
+Description: Contain code to work with the `cgeneric` 
+  latent Gaussian Markov random field (GMRF) models. 
+  The `cgeneric` is a way to implement new GMRF models 
+  to be fitted as model components and can be accessed 
+  from a C program like 'INLA' (<https://www.r-inla.org>).
+  The `cgeneric` defines a C struct contaning code for 
+  GMRF model specifications and its parameter priors.
+  Queries such are implemented so one can access it from R.
   The implemented functionalities leverage the use 
   of 'cgeneric' models and provide a way to debug 
   the code as well to work with the prior for the 
