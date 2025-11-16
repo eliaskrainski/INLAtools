@@ -173,7 +173,7 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
                 if (ck_ltdl_init) {
                         lt_dlinit();
 		}
-		ltdl_init = 0;
+		ck_ltdl_init = 0;
 		d12cache->handle1 = lt_dlopen(&d12cache->dataM1->chars[1]->chars[0]);
 #else
 		d12cache->handle1 =  dlopen(&d12cache->dataM1->chars[1]->chars[0], RTLD_LAZY);
