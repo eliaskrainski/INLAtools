@@ -338,21 +338,22 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 	if (strcmp(CMD, "initial") == 0) {
 		ret = model_func(INLA_CGENERIC_INITIAL, theta, cgeneric_data);
 		nout = (int)ret[0];
-		if (debug > 0) {
-			Rprintf("intial: %d elements (%f)\n", nout, ret[0]);
-			if (nout > 0) {
-				for (i = 0; i < nout; i++)
-					Rprintf("theta[%d] = %f\n", i,
-						ret[1 + i]);
-			}
-		}
 		if (nout > 0) {
-			Rret = PROTECT(allocVector(REALSXP, nout));
-			daux = REAL(Rret);
-			for (i = 0; i < nout; i++) {
-				daux[i] = ret[1 + i];
-			}
+		  Rret = PROTECT(allocVector(REALSXP, nout));
+		  daux = REAL(Rret);
+		  for (i = 0; i < nout; i++) {
+		    daux[i] = ret[1 + i];
+		  }
+		  if (debug > 0) {
+		    Rprintf("intial: %d elements (%f)\n", nout, ret[0]);
+				for (i = 0; i < nout; i++)
+					Rprintf("theta[%d] = %f\n", i, ret[1 + i]);
+		  }
 			UNPROTECT(1);
+		} else {
+		  if (debug > 0) {
+		    Rprintf("no intial\n");
+		  }
 		}
 	}
 
