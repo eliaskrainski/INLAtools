@@ -19,21 +19,23 @@ Authors@R: c(
         )
 Description: Contain code to work with a C struct, in short
   cgeneric, to define a Gaussian Markov random (GMRF) model.
-  A cgeneric model contain code to specify the graph and
-  the precision matrix as well initial and prior for its
-  parameters, and can be accessed from a C program.
-  It is the recommended way to implement new GMRF models 
-  in 'INLA' (<https://www.r-inla.org>).
-  The 'INLAtools' contan code to make queries to evaluate 
+  The cgeneric contain code to specify GMRF elements such as
+  the graph and the precision matrix, and also initial and 
+  prior for its parameters, in order to make it useful to 
+  perform inference. It can be accessed from a C program and
+  is the recommended way to implement new GMRF models 
+  in the 'INLA' package (<https://www.r-inla.org>).
+  The 'INLAtools' implement functions to evaluate 
   each one of the model specifications from R.
   The implemented functionalities leverage the use 
   of 'cgeneric' models and provide a way to debug 
   the code as well to work with the prior for the 
   model parameters and to sample from it. 
-  A Kronecker product method is also implemented to 
-  work with the four possible combinations between 
-  a 'cgeneric' and a 'rgeneric' models. 
-  This was used in 
+  One of the functionalities is the Kronecker product method 
+  in order to (Kronecker) combine multiple cgeneric models.
+  It also works with the rgeneric, the R version of the 
+  cgeneric intended to easy try implementation of new GMRF models.
+  As an example, the Kronecker between two cgeneric models was used in 
   Sterrantino et. al. (2024) <doi:10.48550/arXiv.2312.06289>
 URL: https://github.com/eliaskrainski/INLAtools
 BugReports: https://github.com/eliaskrainski/INLAtools/issues
