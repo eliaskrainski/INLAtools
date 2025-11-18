@@ -270,13 +270,18 @@ setMethod(
     # Note: kron(X,Y) gives X-major ordering (the X-index varies slowly, the
     # Y-index varies quickly), which requires the mappers to be in reverse
     # order, multi(Y,X):
-    ret$mapper <-
+    inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
+    if(is.na(inlabruCheck)) {
+      warning("Please install a inlabru recent version from git.")
+    } else {
+      ret$mapper <-
       inlabru::bm_multi(
         list(
           inlabru::bru_get_mapper(Y),
           inlabru::bru_get_mapper(X)
         )
       )
+    }
 
     return(ret)
   }
@@ -402,13 +407,18 @@ setMethod(
     # Note: kron(X,Y) gives X-major ordering (the X-index varies slowly, the
     # Y-index varies quickly), which requires the mappers to be in reverse
     # order, multi(Y,X):
-    rmodel$mapper <-
+    inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
+    if(is.na(inlabruCheck)) {
+      warning("Please install a inlabru recent version from git.")
+    } else {
+      rmodel$mapper <-
       inlabru::bm_multi(
         list(
           inlabru::bru_get_mapper(Y),
           inlabru::bru_get_mapper(X)
         )
       )
+    }
 
     return(rmodel)
   }
@@ -532,13 +542,18 @@ setMethod(
     # Note: kron(X,Y) gives X-major ordering (the X-index varies slowly, the
     # Y-index varies quickly), which requires the mappers to be in reverse
     # order, multi(Y,X):
-    rmodel$mapper <-
+    inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
+    if(is.na(inlabruCheck)) {
+      warning("Please install a inlabru recent version from git.")
+    } else {
+      rmodel$mapper <-
       inlabru::bm_multi(
         list(
           inlabru::bru_get_mapper(Y),
           inlabru::bru_get_mapper(X)
         )
       )
+    }
 
     return(rmodel)
   }
@@ -642,13 +657,18 @@ setMethod(
     # Note: kron(X,Y) gives X-major ordering (the X-index varies slowly, the
     # Y-index varies quickly), which requires the mappers to be in reverse
     # order, multi(Y,X):
-    rmodel$mapper <-
+    inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
+    if(is.na(inlabruCheck)) {
+      warning("Please install a inlabru recent version from git.")
+    } else {
+      rmodel$mapper <-
       inlabru::bm_multi(
         list(
           inlabru::bru_get_mapper(Y),
           inlabru::bru_get_mapper(X)
         )
       )
+    }
 
     return(rmodel)
   }

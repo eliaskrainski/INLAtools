@@ -35,8 +35,7 @@ Description: Contain code to work with the `cgeneric`
 URL: https://github.com/eliaskrainski/INLAtools
 BugReports: https://github.com/eliaskrainski/INLAtools/issues
 Additional_repositories: 
-    https://inla.r-inla-download.org/R/testing,
-    https://inlabru-org.r-universe.dev
+    https://inla.r-inla-download.org/R/testing
 License: GPL (>=2) 
 Encoding: UTF-8
 RoxygenNote: 7.3.3
