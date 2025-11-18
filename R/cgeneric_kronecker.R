@@ -44,30 +44,18 @@ setMethod(
     } else {
       useINLAprecomp = mcall$useINLAprecomp
     }
-    if(is.null(mcall$shlib)) {
-      shlib <- NULL
-    } else {
-      shlib <- mcall$shlib
-    }
 
     INLAvcheck <- packageCheck("INLA", "25-10-28")
+    if(is.na(INLAvcheck) & useINLAprecomp) {
+      useINLAprecomp <- FALSE
+      warning("INLA version is old. Setting 'useINLAprecomp = FALSE'!")
+    }
+    shlib <- cgeneric_shlib(
+      package = "INLAtools",
+      useINLAprecomp = useINLAprecomp,
+      debug = debug)
 
     cmodel <- "inla_cgeneric_kronecker"
-    if (is.null(shlib)) {
-      if(useINLAprecomp) {
-        shlib <- cgeneric_shlib(
-          package = ifelse(is.na(INLAvcheck),
-                           "graphpcor", ## it is there
-                           "INLAtools"),
-          useINLAprecomp = TRUE,
-          debug = debug)
-      } else {
-        shlib <- cgeneric_shlib(
-          package = "INLAtools",
-          useINLAprecomp = FALSE,
-          debug = debug)
-      }
-    }
 
     n1 <- as.integer(X$f$n)
     n2 <- as.integer(Y$f$n)

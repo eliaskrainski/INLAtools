@@ -92,25 +92,20 @@ cgeneric_generic0 <-
       }
     }
 
-    INLAvcheck <- packageCheck("INLA", "25-10-28")
     if(is.null(dotArgs$useINLAprecomp)) {
       useINLAprecomp <- TRUE
     } else {
       useINLAprecomp <- dotArgs$useINLAprecomp
     }
-    if(useINLAprecomp) {
-     shlib <- cgeneric_shlib(
-       package = ifelse(is.na(INLAvcheck),
-                        "graphpcor", ## it is there
-                        "INLAtools"),
-       useINLAprecomp = TRUE,
-       debug = debug)
-    } else {
-      shlib <- cgeneric_shlib(
-        package = "INLAtools",
-        useINLAprecomp = FALSE,
-        debug = debug)
+    INLAvcheck <- packageCheck("INLA", "25-10-28")
+    if(is.na(INLAvcheck) & useINLAprecomp) {
+      useINLAprecomp <- FALSE
+      warning("INLA version is old. Setting 'useINLAprecomp = FALSE'!")
     }
+    shlib <- cgeneric_shlib(
+      package = "INLAtools",
+      useINLAprecomp = useINLAprecomp,
+      debug = debug)
 
     the_model <- do.call(
       what = "cgenericBuilder",
