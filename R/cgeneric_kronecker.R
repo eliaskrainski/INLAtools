@@ -743,6 +743,10 @@ multi_generic_model <- function(models, ...) {
   stopifnot(is.list(models))
   stopifnot(length(models) >= 1L)
 
+  inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
+  if(is.na(inlabruCheck))
+    stop("Please install a inlabru recent version from git.")
+
   models <- lapply(models, function(model) {
     if (inherits(model, c("rgeneric", "inla.rgeneric"))) {
       rgeneric(model)

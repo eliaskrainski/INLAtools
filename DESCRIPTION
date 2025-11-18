@@ -34,7 +34,9 @@ Description: Contain code to work with the `cgeneric`
   a 'cgeneric' and a 'rgeneric' model.
 URL: https://github.com/eliaskrainski/INLAtools
 BugReports: https://github.com/eliaskrainski/INLAtools/issues
-Additional_repositories: https://inla.r-inla-download.org/R/testing
+Additional_repositories: 
+    https://inla.r-inla-download.org/R/testing,
+    https://inlabru-org.r-universe.dev
 License: GPL (>=2) 
 Encoding: UTF-8
 RoxygenNote: 7.3.3
@@ -43,7 +45,7 @@ Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 4.3),
     Matrix,
-    inlabru (>= 2.13.0.9005)
+    inlabru 
 Imports:
     methods,
     utils
