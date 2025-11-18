@@ -725,15 +725,13 @@ kronecker_extraconstr <- function(c1, c2, n1, n2) {
 #'   list(m1 = m1, m2 = m2, m3 = m3),
 #'   useINLAprecomp = FALSE
 #' )
-#' print(multi123$mapper)
 #' prec(multi123, theta = 0.0)
+#' if(!is.na(packageCheck("inlabru", "2.13.0.9005"))) {
+#'   print(multi123$mapper)
+#' }
 multi_generic_model <- function(models, ...) {
   stopifnot(is.list(models))
   stopifnot(length(models) >= 1L)
-
-  inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
-  if(is.na(inlabruCheck))
-    stop("Please install a inlabru recent version from git.")
 
   models <- lapply(models, function(model) {
     if (inherits(model, c("rgeneric", "inla.rgeneric"))) {
@@ -750,9 +748,14 @@ multi_generic_model <- function(models, ...) {
     ret <- Matrix::kronecker(models[[i]], ret, ...)
   }
 
-  ret[["mapper"]] <- inlabru::bm_multi(
-    lapply(models, inlabru::bru_get_mapper)
-  )
+  inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
+  if(is.na(inlabruCheck)) {
+    warning("Please install a inlabru recent version from git.")
+  } else {
+    ret[["mapper"]] <- inlabru::bm_multi(
+      lapply(models, inlabru::bru_get_mapper)
+    )
+  }
 
   return(ret)
 }
