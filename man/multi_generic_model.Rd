@@ -41,6 +41,8 @@ multi123 <- multi_generic_model(
   list(m1 = m1, m2 = m2, m3 = m3),
   useINLAprecomp = FALSE
 )
-print(multi123$mapper)
 prec(multi123, theta = 0.0)
+if(!is.na(packageCheck("inlabru", "2.13.0.9005"))) {
+  print(multi123$mapper)
+}
 }
