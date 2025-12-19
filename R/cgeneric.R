@@ -318,25 +318,27 @@ inla.cgeneric.sample <- function(n = 1e4, result, name,
   stopifnot(!missing(result))
   stopifnot(inherits(result, "inla"))
   stopifnot(!missing(name))
-  stopifnot(!missing(model))
+  if(missing(model))
+    if(missing(from.theta))
+      stop("Please provide either 'model' or 'from.theta'!")
   stopifnot(n > 0)
   idx <- grep(name, names(result$mode$theta))
   xx <- INLA::inla.hyperpar.sample(
     n = n,
     result = result,
     intern = TRUE)[, idx, drop = FALSE]
-  if(inherits(model, "cgeneric")) {
+  if(missing(model)) {
+    result <- sapply(
+      1:n,
+      function(i) from.theta(xx[i,]),
+      simplify = simplify)
+  } else {
     result <- sapply(1:n, function(i)
       cgeneric_get(model = model,
                    cmd = "Q",
                    theta = xx[i, ]),
       simplify = simplify
     )
-  } else {
-    result <- sapply(
-      1:n,
-      function(i) from.theta(xx[i,]),
-      simplify = simplify)
   }
   return(result)
 }
