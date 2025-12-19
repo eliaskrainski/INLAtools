@@ -382,4 +382,3 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 	return (ret);
 }
 
-
