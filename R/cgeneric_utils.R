@@ -70,11 +70,16 @@ cgeneric_get <- function(model,
     PACKAGE = "INLAtools"
   ), silent = TRUE)
 
+  if(inherits(initheta, "try-error")) {
+    stop('Error trying to get "initial"!')
+  }
+
+  if((length(cmd)==1) & (cmd=="inital")) {
+    return(initheta)
+  }
+
   if(missing(theta)) {
     warning('missing "theta", using "initial"!')
-    if(inherits(initial, "try-error")) {
-      stop('Error trying to get "initial"!')
-    }
     theta <- initheta
   }
 
@@ -219,7 +224,8 @@ graph.cgeneric <- function(model, optimize) {
 #' @export
 prec.cgeneric <- function(model, theta, optimize) {
   if(missing(theta)) {
-    theta <- NULL
+    warning('missing "theta", using "initial"!')
+    theta <- initial(model)
   }
   if(missing(optimize)) {
     optimize <- FALSE

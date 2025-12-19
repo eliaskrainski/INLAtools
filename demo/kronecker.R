@@ -1,4 +1,6 @@
-# Q = \tau (R2 \otimes R1)
+library(INLAtools)
+
+### Q = \tau (R2 \otimes R1)
 
 ## first
 (n1 <- nrow(
@@ -32,7 +34,7 @@ cg2 <- cgeneric(
 ## Kronecker of cgeneric models 1 and 2
 cg12 <- kronecker(cg1, cg2)
 
-all.equal(Sparse(R12),
+all.equal(Sparse(kronecker(R1, R2)),
           Sparse(prec(cg12, theta = 0)))
 
 
