@@ -57,29 +57,27 @@ cgeneric_get <- function(model,
                    several.ok = TRUE)
   stopifnot(length(cmd)>0)
 
-  initheta <- try(.Call(
-    "inla_cgeneric_element_get",
-    "initial",
-    NULL,
-    as.integer(1),
-    cgdata$ints,
-    cgdata$doubles,
-    cgdata$characters,
-    cgdata$matrices,
-    cgdata$smatrices,
-    PACKAGE = "INLAtools"
-  ), silent = TRUE)
-
-  if(inherits(initheta, "try-error")) {
-    stop('Error trying to get "initial"!')
-  }
-
-  if((length(cmd)==1) & (cmd=="inital")) {
-    return(initheta)
-  }
-
-  if(missing(theta)) {
+  needtheta <- any(cmd %in% c("Q", "log_prior"))
+  if((missing(theta) || is.null(theta)) & needtheta) {
     warning('missing "theta", using "initial"!')
+    initheta <- try(.Call(
+      "inla_cgeneric_element_get",
+      "initial",
+      NULL,
+      as.integer(1),
+      cgdata$ints,
+      cgdata$doubles,
+      cgdata$characters,
+      cgdata$matrices,
+      cgdata$smatrices,
+      PACKAGE = "INLAtools"
+    ), silent = TRUE)
+    if(inherits(initheta, "try-error")) {
+      stop('Error trying to get "initial"!')
+    }
+    if((length(cmd)==1) & (cmd=="initial")) {
+      return(initheta)
+    }
     theta <- initheta
   }
 
