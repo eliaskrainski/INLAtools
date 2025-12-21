@@ -23,12 +23,14 @@ R2
 
 ## cgeneric models
 cg1 <- cgeneric(
-    model = "generic0", R = R1,
-    constr = FALSE, scale = FALSE,
+    model = "generic0", 
+    R = R1,
+    scale = FALSE,
     param = c(1, 0.5)) ## P(sigma > 1) = 0.5
 cg2 <- cgeneric(
-    model = "generic0", R = R2,
-    constr = FALSE, scale = FALSE,
+    model = "generic0", 
+    R = R2,
+    scale = FALSE,
     param = c(1, NA)) ## fix sigma, simga = 1
 
 ## Kronecker of cgeneric models 1 and 2

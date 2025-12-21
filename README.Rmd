@@ -1,0 +1,212 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dev = "png",
+  dev.args = list(type = "cairo-png"),
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# INLAtools
+
+<!-- badges: start -->
+[![CRAN Status](http://www.r-pkg.org/badges/version-last-release/INLAtools)](https://cran.r-project.org/package=INLAtools)
+[![](https://cranlogs.r-pkg.org/badges/INLAtools)](https://cran.r-project.org/package=INLAtools)
+<!-- badges: end -->
+
+Contain code to work with a C struct, in short
+  cgeneric, to define a Gaussian Markov random (GMRF) model.
+  The cgeneric contain code to specify GMRF elements such as
+  the graph and the precision matrix, and also the initial and 
+  prior for its parameters, useful for model inference. 
+  It can be accessed from a C program and is the recommended 
+  way to implement new GMRF models in the 'INLA' package 
+  (<https://www.r-inla.org>).
+  The 'INLAtools' implement functions to evaluate 
+  each one of the model specifications from R.
+  The implemented functionalities leverage the use 
+  of 'cgeneric' models and provide a way to debug 
+  the code as well to work with the prior for the 
+  model parameters and to sample from it. 
+  A very useful functionality is the Kronecker product method 
+  that creates a new model from multiple cgeneric models.
+  It also works with the rgeneric, the R version of the 
+  cgeneric intended to easy try implementation of new GMRF models.
+  The Kronecker between two cgeneric models was used in 
+  Sterrantino et. al. (2024) <doi:10.1007/s10260-025-00788-y>,
+  and can be used to build the 
+  spatio-temporal intrinsic interaction models
+  [Knorr-Held (2000)](https://onlinelibrary.wiley.com/doi/10.1002/1097-0258%2820000915/30%2919%3A17/18%3C2555%3A%3AAID-SIM587%3E3.0.CO%3B2-%23)
+  for what the needed constraints are automatically set.
+
+## Installation
+
+The 'INLA' package is a suggested one, but you will need it 
+for actually fitting a model. You can install it with
+```{r eval = !require(INLA)}
+install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE) 
+```
+
+
+You can install the current [CRAN](https://CRAN.R-project.org) version of INLAtools:
+```{r cran-installation, eval = FALSE}
+install.packages("INLAtools")
+```
+
+You can install the latest version of INLAtools from [GitHub](https://github.com/eliaskrainski/INLAtools) with
+```{r ghinst, eval = FALSE}
+## install.packages("remotes")
+remotes::install_github("eliaskrainski/INLAtools")
+```
+
+## Example:
+
+Build a Kronecker product model where the precision is 
+given as 
+\[ \mathbf{Q} = \tau \mathbf{R}_1 \otimes \mathbf{R}_2 \]
+
+```{r first} 
+library(Matrix)
+## first
+n1 <- 15
+(R1 <- crossprod(diff(Diagonal(n1))))
+```
+
+
+```{r second}
+G2 <- sparseMatrix(
+  i = c(1,1,2,2,3,3,6), 
+  j = c(2,3,4,6,4,5,7), 
+  symmetric = TRUE)
+(n2 <- nrow(G2)) 
+R2 <- Diagonal(n = n2, x = colSums(G2)) - G2
+R2
+```
+
+```{r viewK}
+image(kronecker(R1, R2))
+```
+
+Notice that the order of the resulting matrix.
+
+## Define the `cgeneric` models
+
+We will use the 'cgeneric0' model for each. 
+This model is written with precision matrix equal 
+$\tau \mathbf{R}$ where the matrix $\mathbf{R}$ is the
+precision structure matrix and $\tau$ is the precision parameter. 
+A precision parameter multiplied by a precision structure is 
+a local precision. 
+A scaling, as proposed in 
+[Sørbye & Rue (2014)](https://www.sciencedirect.com/science/article/pii/S2211675313000407),
+is applied by default in the following code
+```{r cg1}
+library(INLAtools)
+cg1 <- cgeneric(
+    model = "generic0", 
+    R = R1, ## precision structure matrix
+    param = c(1, 0.05)) ## P(sigma > 1) = 0.05
+```
+where the prior is a PC-prior, as proposed in 
+[Simpson et. al. (2017)](https://projecteuclid.org/journals/statistical-science/volume-32/issue-1/Penalising-Model-Component-Complexity--A-Principled-Practical-Approach-to/10.1214/16-STS576.full).
+
+For the second model we also use the `cgeneric0` but
+fix the parameter to 1,
+leaving the precision matrix from the first model
+as the one for the resulting precision matrix.
+
+```{r cg2}
+cg2 <- cgeneric(
+    model = "generic0", 
+    R = R2, ## precision structure matrix
+    param = c(1, NA)) ## fix sigma = 1
+```
+
+The resulting Kronecker product model is
+```{r cg12}
+cg12 <- kronecker(cg1, cg2)
+(N <- cg12$f$n)
+tau <- 4
+Q <- prec(cg12, theta = log(tau))
+image(Q)
+```
+
+Note: the scaling makes $\sigma = \tau^{-0.5}$
+a marginal standard deviation parameter.
+
+## Fit the model to some data
+
+Simulate $k=5$ samples (replicates) from the 
+Kronecker product model
+
+```{r xx}
+library(INLA)
+k <- 5
+xx <- inla.qsample(
+  n = k, 
+  Q = Q + Diagonal(N, 1e-9), 
+  constr = cg12$f$extraconstr
+)
+apply(xx, 2, summary)
+```
+
+Plot each replicate per group
+```{r ggplot}
+dataf <- data.frame(
+  i1 = rep(rep(1:n1, each = n2), k),
+  i2 = factor(rep(rep(1:n2, n1), k)),
+  i = rep(1:N, k), 
+  r = rep(1:k, each = N),
+  x = as.vector(xx)
+)
+head(dataf, 10)
+
+library(ggplot2)
+ggplot(dataf) + theme_minimal() + 
+  geom_line(aes(x = i1, y = x, group = i2, color = i2)) + 
+  facet_wrap(~r)
+```
+
+Simulate observations considering a Poisson model as
+```{r dataf}
+dataf$y <- rpois(N * k, exp(3 + dataf$x))
+```
+
+Fit the model with a call to the main `INLA` function:
+```{r inla}
+fit <- inla(
+    formula = y ~ f(i, model = cg12, replicate = r),
+    family = "poisson", 
+    data = dataf)
+```
+
+Summary of the intercept and $\tau$ posterior marginals
+```{r smarg}
+fit$summary.fixed
+fit$summary.hyperpar
+```
+
+Scatterplot of the posterior mode and simulated
+```{r sfit}
+par(mar = c(3,3,0.5,0.5), mgp = c(2,0.5,0), bty = "n")
+plot(fit$summary.random$i$mean, xx, pch = 8,
+     xlab = "Posterior mean", ylab = "Simulated")
+```
+
+Posterior marginal summary for $\sigma=\tau^{-1/2}$:
+```{r pmdsummary}
+pm.sigma <- inla.tmarginal(
+  fun = function(x) exp(-x/2), ## from log(tau) to sigma
+  marginal = fit$internal.marginals.hyperpar[[1]])
+1/sqrt(tau)
+inla.zmarginal(pm.sigma)
+```
+

@@ -75,9 +75,10 @@ cgeneric_get <- function(model,
   if((length(cmd)==1) && (cmd=="initial")) {
     return(initheta)
   }
+  theta.size <- length(initheta)
 
   needtheta <- any(cmd %in% c("Q", "log_prior"))
-  if(needtheta) {
+  if(needtheta & (theta.size>0)) {
     if(missing(theta)) {
       warning('missing "theta", using "initial"!')
       theta <- initheta
@@ -88,10 +89,11 @@ cgeneric_get <- function(model,
       }
     }
     theta <- as.double(theta)
+    ntheta <- floor(length(theta)/length(initheta))
   } else {
     theta <- NULL
+    ntheta <- 0L
   }
-  ntheta <- floor(length(theta)/length(initheta))
 
   if(length(cmd) == 1) {
     ret <- .Call(
