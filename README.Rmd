@@ -40,12 +40,11 @@ Contain code to work with a C struct, in short
   that creates a new model from multiple cgeneric models.
   It also works with the rgeneric, the R version of the 
   cgeneric intended to easy try implementation of new GMRF models.
-  The Kronecker between two cgeneric models was used in 
-  Sterrantino et. al. (2024) <doi:10.1007/s10260-025-00788-y>,
-  and can be used to build the 
+  The Kronecker between two cgeneric models can be used to build the 
   spatio-temporal intrinsic interaction models
   [Knorr-Held (2000)](https://onlinelibrary.wiley.com/doi/10.1002/1097-0258%2820000915/30%2919%3A17/18%3C2555%3A%3AAID-SIM587%3E3.0.CO%3B2-%23)
-  for what the needed constraints are automatically set.
+  for what the needed constraints are automatically set
+  as in the example below.
 
 ## Installation
 

@@ -24,11 +24,11 @@ parameters and to sample from it. A very useful functionality is the
 Kronecker product method that creates a new model from multiple cgeneric
 models. It also works with the rgeneric, the R version of the cgeneric
 intended to easy try implementation of new GMRF models. The Kronecker
-between two cgeneric models was used in Sterrantino et. al. (2024)
-<doi:10.1007/s10260-025-00788-y>, and can be used to build the
-spatio-temporal intrinsic interaction models [Knorr-Held
+between two cgeneric models can be used to build the spatio-temporal
+intrinsic interaction models [Knorr-Held
 (2000)](https://onlinelibrary.wiley.com/doi/10.1002/1097-0258%2820000915/30%2919%3A17/18%3C2555%3A%3AAID-SIM587%3E3.0.CO%3B2-%23)
-for what the needed constraints are automatically set.
+for what the needed constraints are automatically set as in the example
+below.
 
 ## Installation
 
@@ -175,12 +175,12 @@ xx <- inla.qsample(
 )
 apply(xx, 2, summary)
 #>              sample:1      sample:2      sample:3      sample:4      sample:5
-#> Min.    -8.968089e-01 -1.299703e+00 -1.783965e+00 -1.116118e+00 -1.045697e+00
-#> 1st Qu. -2.934609e-01 -2.560586e-01 -3.665516e-01 -3.000657e-01 -2.939512e-01
-#> Median   1.166889e-02  1.152800e-02  4.607156e-02 -1.830056e-02  6.944613e-03
-#> Mean    -7.593160e-13 -3.366361e-13  3.690893e-13 -1.937100e-13  7.174773e-13
-#> 3rd Qu.  2.822042e-01  2.357625e-01  3.588101e-01  3.231828e-01  3.101604e-01
-#> Max.     8.335662e-01  1.465949e+00  1.591868e+00  1.156695e+00  7.117289e-01
+#> Min.    -1.095347e+00 -1.432682e+00 -1.503795e+00 -1.237129e+00 -1.998315e+00
+#> 1st Qu. -2.381498e-01 -5.689962e-01 -3.056201e-01 -3.136942e-01 -2.401161e-01
+#> Median   5.298542e-02  3.426877e-02 -4.348082e-02  4.525474e-02  1.099955e-02
+#> Mean     2.014116e-12 -2.819154e-13  1.042859e-12  1.472012e-13 -1.334471e-12
+#> 3rd Qu.  2.820776e-01  4.682985e-01  3.242294e-01  3.322629e-01  3.721559e-01
+#> Max.     8.877810e-01  1.884833e+00  1.394109e+00  1.654145e+00  1.291929e+00
 ```
 
 Plot each replicate per group
@@ -194,17 +194,17 @@ dataf <- data.frame(
   x = as.vector(xx)
 )
 head(dataf, 10)
-#>    i1 i2  i r            x
-#> 1   1  1  1 1  0.807030656
-#> 2   1  2  2 1 -0.175215092
-#> 3   1  3  3 1  0.215147005
-#> 4   1  4  4 1 -0.705119942
-#> 5   1  5  5 1  0.535558847
-#> 6   1  6  6 1 -0.368338618
-#> 7   1  7  7 1 -0.309062857
-#> 8   2  1  8 1  0.624431808
-#> 9   2  2  9 1  0.089657553
-#> 10  2  3 10 1  0.004871403
+#>    i1 i2  i r           x
+#> 1   1  1  1 1  0.16166945
+#> 2   1  2  2 1  0.16487189
+#> 3   1  3  3 1 -0.55721074
+#> 4   1  4  4 1  0.12226728
+#> 5   1  5  5 1 -0.35311952
+#> 6   1  6  6 1  0.29788146
+#> 7   1  7  7 1  0.16364017
+#> 8   2  1  8 1 -0.09849950
+#> 9   2  2  9 1 -0.03702196
+#> 10  2  3 10 1 -0.52317234
 
 library(ggplot2)
 ggplot(dataf) + theme_minimal() + 
@@ -233,13 +233,13 @@ Summary of the intercept and $\tau$ posterior marginals
 
 ``` r
 fit$summary.fixed
-#>                 mean         sd 0.025quant 0.5quant 0.975quant    mode
-#> (Intercept) 2.997917 0.01027399   2.977763  2.99792   3.018055 2.99792
+#>                 mean         sd 0.025quant 0.5quant 0.975quant     mode
+#> (Intercept) 3.008058 0.01040015   2.987657 3.008061   3.028444 3.008061
 #>                      kld
-#> (Intercept) 7.993603e-11
+#> (Intercept) 8.211414e-11
 fit$summary.hyperpar
-#>                 mean        sd 0.025quant 0.5quant 0.975quant     mode
-#> Theta1 for i 1.50995 0.1169644   1.280737 1.509944   1.739191 1.509931
+#>                  mean        sd 0.025quant 0.5quant 0.975quant     mode
+#> Theta1 for i 1.248041 0.1072194   1.037124  1.24833   1.457372 1.248899
 ```
 
 Scatterplot of the posterior mode and simulated
@@ -261,11 +261,11 @@ pm.sigma <- inla.tmarginal(
 1/sqrt(tau)
 #> [1] 0.5
 inla.zmarginal(pm.sigma)
-#> Mean            0.470817 
-#> Stdev           0.0273699 
-#> Quantile  0.025 0.419297 
-#> Quantile  0.25  0.451829 
-#> Quantile  0.5   0.46998 
-#> Quantile  0.75  0.488859 
-#> Quantile  0.975 0.526781
+#> Mean            0.536544 
+#> Stdev           0.0286005 
+#> Quantile  0.025 0.482727 
+#> Quantile  0.25  0.516699 
+#> Quantile  0.5   0.535662 
+#> Quantile  0.75  0.555392 
+#> Quantile  0.975 0.595044
 ```
