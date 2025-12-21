@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   dev = "png",
   dev.args = list(type = "cairo-png"),
-  fig.path = "man/figures/README-",
+  fig.path = "figures/README_",
   out.width = "100%"
 )
 ```
