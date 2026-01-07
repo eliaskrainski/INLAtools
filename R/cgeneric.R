@@ -44,8 +44,9 @@
 #'
 #'  The `cgeneric_shlib` function returns a `character`
 #'  with the path to the shared lib.
-#' @seealso [INLA::cgeneric()] and [methods()]
+#' @seealso [INLA::cgeneric()] and [INLAtools-methods()]
 #' @export
+#' @example demo/cgeneric.R
 cgeneric <- function(model, ...) {
   UseMethod("cgeneric")
 }
@@ -341,4 +342,15 @@ inla.cgeneric.sample <- function(n = 1e4, result, name,
     )
   }
   return(result)
+}
+#' @describeIn cgeneric-class
+#' Print the cgeneric object
+#' @export
+print.cgeneric <- function(model) {
+  cat(model$f$cgeneric$model, ", n = ",
+      model$f$cgeneric$n, ", from\n", sep = "")
+  cat(model$f$cgeneric$data$characters$shlib, "\n")
+  d0 <- c(2L, 0L, 2L, 0, 0)
+  dn <- sapply(model$f$cgeneric$data, length)
+  print(dn[(dn-d0)>0])
 }

@@ -10,6 +10,7 @@
 \alias{cgeneric.inla.cgeneric}
 \alias{cgenericBuilder}
 \alias{cgeneric_shlib}
+\alias{print.cgeneric}
 \title{Organize data for the latent GMRF C interface for \code{INLA}.}
 \usage{
 cgeneric(model, ...)
@@ -25,6 +26,8 @@ cgeneric(model, ...)
 cgenericBuilder(...)
 
 cgeneric_shlib(debug, package, useINLAprecomp)
+
+\method{print}{cgeneric}(model)
 }
 \arguments{
 \item{model}{object class for what a \code{cgeneric} method exists.
@@ -104,12 +107,32 @@ whose order shall follow the graph definition.
 
 \item \code{cgeneric(inla.cgeneric)}: Converts a regular \code{inla.cgeneric} object to \code{cgeneric}.
 
+\item \code{print(cgeneric)}: Print the cgeneric object
+
 }}
 \note{
 The \code{graph} and \code{Q} non-zero pattern should match,
 its elements should be ordered by row,
 and only its upper part stored.
 }
+\examples{
+library(INLAtools)
+
+R <- Sparse(crossprod(diff(diag(10))))
+R
+
+m <- cgeneric("generic0", R = R,
+	      scale = FALSE,
+	      param = c(1, 0.01))
+m
+
+all.equal(R, Sparse(prec(m, theta = 0)))
+
+graph(m)
+prior(m, theta = 0)
+prior(m, theta = matrix(-1:1, 1)) ## see ?prior.cgeneric
+
+}
 \seealso{
-\code{\link[INLA:cgeneric]{INLA::cgeneric()}} and \code{\link[=methods]{methods()}}
+\code{\link[INLA:cgeneric]{INLA::cgeneric()}} and \code{\link[=INLAtools-methods]{INLAtools-methods()}}
 }

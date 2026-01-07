@@ -1,5 +1,5 @@
 #' Methods to work with a `model`.
-#' @name methods
+#' @name INLAtools-methods
 #' @description
 #' For a given model object query the `initial`,
 #' `mu`, log `prior`, `graph` or precision `prec`
@@ -12,13 +12,13 @@
 NULL
 #> NULL
 
-#' @describeIn methods
+#' @describeIn INLAtools-methods
 #' Retrieve the initial model parameter(s)
 #' @export
 initial <- function(model) {
   UseMethod("initial")
 }
-#' @describeIn methods
+#' @describeIn INLAtools-methods
 #' Evaluate the model's mean
 #' @param theta numeric vector.
 #' For `prior` it can be a numeric matrix,
@@ -28,14 +28,14 @@ initial <- function(model) {
 mu <- function(model, theta) {
   UseMethod("mu")
 }
-#' @describeIn methods
+#' @describeIn INLAtools-methods
 #' Evaluate the log-prior for a given `theta`
 #' @seealso [prior.cgeneric()]
 #' @export
 prior <- function(model, theta) {
   UseMethod("prior")
 }
-#' @describeIn methods
+#' @describeIn INLAtools-methods
 #' Retrieve the models' graph
 #' @param optimize logical indicating if it is to be
 #' returned only the elements and not as a sparse matrix.
@@ -43,13 +43,13 @@ prior <- function(model, theta) {
 graph <- function(model, optimize) {
   UseMethod("graph")
 }
-#' @describeIn methods
+#' @describeIn INLAtools-methods
 #' Retrieve the precision for a given `theta`
 #' @export
 prec <- function(model, theta, optimize) {
   UseMethod("prec")
 }
-#' @describeIn methods
+#' @describeIn INLAtools-methods
 #' The default precision method
 #' computes the inverse of the variance
 #' @param ... additional arguments passed on
@@ -64,7 +64,7 @@ prec.default <- function(model, ...) {
     )
   )
 }
-#' @describeIn methods
+#' @describeIn INLAtools-methods
 #' The `vcov` method for sparse matrices
 #' @param object Matrix supposed to be a
 #' sparse precision matrix

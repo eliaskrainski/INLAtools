@@ -63,15 +63,6 @@ otherwise \eqn{\tau} is the conditional precision.
 with the structure matrix as the identity.
 
 }}
-\examples{
-## structured precision matrix model definition
-R <- Matrix(toeplitz(c(2,-1,0,0,0)))
-R
-mR <- cgeneric("generic0", R = R,
-  param = c(1, 0.05), scale = FALSE)
-graph(mR)
-prec(mR, theta = 0)
-}
 \references{
 Sigrunn Holbek Sørbye and Håvard Rue (2014).
 Scaling intrinsic Gaussian Markov random field priors in

@@ -42,14 +42,6 @@
 #' @seealso [prior.cgeneric()]
 #' @importFrom methods as
 #' @export
-#' @examples
-#' ## structured precision matrix model definition
-#' R <- Matrix(toeplitz(c(2,-1,0,0,0)))
-#' R
-#' mR <- cgeneric("generic0", R = R,
-#'   param = c(1, 0.05), scale = FALSE)
-#' graph(mR)
-#' prec(mR, theta = 0)
 cgeneric_generic0 <-
   function(R,
            param,
