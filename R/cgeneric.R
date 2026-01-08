@@ -347,10 +347,36 @@ inla.cgeneric.sample <- function(n = 1e4, result, name,
 #' Print the cgeneric object
 #' @export
 print.cgeneric <- function(model) {
-  cat(model$f$cgeneric$model, ", n = ",
-      model$f$cgeneric$n, ", from\n", sep = "")
+  cat("cgeneric: ", model$f$cgeneric$model, ", n = ",
+      model$f$cgeneric$n, ", shlib:\n", sep = "")
   cat(model$f$cgeneric$data$characters$shlib, "\n")
   d0 <- c(2L, 0L, 2L, 0, 0)
   dn <- sapply(model$f$cgeneric$data, length)
-  print(dn[(dn-d0)>0])
+  dn0 <- dn-d0
+  ii <- which(dn0>0)
+  if(length(ii)>0) {
+    nd <- names(dn)
+    for(i in ii){
+      d <- model$f$cgeneric$data[[i]]
+      ndi <- names(d)
+      jj <- (d0[i]+1):dn[i]
+      cat(nd[i], " (", dn[i], ") : ", sep = "")
+      if(i %in% c(1,2,3)) {
+        cat(paste(ndi[jj], "(", sapply(d[jj], length),
+                  ") ", sep = ""), "\n")
+      } else {
+        if(i==4) {
+          dj <- sapply(d[jj], function(x) x[1:2])
+          cat(paste(ndi[jj], "(", dj[1,], ",", dj[2, ],
+                    ") ", sep = ""), "\n")
+        }
+        if(i==5) {
+          dj <- sapply(d[jj], function(x) x[1:3])
+          cat(paste(ndi[jj], "(", dj[1,], ",",
+                    dj[2, ], ",", dj[3,],
+                    ") ", sep = ""), "\n")
+        }
+      }
+    }
+  }
 }
