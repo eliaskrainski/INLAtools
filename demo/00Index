@@ -1,3 +1,5 @@
-cgeneric    	The cgeneric model objects
-kronecker    	The cgeneric kronecker models
+cgeneric    	A cgeneric model demo
+kronecker    	Kronecker with cgeneric models
+kronecker3      Kronecker with 3 cgeneric models
 minimal         Minimal INLA fit
+prior     	PC-prior for the standard deviation

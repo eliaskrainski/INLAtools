@@ -65,7 +65,7 @@ The functions listed below are for each \code{cmd} case.
 
 }}
 \examples{
-
+library(INLAtools)
 old.par <- par(no.readonly = TRUE)
 
 ## Setting the prior parameters
@@ -112,7 +112,6 @@ rug(smedian, lwd = 3, col = 3)
 rug(smean, lwd = 3, col = 4)
 
 par(old.par)
-
 }
 \seealso{
 check the examples in \code{\link[=cgeneric_generic0]{cgeneric_generic0()}}

@@ -732,23 +732,7 @@ kronecker_extraconstr <- function(c1, c2, n1, n2) {
 #'   mapper.
 #' @rdname multi_generic_model
 #' @export
-#' @examples
-#' R1 <- Matrix(crossprod(diff(diag(4))))
-#' m1 <- cgeneric("generic0", R = R1, param = c(1, NA),
-#'   scale = FALSE, useINLAprecomp = FALSE)
-#' R2 <- Matrix(crossprod(diff(diag(3))))
-#' m2 <- cgeneric("generic0", R = R2, param = c(1, NA),
-#'   scale = FALSE, useINLAprecomp = FALSE)
-#' m3 <- cgeneric("iid", n = 2, param = c(1, 0.5),
-#'   useINLAprecomp = FALSE)
-#' multi123 <- multi_generic_model(
-#'   list(m1 = m1, m2 = m2, m3 = m3),
-#'   useINLAprecomp = FALSE
-#' )
-#' prec(multi123, theta = 0.0)
-#' if(!is.na(packageCheck("inlabru", "2.13.0.9005"))) {
-#'   print(multi123$mapper)
-#' }
+#' @example demo/kronecker3.R
 multi_generic_model <- function(models, ...) {
   stopifnot(is.list(models))
   stopifnot(length(models) >= 1L)
