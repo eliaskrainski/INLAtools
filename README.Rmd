@@ -152,7 +152,8 @@ k <- 5
 xx <- inla.qsample(
   n = k, 
   Q = Q + Diagonal(N, 1e-9), 
-  constr = cg12$f$extraconstr
+  constr = cg12$f$extraconstr, 
+  seed = 1
 )
 apply(xx, 2, summary)
 ```

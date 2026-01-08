@@ -4,13 +4,14 @@
 \alias{prec.inla}
 \title{Define the prec method for an inla output object}
 \usage{
-\method{prec}{inla}(model)
+\method{prec}{inla}(model, ...)
 }
 \arguments{
 \item{model}{an inla output}
 
-\item{prior}{logical (default is TRUE) to indicate
-if it should retrieve the prior or the posterior precision}
+\item{...}{used to pass the 'prior' argument,
+as logical (default is TRUE) to indicate if it is
+to retrieve the prior or the posterior precision.}
 }
 \description{
 Define the prec method for an inla output object

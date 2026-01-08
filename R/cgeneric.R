@@ -345,19 +345,21 @@ inla.cgeneric.sample <- function(n = 1e4, result, name,
 }
 #' @describeIn cgeneric-class
 #' Print the cgeneric object
+#' @param x a cgneric object
+#' @param ... not used
 #' @export
-print.cgeneric <- function(model) {
-  cat("cgeneric: ", model$f$cgeneric$model, ", n = ",
-      model$f$cgeneric$n, ", shlib:\n", sep = "")
-  cat(model$f$cgeneric$data$characters$shlib, "\n")
+print.cgeneric <- function(x, ...) {
+  cat("cgeneric: ", x$f$cgeneric$model, ", n = ",
+      x$f$cgeneric$n, ", shlib:\n", sep = "")
+  cat(x$f$cgeneric$data$characters$shlib, "\n")
   d0 <- c(2L, 0L, 2L, 0, 0)
-  dn <- sapply(model$f$cgeneric$data, length)
+  dn <- sapply(x$f$cgeneric$data, length)
   dn0 <- dn-d0
   ii <- which(dn0>0)
   if(length(ii)>0) {
     nd <- names(dn)
     for(i in ii){
-      d <- model$f$cgeneric$data[[i]]
+      d <- x$f$cgeneric$data[[i]]
       ndi <- names(d)
       jj <- (d0[i]+1):dn[i]
       cat(nd[i], " (", dn[i], ") : ", sep = "")

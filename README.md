@@ -171,16 +171,20 @@ k <- 5
 xx <- inla.qsample(
   n = k, 
   Q = Q + Diagonal(N, 1e-9), 
-  constr = cg12$f$extraconstr
+  constr = cg12$f$extraconstr, 
+  seed = 1
 )
+#> Warning in inla.qsample(n = k, Q = Q + Diagonal(N, 1e-09), constr =
+#> cg12$f$extraconstr, : Since 'seed!=0', parallel model is disabled and serial
+#> model is selected
 apply(xx, 2, summary)
 #>              sample:1      sample:2      sample:3      sample:4      sample:5
-#> Min.    -1.095347e+00 -1.432682e+00 -1.503795e+00 -1.237129e+00 -1.998315e+00
-#> 1st Qu. -2.381498e-01 -5.689962e-01 -3.056201e-01 -3.136942e-01 -2.401161e-01
-#> Median   5.298542e-02  3.426877e-02 -4.348082e-02  4.525474e-02  1.099955e-02
-#> Mean     2.014116e-12 -2.819154e-13  1.042859e-12  1.472012e-13 -1.334471e-12
-#> 3rd Qu.  2.820776e-01  4.682985e-01  3.242294e-01  3.322629e-01  3.721559e-01
-#> Max.     8.877810e-01  1.884833e+00  1.394109e+00  1.654145e+00  1.291929e+00
+#> Min.    -1.244648e+00 -1.921912e+00 -8.876440e-01 -8.104780e-01 -1.195814e+00
+#> 1st Qu. -4.227780e-01 -3.927394e-01 -2.466591e-01 -2.647159e-01 -2.574487e-01
+#> Median   8.474877e-03  5.005800e-02 -2.834700e-02  2.188409e-02 -2.665859e-02
+#> Mean    -1.054734e-12  3.951671e-13 -3.884818e-13  1.512079e-14  6.087083e-13
+#> 3rd Qu.  4.315217e-01  4.220450e-01  2.283570e-01  2.644288e-01  3.051810e-01
+#> Max.     1.166829e+00  1.814482e+00  1.762854e+00  8.952277e-01  9.702742e-01
 ```
 
 Plot each replicate per group
@@ -194,17 +198,17 @@ dataf <- data.frame(
   x = as.vector(xx)
 )
 head(dataf, 10)
-#>    i1 i2  i r           x
-#> 1   1  1  1 1  0.16166945
-#> 2   1  2  2 1  0.16487189
-#> 3   1  3  3 1 -0.55721074
-#> 4   1  4  4 1  0.12226728
-#> 5   1  5  5 1 -0.35311952
-#> 6   1  6  6 1  0.29788146
-#> 7   1  7  7 1  0.16364017
-#> 8   2  1  8 1 -0.09849950
-#> 9   2  2  9 1 -0.03702196
-#> 10  2  3 10 1 -0.52317234
+#>    i1 i2  i r            x
+#> 1   1  1  1 1 -0.034627319
+#> 2   1  2  2 1  0.002663663
+#> 3   1  3  3 1 -0.562134730
+#> 4   1  4  4 1 -0.493268793
+#> 5   1  5  5 1 -0.228196484
+#> 6   1  6  6 1  0.695164926
+#> 7   1  7  7 1  0.620398736
+#> 8   2  1  8 1  0.199000730
+#> 9   2  2  9 1  0.027308761
+#> 10  2  3 10 1 -0.520617245
 
 library(ggplot2)
 ggplot(dataf) + theme_minimal() + 
@@ -234,12 +238,12 @@ Summary of the intercept and $\tau$ posterior marginals
 ``` r
 fit$summary.fixed
 #>                 mean         sd 0.025quant 0.5quant 0.975quant     mode
-#> (Intercept) 3.008058 0.01040015   2.987657 3.008061   3.028444 3.008061
+#> (Intercept) 3.007856 0.01022422   2.987801 3.007859   3.027898 3.007859
 #>                      kld
-#> (Intercept) 8.211414e-11
+#> (Intercept) 7.646788e-11
 fit$summary.hyperpar
 #>                  mean        sd 0.025quant 0.5quant 0.975quant     mode
-#> Theta1 for i 1.248041 0.1072194   1.037124  1.24833   1.457372 1.248899
+#> Theta1 for i 1.665615 0.1160537   1.437599 1.665828   1.892466 1.666246
 ```
 
 Scatterplot of the posterior mode and simulated
@@ -261,11 +265,11 @@ pm.sigma <- inla.tmarginal(
 1/sqrt(tau)
 #> [1] 0.5
 inla.zmarginal(pm.sigma)
-#> Mean            0.536544 
-#> Stdev           0.0286005 
-#> Quantile  0.025 0.482727 
-#> Quantile  0.25  0.516699 
-#> Quantile  0.5   0.535662 
-#> Quantile  0.75  0.555392 
-#> Quantile  0.975 0.595044
+#> Mean            0.435548 
+#> Stdev           0.0251301 
+#> Quantile  0.025 0.388361 
+#> Quantile  0.25  0.418096 
+#> Quantile  0.5   0.434739 
+#> Quantile  0.75  0.452089 
+#> Quantile  0.975 0.487044
 ```

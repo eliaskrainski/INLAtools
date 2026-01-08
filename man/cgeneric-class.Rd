@@ -27,24 +27,14 @@ cgenericBuilder(...)
 
 cgeneric_shlib(debug, package, useINLAprecomp)
 
-\method{print}{cgeneric}(model)
+\method{print}{cgeneric}(x, ...)
 }
 \arguments{
 \item{model}{object class for what a \code{cgeneric} method exists.
 E.g., if it is a character, a specific function will be called.
 E.g. cgeneric("iid", ...") calls cgeneric_iid(...).}
 
-\item{...}{arguments passed from the
-\code{\link[=cgeneric]{cgeneric()}} methods. FIt should include
-\code{n} and \code{debug}. For \code{cgenericBuild} it should
-\code{model} as a character string with the name of the
-C function and \code{shlib} as the path to the
-shared object containing such function.
-If \code{shlib} is not provided it can be built
-using \code{inla_shlib} from the arguments,
-\code{package} (character with the R package containing it),
-\code{useINLAprecomp} (logical to indicate if \code{INLA} contains it
-and to use it).}
+\item{...}{not used}
 
 \item{debug}{integer, used as verbose in debug.}
 
@@ -53,6 +43,8 @@ that contains the \code{cgeneric} model.}
 
 \item{useINLAprecomp}{logical, indicating if it is to use
 the shared object previously copied and compiled by INLA.}
+
+\item{x}{a cgneric object}
 }
 \value{
 a method to build a \code{cgeneric} should return
