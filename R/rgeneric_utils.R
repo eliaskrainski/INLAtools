@@ -60,6 +60,14 @@ rgeneric_get <- function(model,
     theta <- as.double(theta)
     ntheta <- floor(length(theta)/length(initheta))
 
+    ## if more than one theta is given
+    if((ntheta>1) && (length(cmd)==1) && (cmd=="log_prior")) {
+      theta <- matrix(theta, nrow = length(initheta))
+      return(sapply(1:ncol(theta), function(j) {
+        rgeneric_get(model, cmd = "initial", theta = theta[, j])
+      }))
+    }
+
   } else {
     theta <- NULL
     ntheta <- 0L
