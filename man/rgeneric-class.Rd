@@ -7,11 +7,9 @@
 \alias{rgeneric.default}
 \alias{rgeneric.rgeneric}
 \alias{rgeneric.inla.rgeneric}
-\alias{graph.rgeneric}
-\alias{prec.rgeneric}
-\alias{initial.rgeneric}
-\alias{mu.rgeneric}
-\alias{prior.rgeneric}
+\alias{print.rgeneric}
+\alias{summary.rgeneric}
+\alias{plot.rgeneric}
 \title{Organize data for the latent GMRF R interface for \code{INLA}.}
 \usage{
 rgeneric(model, debug = FALSE, compile = TRUE, optimize = TRUE, ...)
@@ -22,18 +20,15 @@ rgeneric(model, debug = FALSE, compile = TRUE, optimize = TRUE, ...)
 
 \method{rgeneric}{inla.rgeneric}(model, ...)
 
-\method{graph}{rgeneric}(model, ...)
+\method{print}{rgeneric}(x, ...)
 
-\method{prec}{rgeneric}(model, ...)
+\method{summary}{rgeneric}(object, ...)
 
-\method{initial}{rgeneric}(model)
-
-\method{mu}{rgeneric}(model, theta)
-
-\method{prior}{rgeneric}(model, theta)
+\method{plot}{rgeneric}(x, y, ...)
 }
 \arguments{
-\item{model}{a \code{rgeneric} model object}
+\item{model}{For the default method, the model defined as a function.
+See the 'rgeneric' vignette from the INLA package.}
 
 \item{debug}{logical indicating debug state.}
 
@@ -42,10 +37,13 @@ rgeneric(model, debug = FALSE, compile = TRUE, optimize = TRUE, ...)
 \item{optimize}{logical indicating if only the elements
 of the precision matrix are returned.}
 
-\item{...}{additional parameter such as 'theta'
-If 'theta' is not supplied, initial will be taken.}
+\item{...}{not used}
 
-\item{theta}{the parameter.}
+\item{x}{a rgeneric object}
+
+\item{object}{a rgeneric object}
+
+\item{y}{not used}
 }
 \value{
 \code{rgeneric}/ \code{inla.rgeneric} object.
@@ -61,14 +59,10 @@ The rgeneric default method.
 
 \item \code{rgeneric(inla.rgeneric)}: Converts a regular \code{inla.rgeneric} object to \code{rgeneric}.
 
-\item \code{graph(rgeneric)}: The graph method for 'rgeneric'
+\item \code{print(rgeneric)}: Print the rgeneric object
 
-\item \code{prec(rgeneric)}: The precision method for an \code{rgeneric} object.
+\item \code{summary(rgeneric)}: A summary for a rgeneric object
 
-\item \code{initial(rgeneric)}: The initial method for 'rgeneric'
-
-\item \code{mu(rgeneric)}: The mu method for 'rgeneric'
-
-\item \code{prior(rgeneric)}: The prior metho for 'rgeneric'
+\item \code{plot(rgeneric)}: A plot for a rgeneric object
 
 }}

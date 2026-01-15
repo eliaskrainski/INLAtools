@@ -11,6 +11,8 @@
 \alias{cgenericBuilder}
 \alias{cgeneric_shlib}
 \alias{print.cgeneric}
+\alias{summary.cgeneric}
+\alias{plot.cgeneric}
 \title{Organize data for the latent GMRF C interface for \code{INLA}.}
 \usage{
 cgeneric(model, ...)
@@ -28,6 +30,10 @@ cgenericBuilder(...)
 cgeneric_shlib(debug, package, useINLAprecomp)
 
 \method{print}{cgeneric}(x, ...)
+
+\method{summary}{cgeneric}(object, ...)
+
+\method{plot}{cgeneric}(x, y, ...)
 }
 \arguments{
 \item{model}{object class for what a \code{cgeneric} method exists.
@@ -44,7 +50,11 @@ that contains the \code{cgeneric} model.}
 \item{useINLAprecomp}{logical, indicating if it is to use
 the shared object previously copied and compiled by INLA.}
 
-\item{x}{a cgneric object}
+\item{x}{a cgeneric object}
+
+\item{object}{a cgeneric object}
+
+\item{y}{not used}
 }
 \value{
 a method to build a \code{cgeneric} should return
@@ -100,6 +110,10 @@ whose order shall follow the graph definition.
 \item \code{cgeneric(inla.cgeneric)}: Converts a regular \code{inla.cgeneric} object to \code{cgeneric}.
 
 \item \code{print(cgeneric)}: Print the cgeneric object
+
+\item \code{summary(cgeneric)}: A summary for a cgeneric object
+
+\item \code{plot(cgeneric)}: A plot for a cgeneric object
 
 }}
 \note{

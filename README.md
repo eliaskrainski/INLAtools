@@ -238,12 +238,12 @@ Summary of the intercept and $\tau$ posterior marginals
 ``` r
 fit$summary.fixed
 #>                 mean         sd 0.025quant 0.5quant 0.975quant     mode
-#> (Intercept) 3.007856 0.01022422   2.987801 3.007859   3.027898 3.007859
-#>                      kld
-#> (Intercept) 7.646788e-11
+#> (Intercept) 2.989044 0.01031124   2.968818 2.989047   3.009256 2.989047
+#>                     kld
+#> (Intercept) 7.51826e-11
 fit$summary.hyperpar
 #>                  mean        sd 0.025quant 0.5quant 0.975quant     mode
-#> Theta1 for i 1.665615 0.1160537   1.437599 1.665828   1.892466 1.666246
+#> Theta1 for i 1.728661 0.1172793   1.498137 1.728913   1.957804 1.729409
 ```
 
 Scatterplot of the posterior mode and simulated
@@ -265,11 +265,11 @@ pm.sigma <- inla.tmarginal(
 1/sqrt(tau)
 #> [1] 0.5
 inla.zmarginal(pm.sigma)
-#> Mean            0.435548 
-#> Stdev           0.0251301 
-#> Quantile  0.025 0.388361 
-#> Quantile  0.25  0.418096 
-#> Quantile  0.5   0.434739 
-#> Quantile  0.75  0.452089 
-#> Quantile  0.975 0.487044
+#> Mean            0.422047 
+#> Stdev           0.0246101 
+#> Quantile  0.025 0.37588 
+#> Quantile  0.25  0.404949 
+#> Quantile  0.5   0.42124 
+#> Quantile  0.75  0.438237 
+#> Quantile  0.975 0.472519
 ```

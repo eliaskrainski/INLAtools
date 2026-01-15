@@ -54,75 +54,30 @@ rgeneric.inla.rgeneric <- function(model, ...) {
 }
 
 #' @describeIn rgeneric-class
-#' The graph method for 'rgeneric'
-#' @param model a `rgeneric` model object
-#' @param ... additional arguments
+#' Print the rgeneric object
+#' @param x a rgeneric object
+#' @param ... not used
 #' @export
-graph.rgeneric <- function(model, ...) {
-  return(do.call(
-    what = "inla.rgeneric.q",
-    args = list(rmodel = model,
-                cmd = "graph")
-    ))
+print.rgeneric <- function(x, ...) {
+  cat("rgeneric: ", x$f$rgeneric$model, ", n = ",
+      x$f$rgeneric$n, "\n", sep = "")
 }
 #' @describeIn rgeneric-class
-#' The precision method for an `rgeneric` object.
-#' @param ... additional parameter such as 'theta'
-#' If 'theta' is not supplied, initial will be taken.
+#' A summary for a rgeneric object
+#' @param object a rgeneric object
+#' @param ... not used
 #' @export
-prec.rgeneric <- function(model, ...) {
-  mc <- list(...)
-  nargs <- names(mc)
-  if(any(nargs == "theta")) {
-    theta <- mc$theta
-  } else {
-    warning("Using the 'default' initial parameter:")
-    theta <- initial(model)
-    cat(theta, '\n')
-  }
-  return(do.call(
-    what = "inla.rgeneric.q",
-    args = list(rmodel = model,
-                cmd = "Q",
-                theta = theta)
-  ))
+summary.rgeneric <- function(object, ...) {
+  g <- graph(object)
+  cat("n = ", object$f$rgeneric$n, ", graph with",
+      length(g@x), "non-zeros\n", sep = "")
 }
 #' @describeIn rgeneric-class
-#' The initial method for 'rgeneric'
+#' A plot for a rgeneric object
+#' @param y not used
+#' @importFrom graphics image
 #' @export
-initial.rgeneric <- function(model) {
-  return(do.call(
-    what = "inla.rgeneric.q",
-    args = list(rmodel = model,
-                cmd = "initial")
-  ))
-}
-#' @describeIn rgeneric-class
-#' The mu method for 'rgeneric'
-#' @export
-mu.rgeneric <- function(model, theta) {
-  if(missing(theta)) {
-    theta <- initial(model)
-    warning(paste(
-      "Using the default initial theta as:",
-      format(theta)))
-  }
-  return(do.call(
-    what = "inla.rgeneric.q",
-    args = list(rmodel = model,
-                cmd = "mu",
-                theta = theta)
-  ))
-}
-#' @describeIn rgeneric-class
-#' The prior metho for 'rgeneric'
-#' @param theta the parameter.
-#' @export
-prior.rgeneric <- function(model, theta) {
-  return(do.call(
-    what = "inla.rgeneric.q",
-    args = list(rmodel = model,
-                cmd = "log.prior",
-                theta = theta)
-  ))
+plot.rgeneric <- function(x, y, ...) {
+  g <- graph(x)
+  image(g)
 }

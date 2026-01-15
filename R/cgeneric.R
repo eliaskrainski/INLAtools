@@ -298,54 +298,9 @@ cgeneric_shlib <- function(
   }
   return(normalizePath(shlib))
 }
-#' Draw samples from hyperparameters of a `cgeneric`
-#' model component from an `inla` output, like
-#' `inla::inla.iidkd.sample()`.
-#' @param n integer as the sample size.
-#' @param result an `inla` output.
-#' @param name character with the name of the model
-#' component in the set of random effects.
-#' @param model a `cgeneric` model
-#' @param from.theta a function to convert from
-#' theta to the desired output for each sample.
-#' @param simplify logical (see ?sapply).
-#' @return matrix (if n>1 and length(from.theta)>1)
-#' or numeric vector otherwise.
-#' @seealso [prior.cgeneric()]
-#' @export
-inla.cgeneric.sample <- function(n = 1e4, result, name,
-                                 model, from.theta,
-                                 simplify = FALSE) {
-  stopifnot(!missing(result))
-  stopifnot(inherits(result, "inla"))
-  stopifnot(!missing(name))
-  if(missing(model))
-    if(missing(from.theta))
-      stop("Please provide either 'model' or 'from.theta'!")
-  stopifnot(n > 0)
-  idx <- grep(name, names(result$mode$theta))
-  xx <- INLA::inla.hyperpar.sample(
-    n = n,
-    result = result,
-    intern = TRUE)[, idx, drop = FALSE]
-  if(missing(model)) {
-    result <- sapply(
-      1:n,
-      function(i) from.theta(xx[i,]),
-      simplify = simplify)
-  } else {
-    result <- sapply(1:n, function(i)
-      cgeneric_get(model = model,
-                   cmd = "Q",
-                   theta = xx[i, ]),
-      simplify = simplify
-    )
-  }
-  return(result)
-}
 #' @describeIn cgeneric-class
 #' Print the cgeneric object
-#' @param x a cgneric object
+#' @param x a cgeneric object
 #' @param ... not used
 #' @export
 print.cgeneric <- function(x, ...) {
@@ -381,4 +336,23 @@ print.cgeneric <- function(x, ...) {
       }
     }
   }
+}
+#' @describeIn cgeneric-class
+#' A summary for a cgeneric object
+#' @param object a cgeneric object
+#' @param ... not used
+#' @export
+summary.cgeneric <- function(object, ...) {
+  g <- graph(object)
+  cat("n = ", object$f$cgeneric$n, ", graph with",
+      length(g@x), "non-zeros\n", sep = "")
+}
+#' @describeIn cgeneric-class
+#' A plot for a cgeneric object
+#' @param y not used
+#' @importFrom graphics image
+#' @export
+plot.cgeneric <- function(x, y, ...) {
+  g <- graph(x)
+  image(g)
 }

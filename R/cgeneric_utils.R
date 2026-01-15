@@ -96,7 +96,7 @@ cgeneric_get <- function(model,
   }
 
   if(length(cmd) == 1) {
-    ret <- .Call(
+    ret <- try(.Call(
       "inla_cgeneric_element_get",
       cmd,
       theta,
@@ -107,7 +107,10 @@ cgeneric_get <- function(model,
       cgdata$matrices,
       cgdata$smatrices,
       PACKAGE = "INLAtools"
-    )
+    ), silent = TRUE)
+    if(inherits(ret, "try-error")) {
+      stop('Error trying to get "', cmd, '"!')
+    }
 
     if((cmd %in% c("graph", "Q")) && (!optimize)) {
       if(cmd == "graph") {

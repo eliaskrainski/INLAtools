@@ -72,15 +72,19 @@ cgeneric_generic0 <-
     stopifnot(n>0)
 
     if(scale) {
-      Rs <- try(
-        INLA::inla.scale.model(
-          Q = R,
-          constr = list(A = matrix(1, 1, n), e = 0)
-      ))
-      if(inherits(R, "try-error")) {
-        warning("Please install 'INLA'!")
+      stopifnot(requireNamespace("INLA"))
+      Rs <- try(do.call(
+        what = "inla.scale.model.internal",
+        args = list(Q = R,
+                    constr = list(A = matrix(1, 1, n), e = 0))
+      ), silent = FALSE)
+      if(inherits(Rs, "try-error")) {
+        stop("Error trying to scale the model!")
       } else {
-        R <- Rs
+        if(debug) {
+          cat("Marginal var = ", Rs$var, "\n")
+        }
+        R <- Sparse(Rs$Q)
       }
     }
 

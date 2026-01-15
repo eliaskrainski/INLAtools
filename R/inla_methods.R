@@ -33,6 +33,6 @@ prec.inla <- function(model, ...) {
       symmetric = TRUE,
       repr = "T"
     )
-  return(Q)
+  return(Sparse(Q))
 }
 

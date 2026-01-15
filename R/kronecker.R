@@ -272,7 +272,7 @@ setMethod(
     # order, multi(Y,X):
     inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
     if(is.na(inlabruCheck)) {
-      warning("Please install a inlabru recent version from git.")
+      warning("Please install a inlabru recent version.")
     } else {
       ret$mapper <-
       inlabru::bm_multi(
@@ -318,15 +318,15 @@ setMethod(
                        theta = NULL) {
 
       graph <- function(n, theta) {
-        g1 <- cgeneric_get(X, "graph", optimize = FALSE)
-        g2 <- INLA::inla.rgeneric.q(Y, "graph")
-        return(kronecker(g1, g2))
+        g1 <- cgeneric_get(X, cmd = "graph", optimize = FALSE)
+        g2 <- rgeneric_get(Y, cmd = "graph", optimize = FALSE)
+        return(Sparse(kronecker(g1, g2)))
       }
 
       Q <- function(n, theta) {
         Q1 <- cgeneric_get(X, "Q", theta = theta[1:nth1], optimize = FALSE)
-        Q2 <- INLA::inla.rgeneric.q(Y, "Q", theta = theta[nth1+1:nth2], optimize = FALSE)
-        QQ <- INLA::inla.as.sparse(kronecker(Q1, Q2))
+        Q2 <- rgeneric_get(Y, "Q", theta = theta[nth1+1:nth2], optimize = FALSE)
+        QQ <- Sparse(kronecker(Q1, Q2))
         idx <- which(QQ@i <= QQ@j)
         return(QQ@x[idx])
       }
@@ -339,8 +339,8 @@ setMethod(
 
       log.prior <- function(n, theta) {
         return(
-          prior(X, theta = theta[1:nth1]) +
-            prior(Y, theta = theta[nth1+1:nth2])
+          cgeneric_get(X, cmd = "log_prior", theta = theta[1:nth1]) +
+            rgeneric_get(Y, cmd = "log_prior", theta = theta[nth1+1:nth2])
         )
       }
 
@@ -409,7 +409,7 @@ setMethod(
     # order, multi(Y,X):
     inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
     if(is.na(inlabruCheck)) {
-      warning("Please install a inlabru recent version from git.")
+      warning("Please install a inlabru recent version.")
     } else {
       rmodel$mapper <-
       inlabru::bm_multi(
@@ -455,15 +455,15 @@ setMethod(
                        theta = NULL) {
 
       graph <- function(n, theta) {
-        g1 <- INLA::inla.rgeneric.q(rmodel = X, cmd = "graph")
-        g2 <- cgeneric_get(Y, "graph", optimize = FALSE)
-        return(kronecker(g1, g2))
+        g1 <- rgeneric_get(X, cmd = "graph", optimize = FALSE)
+        g2 <- cgeneric_get(Y, cmd = "graph", optimize = FALSE)
+        return(Sparse(kronecker(g1, g2)))
       }
 
       Q <- function(n, theta) {
-        Q1 <- INLA::inla.rgeneric.q(rmodel = X, cmd = "Q", theta = theta[1:nth1])
-        Q2 <- cgeneric_get(Y, "Q", theta = theta[nth1+1:nth2], optimize = FALSE)
-        QQ <- INLA::inla.as.sparse(kronecker(Q1, Q2))
+        Q1 <- rgeneric_get(X, cmd = "Q", theta = theta[1:nth1], optimize = FALSE)
+        Q2 <- cgeneric_get(Y, cmd = "Q", theta = theta[nth1+1:nth2], optimize = FALSE)
+        QQ <- Sparse(kronecker(Q1, Q2))
         idx <- which(QQ@i <= QQ@j)
         return(QQ@x[idx])
       }
@@ -476,8 +476,8 @@ setMethod(
 
       log.prior <- function(n, theta) {
         return(
-          INLA::inla.rgeneric.q(rmodel = X, cmd = "log.prior", theta = theta[1:nth1]) +
-          prior(Y, theta = theta[nth1+1:nth2])
+          rgeneric_get(X, cmd = "log_prior", theta = theta[1:nth1]) +
+          cgeneric_get(Y, cmd = "log_prior", theta = theta[nth1+1:nth2])
         )
       }
 
@@ -544,7 +544,7 @@ setMethod(
     # order, multi(Y,X):
     inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
     if(is.na(inlabruCheck)) {
-      warning("Please install a inlabru recent version from git.")
+      warning("Please install a inlabru recent version.")
     } else {
       rmodel$mapper <-
       inlabru::bm_multi(
@@ -588,16 +588,15 @@ setMethod(
                        theta = NULL) {
 
       graph <- function(n, theta) {
-        g1 <- INLA::inla.rgeneric.q(X, "graph")
-        g2 <- INLA::inla.rgeneric.q(Y, "graph")
-        return(kronecker(g1, g2))
+        g1 <- rgeneric_get(X, cmd = "graph", optimize = FALSE)
+        g2 <- rgeneric_get(Y, cmd = "graph", optimize = FALSE)
+        return(Sparse(kronecker(g1, g2)))
       }
 
       Q <- function(n, theta) {
-        Q1 <- INLA::inla.rgeneric.q(rmodel = X, cmd = "Q", theta = theta[1:nth1])
-        Q2 <- INLA::inla.rgeneric.q(rmodel = Y, cmd = "Q", theta = theta[nth1+1:nth2])
-        QQ <- INLA::inla.as.sparse(
-          kronecker(Q1, Q2))
+        Q1 <- rgeneric_get(X, cmd = "Q", theta = theta[1:nth1], optimize = FALSE)
+        Q2 <- rgeneric_get(Y, cmd = "Q", theta = theta[nth1+1:nth2], optimize = FALSE)
+        QQ <- Sparse(kronecker(Q1, Q2))
         idx <- which(QQ@i <= QQ@j)
         return(QQ@x[idx])
       }
@@ -609,8 +608,8 @@ setMethod(
         return(numeric(0))
 
       log.prior <- function(n, theta) {
-        lp1 <- INLA::inla.rgeneric.q(rmodel = X, cmd = "log.prior", theta = theta[1:nth1])
-        lp2 <- INLA::inla.rgeneric.q(rmodel = Y, cmd = "log.prior", theta = theta[nth1+1:nth2])
+        lp1 <- rgeneric_get(X, cmd = "log.prior", theta = theta[1:nth1])
+        lp2 <- rgeneric_get(Y, cmd = "log.prior", theta = theta[nth1+1:nth2])
         return(lp1 + lp2)
       }
 
@@ -634,11 +633,27 @@ setMethod(
       return(ret)
     }
 
-    rmodel <- INLA::inla.rgeneric.define(
-      model = kmodel,
-      optimize = TRUE
+    rmodel <- structure(
+      list(
+        f = list(
+          model = "rgeneric",
+          n = n,
+          rgeneric = structure(
+            list(
+              definition =
+                compiler::cmpfun(
+                  kmodel,
+                  options = list(optimize = 3L)),
+              debug = debug,
+              optimize = TRUE
+            ),
+            # inla.rgeneric is needed to support INLA before August 2025
+            class = c("inla.rgeneric.f", "inla.rgeneric")
+          )
+        )
+      ),
+      class = c("rgeneric", "inla.rgeneric")
     )
-    class(rmodel) <- c("rgeneric", class(rmodel))
 
     if((!is.null(X$f$extraconstr)) |
        (!is.null(Y$f$extraconstr))) {
@@ -659,7 +674,7 @@ setMethod(
     # order, multi(Y,X):
     inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
     if(is.na(inlabruCheck)) {
-      warning("Please install a inlabru recent version from git.")
+      warning("Please install a inlabru recent version.")
     } else {
       rmodel$mapper <-
       inlabru::bm_multi(
@@ -702,13 +717,16 @@ kronecker_extraconstr <- function(c1, c2, n1, n2) {
         e = rep(c1$e, each = n2)
       )
     } else {
+      Aret <- rbind(
+        kronecker(c1$A, diag(ncol(c2$A))),
+        kronecker(diag(ncol(c1$A)), c2$A)
+      )
+      eret <- c(rep(c1$e, each = ncol(c2$A)),
+                rep(c2$e, ncol(c1$A)))
       ret <- list(
-        A = rbind(
-          kronecker(c1$A, diag(ncol(c2$A))),
-          kronecker(diag(ncol(c1$A)), c2$A)
-        )[-1, , drop = FALSE], ## remove one redundant
-        e = c(rep(c1$e, each = ncol(c2$A)),
-              rep(c2$e, ncol(c1$A)))[-1] ## rm 1
+        ## remove one (the last) redundant constraint
+        A = Aret[-nrow(Aret), , drop = FALSE],
+        e = eret[-nrow(Aret)]
       )
     }
   }
@@ -754,7 +772,7 @@ multi_generic_model <- function(models, ...) {
 
   inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
   if(is.na(inlabruCheck)) {
-    warning("Please install a inlabru recent version from git.")
+    warning("Please install a inlabru recent version.")
   } else {
     ret[["mapper"]] <- inlabru::bm_multi(
       lapply(models, inlabru::bru_get_mapper)
