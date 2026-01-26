@@ -130,13 +130,13 @@ cgeneric_get <- function(model,
           PACKAGE = "INLAtools"
         )
       }
-      ret <- Matrix::sparseMatrix(
+      ret <- Sparse(Matrix::sparseMatrix(
         i = ij[[1]] + 1L,
         j = ij[[2]] + 1L,
         x = ret,
         symmetric = TRUE,
         repr = "T"
-      )
+      ))
     }
     return(ret)
   }
