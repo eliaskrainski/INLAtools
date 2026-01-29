@@ -84,11 +84,12 @@ cgeneric_get <- function(model,
       theta <- initheta
     } else {
       if(is.null(theta)) {
-        warning('missing "theta", using "initial"!')
+        warning('NULL "theta", using "initial"!')
         theta <- initheta
       }
     }
     theta <- as.double(theta)
+    stopfinot((length(theta)%%theta.size)==0)
     ntheta <- floor(length(theta)/length(initheta))
   } else {
     theta <- NULL
