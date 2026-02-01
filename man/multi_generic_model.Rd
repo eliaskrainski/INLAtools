@@ -2,9 +2,12 @@
 % Please edit documentation in R/kronecker.R
 \name{multi_generic_model}
 \alias{multi_generic_model}
+\alias{multi_generic_model_mapper}
 \title{Combine two or more \code{cgeneric} or \code{rgeneric} models}
 \usage{
 multi_generic_model(models, ...)
+
+multi_generic_model_mapper(models)
 }
 \arguments{
 \item{models}{A list of \code{cgeneric} or \code{rgeneric} models, optionally with names}
@@ -28,6 +31,11 @@ first model has the fastest index variation. This matches the latent
 variable ordering of standard \code{INLA:f()} model components with
 \verb{(main, group, replicate)}.
 }
+\section{Functions}{
+\itemize{
+\item \code{multi_generic_model_mapper()}: Buidl the bm_multi mapper for a list of models
+
+}}
 \examples{
 library(INLAtools)
 R1 <- Matrix(crossprod(diff(diag(4))))

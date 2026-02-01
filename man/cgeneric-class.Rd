@@ -9,6 +9,7 @@
 \alias{cgeneric.cgeneric}
 \alias{cgeneric.inla.cgeneric}
 \alias{cgenericBuilder}
+\alias{mapper1}
 \alias{cgeneric_shlib}
 \alias{print.cgeneric}
 \alias{summary.cgeneric}
@@ -26,6 +27,8 @@ cgeneric(model, ...)
 \method{cgeneric}{inla.cgeneric}(model, ...)
 
 cgenericBuilder(...)
+
+mapper1(model)
 
 cgeneric_shlib(debug, package, useINLAprecomp)
 
@@ -70,7 +73,6 @@ data needed to define the model. Each element on
 and \code{smatrices}.
 \item (possible) \code{extraconstr} as a named list with: \code{A} as a
 \code{n} times \code{k} matrix and \code{e} as a length \code{k} vector.
-\item (possible) \code{bm_mapper} (TO DO) mapper for \code{inlabru} package.
 }
 
 The \code{cgeneric_shlib} function returns a \code{character}
@@ -108,6 +110,8 @@ whose order shall follow the graph definition.
 \item \code{cgeneric(cgeneric)}: Returns the model object unchanged.
 
 \item \code{cgeneric(inla.cgeneric)}: Converts a regular \code{inla.cgeneric} object to \code{cgeneric}.
+
+\item \code{mapper1()}: A default mapper for a cgeneric/rgeneric model
 
 \item \code{print(cgeneric)}: Print the cgeneric object
 

@@ -8,7 +8,6 @@
 #' @param ... see [kronecker()]
 #' @return if 'X' and 'Y' are `cgeneric`
 #' return a `cgeneric`, else a `rgeneric`.
-#' @importFrom inlabru bru_get_mapper
 NULL
 #> NULL
 
@@ -274,13 +273,7 @@ setMethod(
     if(is.na(inlabruCheck)) {
       warning("Please install a inlabru recent version.")
     } else {
-      ret$mapper <-
-      inlabru::bm_multi(
-        list(
-          inlabru::bru_get_mapper(Y),
-          inlabru::bru_get_mapper(X)
-        )
-      )
+      ret[["mapper"]] <- multi_generic_model_mapper(list(Y, X))
     }
 
     return(ret)
@@ -407,18 +400,7 @@ setMethod(
     # Note: kron(X,Y) gives X-major ordering (the X-index varies slowly, the
     # Y-index varies quickly), which requires the mappers to be in reverse
     # order, multi(Y,X):
-    inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
-    if(is.na(inlabruCheck)) {
-      warning("Please install a inlabru recent version.")
-    } else {
-      rmodel$mapper <-
-      inlabru::bm_multi(
-        list(
-          inlabru::bru_get_mapper(Y),
-          inlabru::bru_get_mapper(X)
-        )
-      )
-    }
+    rmodel$mapper <- multi_generic_model_mapper(list(Y, X))
 
     return(rmodel)
   }
@@ -542,18 +524,7 @@ setMethod(
     # Note: kron(X,Y) gives X-major ordering (the X-index varies slowly, the
     # Y-index varies quickly), which requires the mappers to be in reverse
     # order, multi(Y,X):
-    inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
-    if(is.na(inlabruCheck)) {
-      warning("Please install a inlabru recent version.")
-    } else {
-      rmodel$mapper <-
-      inlabru::bm_multi(
-        list(
-          inlabru::bru_get_mapper(Y),
-          inlabru::bru_get_mapper(X)
-        )
-      )
-    }
+    rmodel$mapper <- multi_generic_model_mapper(list(Y, X))
 
     return(rmodel)
   }
@@ -672,18 +643,7 @@ setMethod(
     # Note: kron(X,Y) gives X-major ordering (the X-index varies slowly, the
     # Y-index varies quickly), which requires the mappers to be in reverse
     # order, multi(Y,X):
-    inlabruCheck <- packageCheck("inlabru", "2.13.0.9005")
-    if(is.na(inlabruCheck)) {
-      warning("Please install a inlabru recent version.")
-    } else {
-      rmodel$mapper <-
-      inlabru::bm_multi(
-        list(
-          inlabru::bru_get_mapper(Y),
-          inlabru::bru_get_mapper(X)
-        )
-      )
-    }
+    rmodel$mapper <- multi_generic_model_mapper(list(Y, X))
 
     return(rmodel)
   }
@@ -774,10 +734,25 @@ multi_generic_model <- function(models, ...) {
   if(is.na(inlabruCheck)) {
     warning("Please install a inlabru recent version.")
   } else {
-    ret[["mapper"]] <- inlabru::bm_multi(
-      lapply(models, inlabru::bru_get_mapper)
-    )
+    ret[["mapper"]] <- multi_generic_model_mapper(models)
   }
-
   return(ret)
+}
+#' @describeIn multi_generic_model
+#' Buidl the bm_multi mapper for a list of models
+multi_generic_model_mapper <- function(models) {
+  vs <- "2.13.0.9005"
+  inlabruCheck <- packageCheck(
+    name = "inlabru",
+    minimum_version = vs) >= vs
+  mapps <- lapply(seq_along(models), function(i)
+    mapper1(models[[i]]))
+  if(!is.na(inlabruCheck)) {
+    return(do.call(what = "bm_multi",
+                   args = mapps))
+  } else {
+    mmap <- list(n = prod(sapply(mapps, function(x) x$n)))
+    class(mmap) <- "bm_index"
+    return(mmap)
+  }
 }

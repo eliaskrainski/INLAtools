@@ -40,7 +40,6 @@
 #'  and `smatrices`.
 #'  * (possible) `extraconstr` as a named list with: `A` as a
 #'   `n` times `k` matrix and `e` as a length `k` vector.
-#'  * (possible) `bm_mapper` (TO DO) mapper for `inlabru` package.
 #'
 #'  The `cgeneric_shlib` function returns a `character`
 #'  with the path to the shared lib.
@@ -64,7 +63,9 @@ cgeneric <- function(model, ...) {
 #'  using `inla_shlib` from the arguments,
 #'  `package` (character with the R package containing it),
 #'  `useINLAprecomp` (logical to indicate if `INLA` contains it
-#'  and to use it).
+#'  and to use it). When using the inlabru package,
+#'  one can also provide a `mapper` which will be evaluated by
+#'  the bru_get_mapper inlabru's function.
 #' @importFrom methods is
 #' @export
 cgeneric.character <- function(
@@ -223,6 +224,7 @@ cgenericBuilder <- function(
   }
   class(cmodel) <- c("inla.cgeneric.f", ## this is needed in INLA::f() from August 2025
                      "inla.cgeneric") ##  this is needed for older INLA
+
   cmodel_wrapper <- structure(
     list(
       f = list(
@@ -230,11 +232,30 @@ cgenericBuilder <- function(
         n = as.integer(cmodel$n),
         cgeneric = cmodel
       ),
-      mapper = inlabru::bm_index(cmodel$n)
+      mapper = dotArgs$mapper
     ),
     class = c("cgeneric", "inla.cgeneric")
   )
+  cmodel$mapper <- mapper1(cmodel_wrapper)
   return(cmodel_wrapper)
+}
+#' @describeIn cgeneric-class
+#' A default mapper for a cgeneric/rgeneric model
+mapper1 <- function(model) {
+  vs <- "2.13.0.9005"
+  inlabruCheck <- packageCheck(
+    name = "inlabru",
+    minimum_version = vs) >= vs
+  if(is.na(inlabruCheck) | is.null(model$mapper)) {
+    mapper <- list(n = model$n)
+    class(mapper) <- "bm_index"
+  } else {
+    mapper <- do.call(
+      what = "bru_get_mapper",
+      args = list(model = model)
+    )
+  }
+  return(mapper)
 }
 #' @rdname cgeneric-class
 #' @param debug integer, used as verbose in debug.
