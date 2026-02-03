@@ -250,10 +250,9 @@ mapper1 <- function(model) {
     mapper <- list(n = model$n)
     class(mapper) <- "bm_index"
   } else {
-    mapper <- do.call(
-      what = "bru_get_mapper",
-      args = list(model = model)
-    )
+    mapper <- findGetFunction(
+      fName = "bru_get_mapper",
+      package = "inlabru")(model = model)
   }
   return(mapper)
 }

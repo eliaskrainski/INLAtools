@@ -58,13 +58,11 @@ cgeneric_generic0 <-
 
     dotArgs <- list(...)
     if(is.null(dotArgs$debug)) {
-      debug <- FALSE
-    } else {
-      debug <- dotArgs$debug
+      dotArgs$debug <- FALSE
     }
 
     R <- upperPadding(R)
-    if(debug) {
+    if(dotArgs$debug) {
       print(str(R))
     }
 
@@ -89,30 +87,26 @@ cgeneric_generic0 <-
     }
 
     if(is.null(dotArgs$useINLAprecomp)) {
-      useINLAprecomp <- TRUE
-    } else {
-      useINLAprecomp <- dotArgs$useINLAprecomp
+      dotArgs$useINLAprecomp <- TRUE
     }
     INLAvcheck <- packageCheck("INLA", "25-10-28")
-    if(is.na(INLAvcheck) & useINLAprecomp) {
-      useINLAprecomp <- FALSE
+    if(is.na(INLAvcheck) & dotArgs$useINLAprecomp) {
+      dotArgs$useINLAprecomp <- FALSE
       warning("INLA version is old. Setting 'useINLAprecomp = FALSE'!")
     }
-    shlib <- cgeneric_shlib(
+    dotArgs$shlib <- cgeneric_shlib(
       package = "INLAtools",
-      useINLAprecomp = useINLAprecomp,
-      debug = debug)
+      useINLAprecomp = dotArgs$useINLAprecomp,
+      debug = dotArgs$debug)
 
     the_model <- do.call(
       what = "cgenericBuilder",
-      args = list(
+      args = c(list(
         model = "inla_cgeneric_generic0",
         n=as.integer(n),
         param=param,
-        Rgraph = R,
-        debug = debug,
-        shlib = shlib
-      )
+        Rgraph = R),
+        dotArgs)
     )
 
     if(constr) {
