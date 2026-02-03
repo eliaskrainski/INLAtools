@@ -248,11 +248,12 @@ mapper1 <- function(model) {
     minimum_version = vs) >= vs
   if(is.na(inlabruCheck) | is.null(model$mapper)) {
     mapper <- list(n = model$n)
-    class(mapper) <- "bm_index"
+    class(mapper) <- c("bm_index", "bru_mapper")
   } else {
-    mapper <- findGetFunction(
+    bgm <- findGetFunction(
       fName = "bru_get_mapper",
-      package = "inlabru")(model = model)
+      package = "inlabru")
+    mapper <- bgm(model = model)
   }
   return(mapper)
 }
