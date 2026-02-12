@@ -8,7 +8,7 @@
 \alias{graph}
 \alias{prec}
 \alias{prec.default}
-\alias{vcov,Matrix-method}
+\alias{vcov.Matrix}
 \title{Methods to work with a \code{model}.}
 \usage{
 initial(model)
@@ -23,7 +23,7 @@ prec(model, theta, optimize)
 
 \method{prec}{default}(model, ...)
 
-\S4method{vcov}{Matrix}(object, ...)
+\method{vcov}{Matrix}(object, ...)
 }
 \arguments{
 \item{model}{object to represent a model}

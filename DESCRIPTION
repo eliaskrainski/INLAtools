@@ -1,7 +1,7 @@
 Package: INLAtools
 Type: Package
 Title: Functionalities for the 'INLA' Package
-Version: 0.0.8.901
+Version: 0.0.9
 Maintainer: Elias Teixeira Krainski <eliaskrainski@gmail.com>
 Authors@R: c(
  person(given = c("Elias"),
@@ -41,8 +41,6 @@ Description: Contain code to work with a C struct, in short
   models for what the needed constraints are automatically set.
 URL: https://github.com/eliaskrainski/INLAtools
 BugReports: https://github.com/eliaskrainski/INLAtools/issues
-Additional_repositories: 
-    https://inla.r-inla-download.org/R/testing
 License: GPL (>=2) 
 Encoding: UTF-8
 RoxygenNote: 7.3.3
@@ -55,7 +53,6 @@ Imports:
     methods,
     utils
 Suggests:
-    ggplot2,
-    INLA (>= 25.12.16)
+    ggplot2
 LazyData: true
 LazyDataCompression: xz

@@ -144,5 +144,5 @@ prior(m, theta = matrix(-1:1, 1)) ## see ?prior.cgeneric
 
 }
 \seealso{
-\code{\link[INLA:cgeneric]{INLA::cgeneric()}} and \code{\link[=INLAtools-methods]{INLAtools-methods()}}
+\code{\link[=INLAtools-methods]{INLAtools-methods()}}
 }

@@ -70,22 +70,36 @@ cgeneric_generic0 <-
     stopifnot(n>0)
 
     if(scale) {
-      stopifnot(requireNamespace("INLA"))
-      Rs <- try(do.call(
-        what = "inla.scale.model.internal",
-        args = list(Q = R,
-                    constr = list(A = matrix(1, 1, n), e = 0))
-      ), silent = FALSE)
-      if(inherits(Rs, "try-error")) {
-        stop("Error trying to scale the model!")
-      } else {
-        if(debug) {
-          cat("Marginal var = ", Rs$var, "\n")
+      vs <- "24.02.09"
+      inlaCheck <- packageCheck(
+        name = "INLA",
+        minimum_version = vs) >= vs
+      if(is.na(inlaCheck)) {
+        warning("Install INLA to fast and disconected graphs scaling!")
+        .gi <- function(m) {
+          s <- svd(R)
+          ip <- which(s$d>sqrt(.Machine$double.eps))
+          stopifnot(length(ip)==0)
+          return(s$v[, ip, drop = FALSE] %*% (
+                   (1/s$d[ip])*t(s$u[, ip, drop=FALSE])))
         }
-        R <- Sparse(Rs$Q)
+        R <- Sparse(R * exp(mean(log(diag(.gi(R))))))
+      } else {
+        fns <- findGetFunction("inla.scale.model.internal", "INLA")
+        Rs <- try(fns(
+          Q = R,
+          constr = list(A = matrix(1, 1, n), e = 0)
+        ), silent = FALSE)
+        if(inherits(Rs, "try-error")) {
+          stop("Error trying to scale the model!")
+        } else {
+          if(dotArgs$debug) {
+            cat("Marginal var = ", Rs$var, "\n")
+          }
+          R <- Sparse(Rs$Q)
+        }
       }
     }
-
     if(is.null(dotArgs$useINLAprecomp)) {
       dotArgs$useINLAprecomp <- TRUE
     }

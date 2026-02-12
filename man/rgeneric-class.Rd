@@ -12,9 +12,9 @@
 \alias{plot.rgeneric}
 \title{Organize data for the latent GMRF R interface for \code{INLA}.}
 \usage{
-rgeneric(model, debug = FALSE, compile = TRUE, optimize = TRUE, ...)
+rgeneric(model, n, debug = FALSE, ...)
 
-\method{rgeneric}{default}(model, debug = FALSE, compile = TRUE, optimize = TRUE, ...)
+\method{rgeneric}{default}(model, n, debug = FALSE, ...)
 
 \method{rgeneric}{rgeneric}(model, ...)
 
@@ -27,15 +27,12 @@ rgeneric(model, debug = FALSE, compile = TRUE, optimize = TRUE, ...)
 \method{plot}{rgeneric}(x, y, ...)
 }
 \arguments{
-\item{model}{For the default method, the model defined as a function.
+\item{model}{an object used to define the model.
 See the 'rgeneric' vignette from the INLA package.}
 
+\item{n}{integer with the dimension of the model}
+
 \item{debug}{logical indicating debug state.}
-
-\item{compile}{logical indicating to compile the model.}
-
-\item{optimize}{logical indicating if only the elements
-of the precision matrix are returned.}
 
 \item{...}{not used}
 

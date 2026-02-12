@@ -1,42 +1,48 @@
 #' @rdname rgeneric-class
 #' @param model an object used to define the model.
-#' Its class will define which method is considered.
+#' See the 'rgeneric' vignette from the INLA package.
 #' @param debug logical indicating debug state.
-#' @param compile logical indicating to compile the model.
-#' @param optimize logical indicating if only the elements
-#' of the precision matrix are returned.
+#' @param n integer with the dimension of the model
 #' @param ... additional arguments to be used internally
 #' for the model, for example, additional data.
 #' @returns `rgeneric`/ `inla.rgeneric` object.
 #' @export
 rgeneric <- function(model,
+                     n,
                      debug = FALSE,
-                     compile = TRUE,
-                     optimize = TRUE,
                      ...) {
   UseMethod("rgeneric")
 }
 #' The rgeneric default method.
 #' @rdname rgeneric-class
-#' @param model For the default method, the model defined as a function.
-#' See the 'rgeneric' vignette from the INLA package.
 #' @export
 rgeneric.default <- function(model,
+                             n,
                              debug = FALSE,
-                             compile = TRUE,
-                             optimize = TRUE,
                              ...) {
-  ## it uses INLA::inla.rgeneric.define()
-
-  rmodel <- INLA::inla.rgeneric.define(
-    model = model,
-    debug = debug,
-    compile = compile,
-    optimize = optimize,
-    ...
+  ## as INLA::inla.rgeneric.define(..., compile = TRUE, optimize = TRUE)
+  rmodel <- structure(
+    list(
+      f = list(
+        model = "rgeneric",
+        n = n,
+        rgeneric = structure(
+          list(
+            definition =
+              compiler::cmpfun(
+                model,
+                options = list(optimize = 3L)),
+            debug = debug,
+            optimize = TRUE
+          ),
+          # inla.rgeneric is needed to support INLA before August 2025
+          class = c("inla.rgeneric.f", "inla.rgeneric")
+        )
+      )
+    ),
+    class = c("rgeneric", "inla.rgeneric")
   )
 
-  class(rmodel) <- c("rgeneric", class(rmodel))
   return(rmodel)
 }
 

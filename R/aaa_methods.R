@@ -68,14 +68,11 @@ prec.default <- function(model, ...) {
 #' The `vcov` method for sparse matrices
 #' @param object Matrix supposed to be a
 #' sparse precision matrix
-setMethod(
-  "vcov",
-  "Matrix",
-  function(object, ...) {
-    object <- Matrix::Cholesky(object)
-    return(solve(object))
-  }
-)
+#' @importFrom stats vcov
+vcov.Matrix <- function(object, ...) {
+  object <- Matrix::Cholesky(object)
+  return(solve(object))
+}
 #' Define the is.zero method
 #' @param x an R object
 #' @param tol numeric to be used as (absolute) tolerance.

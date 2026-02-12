@@ -43,7 +43,7 @@
 #'
 #'  The `cgeneric_shlib` function returns a `character`
 #'  with the path to the shared lib.
-#' @seealso [INLA::cgeneric()] and [INLAtools-methods()]
+#' @seealso [INLAtools-methods()]
 #' @export
 #' @example demo/cgeneric.R
 cgeneric <- function(model, ...) {
@@ -164,11 +164,11 @@ cgenericBuilder <- function(
   ind <- pmatch(c("n", "debug"),
                 names(dotArgs))
   dotArgs <- c(list(
-    n = dotArgs$n,
+    n = as.integer(dotArgs$n),
     debug = dotArgs$debug),
     dotArgs[setdiff(1:length(dotArgs),ind)]
   )
-  dotArgs$n <- as.integer(dotArgs$n)
+  n <- dotArgs$n
   dotArgs$debug <- as.integer(dotArgs$debug)
   dotArgs$model <- as.character(dotArgs$model)
   dotArgs$shlib <- as.character(dotArgs$shlib)
@@ -229,14 +229,19 @@ cgenericBuilder <- function(
     list(
       f = list(
         model = "cgeneric",
-        n = as.integer(cmodel$n),
+        n = n,
         cgeneric = cmodel
-      ),
-      mapper = dotArgs$mapper
+      )
     ),
     class = c("cgeneric", "inla.cgeneric")
   )
-  cmodel$mapper <- mapper1(cmodel_wrapper)
+  if(is.null(dotArgs$mapper)) {
+    mapper <- list(n = n)
+    class(mapper) <- c("bm_index", "bru_mapper")
+    cmodel_wrapper$mapper <- mapper
+  } else {
+    cmodel_wrapper$mapper <- dotArgs$mapper
+  }
   return(cmodel_wrapper)
 }
 #' @describeIn cgeneric-class
@@ -246,7 +251,7 @@ mapper1 <- function(model) {
   inlabruCheck <- packageCheck(
     name = "inlabru",
     minimum_version = vs) >= vs
-  if(is.na(inlabruCheck) | is.null(model$mapper)) {
+  if(is.null(model$mapper) || is.na(inlabruCheck)) {
     mapper <- list(n = model$n)
     class(mapper) <- c("bm_index", "bru_mapper")
   } else {
@@ -277,6 +282,10 @@ cgeneric_shlib <- function(
   }
   if(missing(useINLAprecomp)) {
     useINLAprecomp <- TRUE
+  } else {
+      if(is.null(useINLAprecomp)) {
+          useINLAprecomp <- TRUE
+      }
   }
 
   nbit <- 8 * (.Machine$sizeof.pointer)

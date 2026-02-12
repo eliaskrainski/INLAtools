@@ -748,8 +748,8 @@ multi_generic_model_mapper <- function(models) {
   mapps <- lapply(seq_along(models), function(i)
     mapper1(models[[i]]))
   if(!is.na(inlabruCheck)) {
-    return(do.call(what = "bm_multi",
-                   args = mapps))
+    fn <- findGetFunction("bm_multi", "inlabru")
+    return(fn(mapps))
   } else {
     mmap <- list(n = prod(sapply(mapps, function(x) x$n)))
     class(mmap) <- "bm_index"
