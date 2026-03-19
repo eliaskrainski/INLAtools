@@ -1,7 +1,7 @@
 
 /* cgeneric_kronecker.c
  *
- * Copyright (C) 2024 Elias T Krainski
+ * Copyright (C) 2024-2027 Elias T Krainski
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -122,10 +122,9 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 #pragma omp critical (Name_5bd4b7198feb5550e84446518f90d47072338c18)
 #endif
 	    if (!(data->cache)) {
-		assert(!strcasecmp(data->ints[ni1 + ni2]->name, "idx1u"));	// this will always be the case
-		assert(!strcasecmp(data->ints[ni1 + ni2 + 1]->name, "idx2u"));	// this will always be the case
-
-		assert(!strcasecmp(data->smats[nsm1 + nsm2]->name, "Kgraph"));	// this will always be the case
+		assert(!strcasecmp(data->ints[ni1 + ni2]->name, "idx1u"));
+		assert(!strcasecmp(data->ints[ni1 + ni2 + 1]->name, "idx2u"));	
+		assert(!strcasecmp(data->smats[nsm1 + nsm2]->name, "Kgraph"));	
 
 		cache_tp *d12cache = Calloc(1, cache_tp);
 		d12cache->dataM1 = Calloc(1, inla_cgeneric_data_tp);
@@ -168,11 +167,11 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 		if (nsm2 > 0) {
 		    d12cache->dataM2->smats = &data->smats[nsm1];
 		}
-#if defined(INLA_EXTERNAL_PACKAGE) 
+#if defined(INLA_EXTERNAL_PACKAGE)
 	      	static int ck_ltdl_init = 1;
                 if (ck_ltdl_init) {
                         lt_dlinit();
-		}
+                  }
 		ck_ltdl_init = 0;
 		d12cache->handle1 = lt_dlopen(&d12cache->dataM1->chars[1]->chars[0]);
 #else
@@ -183,16 +182,16 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 		    fprintf(stderr,"\n\n\t*** ERROR *** Failed to load shared library '%s': %s\n\n",
 			    &d12cache->dataM1->chars[1]->chars[0], lt_dlerror());
 		    abort();
-#else		    
+#else
 		    Rf_error("Failed to load shared library '%s': %s",
 			     &d12cache->dataM1->chars[1]->chars[0],  dlerror());
 #endif
 		}
 		if (strcmp(&d12cache->dataM1->chars[1]->chars[0],
 			   &d12cache->dataM2->chars[1]->chars[0]) != 0) {
-#if defined(INLA_EXTERNAL_PACKAGE) 
+#if defined(INLA_EXTERNAL_PACKAGE)
 			d12cache->handle2 = lt_dlopen(&d12cache->dataM2->chars[1]->chars[0]);
-#else			
+#else
 		    d12cache->handle2 = dlopen(&d12cache->dataM2->chars[1]->chars[0],  RTLD_LAZY);
 #endif
 		    if (!d12cache->handle2) {
