@@ -56,13 +56,7 @@ prec <- function(model, theta, optimize) {
 #' @export
 prec.default <- function(model, ...) {
   v <- vcov(model, ...)
-  return(
-    forwardsolve(
-      backsolve(
-        chol(v)
-      )
-    )
-  )
+  return(chol2inv(chol(v)))
 }
 #' @describeIn INLAtools-methods
 #' The `vcov` method for sparse matrices

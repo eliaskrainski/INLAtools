@@ -295,9 +295,10 @@ cgeneric_shlib <- function(
       OSb <- paste0("linux/", nbit, "bit/")
       if(!is.na(file.info("/Library")$isdir)) {
         OSb <- paste0("mac/", nbit, "bit/")
-      }
-      if(Sys.info()[["machine"]] == "arm64") {
-        OSb <- "mac.arm64/"
+      } else {
+        if(Sys.info()[["machine"]] == "arm64") {
+          OSb <- "mac.arm64/"
+        }
       }
     } else {
       OSb <- paste0(OS, "/", nbit, "bit/")
