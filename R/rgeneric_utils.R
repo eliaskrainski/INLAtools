@@ -32,11 +32,22 @@ rgeneric_get <- function(model,
                    several.ok = TRUE)
   stopifnot(length(cmd)>0)
 
+  optimize <- list(...)$optimize
+  if(is.null(optimize))
+    optimize <- FALSE
+
   func <- model$f$rgeneric$definition
-  initheta <- try(do.call(
-    what = func,
-    args = list(cmd = "initial", theta = NULL)
-  ), silent = TRUE)
+
+  if(length(cmd) == 1) {
+    if(cmd == "graph") {
+      return(try(func("graph"), silent = TRUE))
+    }
+    if(cmd == "mu") {
+      return(try(func("mu"), silent = TRUE))
+    }
+  }
+
+  initheta <- try(func("initial"), silent = TRUE)
 
   if(inherits(initheta, "try-error")) {
     stop('Error trying to get "initial"!')
@@ -48,36 +59,32 @@ rgeneric_get <- function(model,
 
   needtheta <- any(cmd %in% c("Q", "log.prior"))
   if(needtheta & (theta.size>0)) {
-    if(missing(theta)) {
+    if(missing(theta) || is.null(theta)) {
       warning('missing "theta", using "initial"!')
       theta <- initheta
-    } else {
-      if(is.null(theta)) {
-        warning('missing "theta", using "initial"!')
-        theta <- initheta
-      }
     }
     theta <- as.double(theta)
     ntheta <- floor(length(theta)/length(initheta))
 
     ## if more than one theta is given
-    if((ntheta>1) && (length(cmd)==1) && (cmd=="log.prior")) {
-      theta <- matrix(theta, nrow = length(initheta))
-      return(sapply(1:ncol(theta), function(j) {
-        rgeneric_get(model, cmd = "initial", theta = theta[, j])
-      }))
+    if((length(cmd)==1) && (cmd=="log.prior")) {
+      if(ntheta==1) {
+        return(func("log.prior", theta = theta))
+      } else {
+        theta <- matrix(theta, nrow = theta.size)
+        return(sapply(1:ncol(theta), function(j) {
+          func("log.prior", theta = theta[, j])
+        }))
+      }
     }
-
   } else {
     theta <- NULL
     ntheta <- 0L
   }
 
   if(length(cmd) == 1) {
-    ret <- try(do.call(
-      what = func,
-      args = list(cmd = cmd, theta = theta)
-    ), silent = TRUE)
+    ret <- try(func(cmd = cmd, theta = theta),
+               silent = TRUE)
     if(inherits(ret, "try-error")) {
       stop('Error trying to get "', cmd, '"!')
     }
@@ -93,8 +100,7 @@ rgeneric_get <- function(model,
   } else {
     names(cmd) <- cmd
     ret <- lapply(cmd, function(x) {
-      try(do.call(what = func,
-                  args = list(cmd = cmd, theta = theta)),
+      try(func(cmd = x, theta = theta),
           silent = TRUE)
     })
     if(optimize) {
