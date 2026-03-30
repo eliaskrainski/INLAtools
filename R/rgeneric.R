@@ -20,6 +20,13 @@ rgeneric.default <- function(model,
                              n,
                              debug = FALSE,
                              ...) {
+    dArgs <- list(...)
+    stopifnot(!any(names(dArgs)==""))
+
+    env <- if (length(dArgs) > 0) as.environment(dArgs) else new.env()
+    parent.env(env) <- .GlobalEnv
+    environment(model) <- env
+
   ## as INLA::inla.rgeneric.define(..., compile = TRUE, optimize = TRUE)
   rmodel <- structure(
     list(

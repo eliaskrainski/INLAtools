@@ -15,7 +15,7 @@ rgeneric_get(
   model,
   cmd = c("graph", "Q", "initial", "mu", "log_prior"),
   theta,
-  optimize = TRUE
+  ...
 )
 
 \method{initial}{rgeneric}(model)

@@ -17,16 +17,16 @@
 rgeneric_get <- function(model,
                          cmd = c("graph", "Q", "initial", "mu", "log_prior"),
                          theta,
-                         optimize = TRUE) {
+                         ...) {
 
   ## internal function to
   ## re-implement INLA::inla.rgeneric.q
   ## to be accessed by rgeneric INLAtools methods
 
   ret <- NULL
-  cmd[cmd == "log.prior"] <- "log_prior"
+  cmd[cmd == "log_prior"] <- "log.prior"
   cmd <- unique(cmd)
-  cmds <- c("graph", "Q", "initial", "mu", "log_prior")
+  cmds <- c("graph", "Q", "initial", "mu", "log.prior")
   cmd <- match.arg(cmd,
                    cmds,
                    several.ok = TRUE)
@@ -46,7 +46,7 @@ rgeneric_get <- function(model,
   }
   theta.size <- length(initheta)
 
-  needtheta <- any(cmd %in% c("Q", "log_prior"))
+  needtheta <- any(cmd %in% c("Q", "log.prior"))
   if(needtheta & (theta.size>0)) {
     if(missing(theta)) {
       warning('missing "theta", using "initial"!')
@@ -61,7 +61,7 @@ rgeneric_get <- function(model,
     ntheta <- floor(length(theta)/length(initheta))
 
     ## if more than one theta is given
-    if((ntheta>1) && (length(cmd)==1) && (cmd=="log_prior")) {
+    if((ntheta>1) && (length(cmd)==1) && (cmd=="log.prior")) {
       theta <- matrix(theta, nrow = length(initheta))
       return(sapply(1:ncol(theta), function(j) {
         rgeneric_get(model, cmd = "initial", theta = theta[, j])
