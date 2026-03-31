@@ -302,7 +302,7 @@ cgeneric_shlib <- function(
         OSb <- paste0("mac/", nbit, "bit/")
       }
       if(Sys.info()[["machine"]] == "arm64") {
-        OSb <- "mac.arm64/"
+        OSb <- paste0("mac.arm64/", nbit, "bit/")
       }
     }
     shlib <- paste0(
