@@ -314,8 +314,8 @@ cgeneric_shlib <- function(
           shlib, "\n")
     }
   } else {
-    shlib <- system.file("libs",
-                         package = package)
+    shlib <- paste0(find.package(package = package),
+                    "/libs/")
     if (Sys.info()["sysname"] == "Windows") {
       shlib <- file.path(
         shlib,
