@@ -295,6 +295,7 @@ cgeneric_shlib <- function(
   nbit <- 8 * (.Machine$sizeof.pointer)
   if(useINLAprecomp) {
     OS <- .Platform$OS.type
+    OSb <- paste0(OS, "/", nbit, "bit/")
     if(OS=="unix") {
       OSb <- paste0("linux/", nbit, "bit/")
       if(!is.na(file.info("/Library")$isdir)) {
@@ -303,8 +304,6 @@ cgeneric_shlib <- function(
       if(Sys.info()[["machine"]] == "arm64") {
         OSb <- "mac.arm64/"
       }
-    } else {
-      OSb <- paste0(OS, "/", nbit, "bit/")
     }
     shlib <- paste0(
       find.package("INLA"), "/bin/", OSb,
