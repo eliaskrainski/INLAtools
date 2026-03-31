@@ -30,7 +30,7 @@ cgenericBuilder(...)
 
 mapper1(model)
 
-cgeneric_shlib(debug, package, useINLAprecomp)
+cgeneric_shlib(package, useINLAprecomp, debug)
 
 \method{print}{cgeneric}(x, ...)
 
@@ -45,13 +45,13 @@ E.g. cgeneric("iid", ...") calls cgeneric_iid(...).}
 
 \item{...}{not used}
 
-\item{debug}{integer, used as verbose in debug.}
-
 \item{package}{character giving the name of the package
 that contains the \code{cgeneric} model.}
 
 \item{useINLAprecomp}{logical, indicating if it is to use
 the shared object previously copied and compiled by INLA.}
+
+\item{debug}{integer, used as verbose in debug.}
 
 \item{x}{a cgeneric object}
 
@@ -141,6 +141,9 @@ all.equal(R, Sparse(prec(m, theta = 0)))
 graph(m)
 prior(m, theta = 0)
 prior(m, theta = matrix(-1:1, 1)) ## see ?prior.cgeneric
+
+cgeneric_shlib(package = "INLAtools", useINLAprecomp = TRUE)
+cgeneric_shlib(package = "INLAtools", useINLAprecomp = FALSE)
 
 }
 \seealso{
