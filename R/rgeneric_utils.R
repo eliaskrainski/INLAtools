@@ -9,10 +9,11 @@
 #' @param cmd an string to specify which model element to get
 #' @param theta numeric vector with the model parameters.
 #' If missing, the [initial()] will be used.
-#' @param optimize logical. If missing or FALSE,
-#' the graph and precision are as a sparse matrix.
-#' If TRUE, graph only return the row/col indexes and
-#' precision return only the elements as a vector.
+#' @param ... additional arguments passed on to methods.
+#' E.g.: `optimize = FALSE` return the graph and precision
+#' as a sparse matrix whereas `optimize = TRUE` retur the
+#' graph as arow/col indexes and the precision as a numeric
+#' vector with its elements.
 #' @return depends on `cmd`
 rgeneric_get <- function(model,
                          cmd = c("graph", "Q", "initial", "mu", "log_prior"),

@@ -665,28 +665,35 @@ kronecker_extraconstr <- function(c1, c2, n1, n2) {
     if(is.null(c2)) {
       return(NULL)
     } else {
+      stopifnot(ncol(c2$A) == n2)
       ret <- list(
         A = kronecker(diag(n1), c2$A),
         e = rep(c2$e, n1)
       )
     }
   } else {
+    stopifnot(ncol(c1$A) == n1)
     if(is.null(c2)) {
       ret <- list(
         A = kronecker(c1$A, diag(n2)),
         e = rep(c1$e, each = n2)
       )
     } else {
+      stopifnot(ncol(c2$A) == n2)
+      nc1 <- nrow(c1$A)
+      nc2 <- nrow(c2$A)
       Aret <- rbind(
-        kronecker(c1$A, diag(ncol(c2$A))),
-        kronecker(diag(ncol(c1$A)), c2$A)
+        kronecker(c1$A, diag(n2)),
+        kronecker(diag(n1), c2$A)
       )
-      eret <- c(rep(c1$e, each = ncol(c2$A)),
-                rep(c2$e, ncol(c1$A)))
+      eret <- c(rep(c1$e, each = n2),
+                rep(c2$e, n1))
+      ## remove redundant constraints
+      AAtsvd <- svd(tcrossprod(Aret))
+      jj <- which(AAtsvd$d>sqrt(.Machine$double.eps))
       ret <- list(
-        ## remove one (the last) redundant constraint
-        A = Aret[-nrow(Aret), , drop = FALSE],
-        e = eret[-nrow(Aret)]
+        A = Aret[jj, , drop = FALSE],
+        e = eret[jj]
       )
     }
   }

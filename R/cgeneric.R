@@ -270,7 +270,6 @@ mapper1 <- function(model) {
 #' @param debug integer, used as verbose in debug.
 #' @export
 #' @examples
-#' cgeneric_shlib(package = "INLAtools", useINLAprecomp = TRUE)
 #' cgeneric_shlib(package = "INLAtools", useINLAprecomp = FALSE)
 #'
 cgeneric_shlib <- function(

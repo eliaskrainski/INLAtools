@@ -142,7 +142,6 @@ graph(m)
 prior(m, theta = 0)
 prior(m, theta = matrix(-1:1, 1)) ## see ?prior.cgeneric
 
-cgeneric_shlib(package = "INLAtools", useINLAprecomp = TRUE)
 cgeneric_shlib(package = "INLAtools", useINLAprecomp = FALSE)
 
 }

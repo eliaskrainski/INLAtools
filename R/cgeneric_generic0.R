@@ -41,6 +41,7 @@
 #' @return a `cgeneric` object, see [cgeneric()].
 #' @seealso [prior.cgeneric()]
 #' @importFrom methods as
+#' @importFrom Matrix as.matrix
 #' @export
 cgeneric_generic0 <-
   function(R,
@@ -69,36 +70,22 @@ cgeneric_generic0 <-
     n <- as.integer(nrow(R))
     stopifnot(n>0)
 
-    if(scale) {
-      vs <- "24.02.09"
-      inlaCheck <- packageCheck(
-        name = "INLA",
-        minimum_version = vs) >= vs
-      if(is.na(inlaCheck)) {
-        warning("Install INLA to fast and disconected graphs scaling!")
-        .gi <- function(m) {
-          s <- svd(R)
-          ip <- which(s$d>sqrt(.Machine$double.eps))
-          stopifnot(length(ip)==0)
-          return(s$v[, ip, drop = FALSE] %*% (
-                   (1/s$d[ip])*t(s$u[, ip, drop=FALSE])))
-        }
-        R <- Sparse(R * exp(mean(log(diag(.gi(R))))))
-      } else {
-        fns <- findGetFunction("inla.scale.model.internal", "INLA")
-        Rs <- try(fns(
-          Q = R,
-          constr = list(A = matrix(1, 1, n), e = 0)
-        ), silent = FALSE)
-        if(inherits(Rs, "try-error")) {
-          stop("Error trying to scale the model!")
-        } else {
-          if(dotArgs$debug) {
-            cat("Marginal var = ", Rs$var, "\n")
-          }
-          R <- Sparse(Rs$Q)
-        }
+    if(scale | constr) {
+      ## This work with dense matrices
+      ## For big matrices, consider INLA:::inla.scale.model()
+      Rd <- as.matrix(R)
+      R.svd <- svd(Rd + t(Rd) - diag(diag(Rd)))
+      R.svd$ip <- which(R.svd$d>sqrt(.Machine$double.eps))
+      if(dotArgs$debug) {
+        print(str(list(R.svd=R.svd)))
       }
+      stopifnot(length(R.svd$ip)>0)
+    }
+
+    if(scale) {
+      R.gi <- R.svd$v[, R.svd$ip, drop = FALSE] %*% (
+          (1/R.svd$d[R.svd$ip])*t(R.svd$u[, R.svd$ip, drop=FALSE]))
+      R <- R * exp(mean(log(diag(R.gi))))
     }
     if(is.null(dotArgs$useINLAprecomp)) {
       dotArgs$useINLAprecomp <- TRUE
@@ -122,13 +109,25 @@ cgeneric_generic0 <-
         Rgraph = R),
         dotArgs)
     )
-
-    if(constr) {
-      the_model$f$extraconstr <- list(
-        A = matrix(1, 1, n),
-        e = 0
-      )
+## setup extraconstr
+    Ae <- dotArgs$extraconstr
+    if(!is.null(Ae)) {
+      stopifnot(!(names(Ae) %in% c("A", "e")))
+      stopifnot(ncol(Ae$A)==n)
+      stopifnot(nrow(Ae$A)==length(Ae$e))
     }
+    if(constr) {
+      the_model$f$constr <- FALSE
+      jj <- setdiff(1:n, R.svd$ip)
+      Ae$A <- rbind(Ae$A,
+                    t(R.svd$u[, jj, drop = FALSE]))
+      Ae$e <- c(Ae$e, rep(0, length(jj)))
+      qrc <- qr(t(Ae$A))
+      c.ok <- which(abs(qrc$qraux)>0)
+      Ae$A <- Ae$A[qrc$pivot[c.ok], , drop = FALSE]
+      Ae$e <- Ae$e[qrc$pivot[c.ok]]
+    }
+    the_model$f$extraconstr <- Ae
 
     return(the_model)
 
