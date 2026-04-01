@@ -126,7 +126,7 @@ given structure matrix and the prior for the precision parameter.
 A precision parameter multiplying a precision structure matrix is 
 a local precision. 
 Therefore, one need to do a scaling, as proposed in 
-[Sørbye & Rue (2014)](https://www.sciencedirect.com/science/article/pii/S2211675313000407),
+[@sorbye2014scaling](https://www.sciencedirect.com/science/article/pii/S2211675313000407),
 in order to have a marginal precision parameter.
 We do this by default in the following code
 ```{r cg1}
@@ -137,7 +137,7 @@ cg1 <- cgeneric(
     param = c(1, 0.05)) ## P(sigma > 1) = 0.05
 ```
 where the prior is a PC-prior, as proposed in 
-[Simpson et. al. (2017)](https://projecteuclid.org/journals/statistical-science/volume-32/issue-1/Penalising-Model-Component-Complexity--A-Principled-Practical-Approach-to/10.1214/16-STS576.full).
+[@simpson2017pcprior](https://projecteuclid.org/journals/statistical-science/volume-32/issue-1/Penalising-Model-Component-Complexity--A-Principled-Practical-Approach-to/10.1214/16-STS576.full).
 This PC-prior is set from the probability statement
 $P(\sigma > \sigma_0) = p$, 
 for a given $\sigma_0$ and $p$.
