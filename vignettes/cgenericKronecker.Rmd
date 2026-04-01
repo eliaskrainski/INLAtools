@@ -1,0 +1,262 @@
+---
+title: "Kronecker product models with `cgeneric`"
+author: "Elias T Krainski and Håvard Rue"
+date: "`r format(Sys.time(), '%B, %Y')`"
+output:
+  - rmarkdown::html_vignette
+  - rmarkdown::pdf_document
+vignette: >
+  %\VignetteIndexEntry{Kronecker product models with `cgeneric`}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: references.bib
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dev = "png",
+  dev.args = list(type = "cairo-png"),
+  fig.path = "figures/cgK_",
+  out.width = "100%"
+)
+```
+
+# Abstract
+
+In this vignette we illustrate the use of the Kronecker method 
+of `cgeneric` models to build interaction models. 
+We illustrate as the easier way to work 
+with interaction between intrinsic models because the 
+needed constraints are automatically set. 
+One can use this to implement the spacetime models propose by 
+[@knorrheld2000stii](https://onlinelibrary.wiley.com/doi/10.1002/1097-0258%2820000915/30%2919%3A17/18%3C2555%3A%3AAID-SIM587%3E3.0.CO%3B2-%23).
+
+## The model definition
+
+The Kronecker product approach was proposed in @clayton1996glmm. 
+It present the rules for deriving the distribution of a interaction 
+between two main effects. 
+The case when the interaction is between two 
+random effects, each set over a different domain,
+the precision (or covariance) for the resulting random effect 
+is the Kronecker product model between 
+the precision (or covariance) from each main effect.
+The covariance of the interaction effect given as
+\[ \Sigma = \sigma^2 \mathbf{C}_1 \otimes \mathbf{C}_2 \]
+where $\sigma^2$ is a marginal variance parameter, 
+$\textbf{C}_1$ is the correlation matrix over the 
+first domain and $\textbf{C}_2$ is the correlation matrix 
+over the second domain. 
+
+Similarly, the precision matrix is given as
+\[ \mathbf{Q} = \tau \mathbf{R}_1 \otimes \mathbf{R}_2 \]
+where the matrices $\mathbf{R}_1$ and $\mathbf{R}_2$ are 
+structure matrices for random effects over each domain.
+Thus, this way of building random interaction models 
+result in a covariance/precision separable interaction.
+Notice that we have one precision parameter $\tau$.
+
+This idea was applied to build spatio-temporal models by 
+@knorrheld2000stii.
+Then, there are words like
+separable, inseparable, non-separable associated with. 
+In @knorrheld2000stii models for 
+inseparable disease risk were proposed.
+Clearly, the **disase risk** is what is spacetime inseparable.
+The precision (or covariance) of such interaction effects 
+**is separable** as it is computed as a Kronecker product between 
+the precision (or covariance) matrices from each random effect domain.
+
+Let us define the first model considering a structure matrix 
+from a second order random walk model, a common model used for 
+one dimensional domain such as time series, considering it with 
+size $n_1$. 
+
+```{r first} 
+library(Matrix)
+n1 <- 15
+(R1 <- crossprod(diff(Diagonal(n1), differences = 2)))
+```
+
+Let us now define a second structure matrix for a second domain, 
+that could, in the spacetime cases, represent 
+the structure for a model over the spatial (discrete) domain.
+
+```{r second}
+G2 <- sparseMatrix(
+  i = c(1,1,2,2,3,3,6), 
+  j = c(2,3,4,6,4,5,7), 
+  symmetric = TRUE)
+(n2 <- nrow(G2)) 
+R2 <- Diagonal(n = n2, x = colSums(G2)) - G2
+R2
+```
+
+```{r viewK}
+image(kronecker(R1, R2))
+```
+
+Notice that the order of the resulting matrix, 
+considering the first domain first, generate a
+structure matrix where the overall pattern is like 
+the first structure matrix and the first $n_2$ arrow/colums 
+pattern is given by the second structure matrix.
+
+## The `cgeneric` models
+
+The models we have considered are intrinsically stationary. 
+It is easier to see that by in the first order random walk model 
+where $n-1$ consecutive differences are used to model $n$ variables.
+Here we consider the class of models where the precision is just 
+a precision parameter times a structure matrix,
+$\tau \mathbf{R}$ where the matrix $\mathbf{R}$ is the
+precision structure matrix and $\tau$ is the precision parameter. 
+This kind of models is available in INLA as a latent model 
+named 'generic0'.
+We have implemented this same model using the `cgeneric` interface, 
+because then we can make combinations as illustrated in this paper. 
+Please see the INLA vignette about the `cgeneric` models for details.
+We called 'cgeneric0' and it can be defined from a
+given structure matrix and the prior for the precision parameter.
+
+A precision parameter multiplying a precision structure matrix is 
+a local precision. 
+Therefore, one need to do a scaling, as proposed in 
+[Sørbye & Rue (2014)](https://www.sciencedirect.com/science/article/pii/S2211675313000407),
+in order to have a marginal precision parameter.
+We do this by default in the following code
+```{r cg1}
+library(INLAtools)
+cg1 <- cgeneric(
+    model = "generic0", 
+    R = R1, ## precision structure matrix
+    param = c(1, 0.05)) ## P(sigma > 1) = 0.05
+```
+where the prior is a PC-prior, as proposed in 
+[Simpson et. al. (2017)](https://projecteuclid.org/journals/statistical-science/volume-32/issue-1/Penalising-Model-Component-Complexity--A-Principled-Practical-Approach-to/10.1214/16-STS576.full).
+This PC-prior is set from the probability statement
+$P(\sigma > \sigma_0) = p$, 
+for a given $\sigma_0$ and $p$.
+
+The rank deficiency of the structure matrix is 2, 
+as it is a structure matrix for a second random walk.
+Then we have to impose two constraints, 
+set by default and returned as `extraconstr`:
+```{r c1}
+nrow(cg1$f$extraconstr$A)
+```
+
+For the second model we also use the `cgeneric0` but
+fix its precision parameter to 1,
+leaving the precision matrix from the first model
+as the one for the resulting precision matrix.
+```{r cg2}
+cg2 <- cgeneric(
+    model = "generic0", 
+    R = R2, ## precision structure matrix
+    param = c(1, NA)) ## fix sigma = 1
+```
+where we set the probability for the prior assignment as NA
+which is internally interpreted so that the precision is fixed. 
+Again, by since by default the model is scaled, 
+the precision is marginal and is the inverse of the 
+reference standard deviation squared.
+The number of constraints for this model is 1:
+```{r c2}
+nrow(cg2$f$extraconstr$A)
+```
+
+The resulting Kronecker product model built with
+```{r cg12}
+cg12 <- kronecker(cg1, cg2)
+nrow(cg12$f$extraconstr$A)
+```
+where the required automatic constraints are accounted for. 
+This number is equal the rank deficiency of 
+$\textbf{R} = \textbf{R}_1 \times \textbf{R}_2$.
+The rank of $\textbf{R}$ is $(n_1-2)(n_2-1)$, giving
+it rank deficiency equals to  $n_1+2n_2-2$.
+
+The (default) scaling makes $\sigma = \tau^{-0.5}$
+in the next code as a marginal standard deviation parameter.
+```{r cg12q}
+(N <- cg12$f$n)
+tau <- 4
+Q <- prec(cg12, theta = log(tau))
+image(Q)
+```
+
+## Fit the model to some data
+
+Simulate $k=5$ samples (replicates) from the 
+Kronecker product model
+
+```{r xx}
+library(INLA)
+k <- 5
+xx <- inla.qsample(
+  n = k, 
+  Q = Q + Diagonal(N, 1e-9), 
+  constr = cg12$f$extraconstr, 
+  seed = 1
+)
+apply(xx, 2, summary)
+```
+
+Plot each replicate per group
+```{r ggplot}
+dataf <- data.frame(
+  i1 = rep(rep(1:n1, each = n2), k),
+  i2 = factor(rep(rep(1:n2, n1), k)),
+  i = rep(1:N, k), 
+  r = rep(1:k, each = N),
+  x = as.vector(xx)
+)
+head(dataf, 10)
+
+library(ggplot2)
+ggplot(dataf) + theme_minimal() + 
+  geom_line(aes(x = i1, y = x, group = i2, color = i2)) + 
+  facet_wrap(~r)
+```
+
+Simulate observations considering a Poisson model as
+```{r dataf}
+dataf$y <- rpois(N * k, exp(3 + dataf$x))
+```
+
+Fit the model with a call to the main `INLA` function:
+```{r inla}
+fit <- inla(
+    formula = y ~ f(i, model = cg12, replicate = r),
+    family = "poisson", 
+    data = dataf)
+```
+
+Summary of the intercept and $\tau$ posterior marginals
+```{r smarg}
+fit$summary.fixed
+fit$summary.hyperpar
+```
+
+Scatterplot of the posterior mode and simulated
+```{r sfit}
+par(mar = c(3,3,0.5,0.5), mgp = c(2,0.5,0), bty = "n")
+plot(fit$summary.random$i$mean, xx, pch = 8,
+     xlab = "Posterior mean", ylab = "Simulated")
+```
+
+Posterior marginal summary for $\sigma=\tau^{-1/2}$:
+```{r pmdsummary}
+pm.sigma <- inla.tmarginal(
+  fun = function(x) exp(-x/2), ## from log(tau) to sigma
+  marginal = fit$internal.marginals.hyperpar[[1]])
+1/sqrt(tau)
+inla.zmarginal(pm.sigma)
+```
+
+# Reference
