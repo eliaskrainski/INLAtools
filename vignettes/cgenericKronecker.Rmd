@@ -28,11 +28,11 @@ knitr::opts_chunk$set(
 # Abstract
 
 In this vignette we illustrate the use of the Kronecker method 
-of `cgeneric` models to build interaction models. 
-We illustrate as the easier way to work 
-with interaction between intrinsic models because the 
+for `cgeneric` models to build interaction models. 
+We illustrate considering it as the easier way to work 
+with interaction between intrinsic models as scaling and the 
 needed constraints are automatically set. 
-One can use this to implement the spacetime models propose by 
+This approach can be used to implement the spacetime models proposed in 
 [@knorrheld2000stii](https://onlinelibrary.wiley.com/doi/10.1002/1097-0258%2820000915/30%2919%3A17/18%3C2555%3A%3AAID-SIM587%3E3.0.CO%3B2-%23).
 
 ## The model definition
@@ -126,7 +126,7 @@ given structure matrix and the prior for the precision parameter.
 A precision parameter multiplying a precision structure matrix is 
 a local precision. 
 Therefore, one need to do a scaling, as proposed in 
-[@sorbye2014scaling](https://www.sciencedirect.com/science/article/pii/S2211675313000407),
+[@sorbye2014scaling](https://doi.org/10.1016/j.spasta.2013.06.004),
 in order to have a marginal precision parameter.
 We do this by default in the following code
 ```{r cg1}
@@ -137,7 +137,7 @@ cg1 <- cgeneric(
     param = c(1, 0.05)) ## P(sigma > 1) = 0.05
 ```
 where the prior is a PC-prior, as proposed in 
-[@simpson2017pcprior](https://projecteuclid.org/journals/statistical-science/volume-32/issue-1/Penalising-Model-Component-Complexity--A-Principled-Practical-Approach-to/10.1214/16-STS576.full).
+[@simpson2017pcprior]( https://doi.org/10.1214/16-STS576).
 This PC-prior is set from the probability statement
 $P(\sigma > \sigma_0) = p$, 
 for a given $\sigma_0$ and $p$.

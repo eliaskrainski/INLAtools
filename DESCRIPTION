@@ -1,7 +1,7 @@
 Package: INLAtools
 Type: Package
 Title: Functionalities for the 'INLA' Package
-Version: 0.1.0.903
+Version: 0.1.0.904
 Maintainer: Elias Teixeira Krainski <eliaskrainski@gmail.com>
 Authors@R: c(
  person(given = c("Elias"),
@@ -31,6 +31,10 @@ Description: Contain code to work with a C struct, in short
   of 'cgeneric' models and provide a way to debug 
   the code as well to work with the prior for the 
   model parameters and to sample from it. 
+  The `generic0` can be used to implement intrinsic models with the
+  scaling as proposed in 
+  Sørbye & Rue (2014) <doi:10.1016/j.spasta.2013.06.004>, 
+  and the required contraints.
   A very useful functionality is the Kronecker product method 
   that creates a new model from multiple cgeneric models.
   It also works with the rgeneric, the R version of the 
@@ -38,7 +42,8 @@ Description: Contain code to work with a C struct, in short
   The Kronecker between two cgeneric models was used in 
   Sterrantino et. al. (2024) <doi:10.1007/s10260-025-00788-y>,
   and can be used to build the spatio-temporal intrinsic interaction 
-  models for what the needed constraints are automatically set.
+  models for what the needed constraints are automatically set, 
+  as illustrated in the vignette.
 URL: https://github.com/eliaskrainski/INLAtools
 BugReports: https://github.com/eliaskrainski/INLAtools/issues
 License: GPL (>=2) 
@@ -52,7 +57,8 @@ Depends:
 Imports:
     methods,
     utils
-Suggests:
-    ggplot2
+Suggests: 
+    R.rsp
+VignetteBuilder: R.rsp
 LazyData: true
 LazyDataCompression: xz
