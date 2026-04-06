@@ -18,7 +18,6 @@ ifeq ($(UNAME_S),Darwin)
 
   PKG_CPPFLAGS += -I$(BREW)/opt/libomp/include
   PKG_LIBS += -L$(BREW)/opt/libomp/lib -lomp
-  PKG_CFLAGS += -fopenmp
 
 endif
 
