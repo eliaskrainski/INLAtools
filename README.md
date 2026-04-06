@@ -50,8 +50,8 @@ You can install the latest version of INLAtools from
 [GitHub](https://github.com/eliaskrainski/INLAtools) with
 
 ``` r
-## install.packages("remotes")
-remotes::install_github("eliaskrainski/INLAtools")
+if(!require(pack)) install.packages("pack")
+pak::pkg_install("eliaskrainski/INLAtools")
 ```
 
 ## Example:
@@ -123,8 +123,6 @@ is applied by default in the following code
 
 ``` r
 library(INLAtools)
-#> Loading required package: inlabru
-#> Loading required package: fmesher
 cg1 <- cgeneric(
     model = "generic0", 
     R = R1, ## precision structure matrix
@@ -179,12 +177,12 @@ xx <- inla.qsample(
 #> model is selected
 apply(xx, 2, summary)
 #>              sample:1      sample:2      sample:3      sample:4      sample:5
-#> Min.    -1.244648e+00 -1.921912e+00 -8.876440e-01 -8.104780e-01 -1.195814e+00
-#> 1st Qu. -4.227780e-01 -3.927394e-01 -2.466591e-01 -2.647159e-01 -2.574487e-01
-#> Median   8.474877e-03  5.005800e-02 -2.834700e-02  2.188409e-02 -2.665859e-02
-#> Mean    -1.054734e-12  3.951671e-13 -3.884818e-13  1.512079e-14  6.087083e-13
-#> 3rd Qu.  4.315217e-01  4.220450e-01  2.283570e-01  2.644288e-01  3.051810e-01
-#> Max.     1.166829e+00  1.814482e+00  1.762854e+00  8.952277e-01  9.702742e-01
+#> Min.    -1.244648e+00 -1.921912e+00 -8.876438e-01 -8.104778e-01 -1.195814e+00
+#> 1st Qu. -4.227779e-01 -3.927393e-01 -2.466590e-01 -2.647159e-01 -2.574486e-01
+#> Median   8.474875e-03  5.005799e-02 -2.834700e-02  2.188409e-02 -2.665859e-02
+#> Mean     1.310260e-12  6.705232e-13 -1.156909e-13  1.568421e-14  1.811621e-12
+#> 3rd Qu.  4.315216e-01  4.220449e-01  2.283570e-01  2.644287e-01  3.051809e-01
+#> Max.     1.166829e+00  1.814481e+00  1.762854e+00  8.952275e-01  9.702740e-01
 ```
 
 Plot each replicate per group
@@ -199,16 +197,16 @@ dataf <- data.frame(
 )
 head(dataf, 10)
 #>    i1 i2  i r            x
-#> 1   1  1  1 1 -0.034627319
-#> 2   1  2  2 1  0.002663663
-#> 3   1  3  3 1 -0.562134730
-#> 4   1  4  4 1 -0.493268793
-#> 5   1  5  5 1 -0.228196484
-#> 6   1  6  6 1  0.695164926
-#> 7   1  7  7 1  0.620398736
-#> 8   2  1  8 1  0.199000730
-#> 9   2  2  9 1  0.027308761
-#> 10  2  3 10 1 -0.520617245
+#> 1   1  1  1 1 -0.034627310
+#> 2   1  2  2 1  0.002663662
+#> 3   1  3  3 1 -0.562134599
+#> 4   1  4  4 1 -0.493268677
+#> 5   1  5  5 1 -0.228196430
+#> 6   1  6  6 1  0.695164763
+#> 7   1  7  7 1  0.620398591
+#> 8   2  1  8 1  0.199000683
+#> 9   2  2  9 1  0.027308755
+#> 10  2  3 10 1 -0.520617123
 
 library(ggplot2)
 ggplot(dataf) + theme_minimal() + 
@@ -238,12 +236,12 @@ Summary of the intercept and $\tau$ posterior marginals
 ``` r
 fit$summary.fixed
 #>                 mean         sd 0.025quant 0.5quant 0.975quant     mode
-#> (Intercept) 2.989044 0.01031124   2.968818 2.989047   3.009256 2.989047
-#>                     kld
-#> (Intercept) 7.51826e-11
+#> (Intercept) 3.003789 0.01024122     2.9837 3.003792   3.023864 3.003792
+#>                      kld
+#> (Intercept) 6.774597e-11
 fit$summary.hyperpar
 #>                  mean        sd 0.025quant 0.5quant 0.975quant     mode
-#> Theta1 for i 1.728661 0.1172793   1.498137 1.728913   1.957804 1.729409
+#> Theta1 for i 1.641144 0.1169112   1.411485 1.641344   1.869711 1.641741
 ```
 
 Scatterplot of the posterior mode and simulated
@@ -265,11 +263,11 @@ pm.sigma <- inla.tmarginal(
 1/sqrt(tau)
 #> [1] 0.5
 inla.zmarginal(pm.sigma)
-#> Mean            0.422047 
-#> Stdev           0.0246101 
-#> Quantile  0.025 0.37588 
-#> Quantile  0.25  0.404949 
-#> Quantile  0.5   0.42124 
-#> Quantile  0.75  0.438237 
-#> Quantile  0.975 0.472519
+#> Mean            0.440921 
+#> Stdev           0.0256279 
+#> Quantile  0.025 0.392806 
+#> Quantile  0.25  0.423121 
+#> Quantile  0.5   0.440094 
+#> Quantile  0.75  0.457789 
+#> Quantile  0.975 0.493443
 ```
