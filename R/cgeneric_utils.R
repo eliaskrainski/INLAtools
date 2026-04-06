@@ -76,6 +76,8 @@ cgeneric_get <- function(model,
     cgdata$characters$shlib <-
       cgeneric_shlib(package = lpkg,
                      useINLAprecomp = FALSE)
+    print(initheta)
+    print(str(cgdata))
     warning(paste("Changed shlib to\n",
                   cgdata$characters$shlib))
     initheta <- try(.Call(
