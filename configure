@@ -1,48 +1,57 @@
 #!/bin/sh
 
-echo "Configuring OpenMP..."
+echo "Running configure..."
 
 : ${R_HOME=$(R RHOME)}
 
-OPENMP_CFLAGS=$(${R_HOME}/bin/R CMD config SHLIB_OPENMP_CFLAGS)
-
 OPENMP_CPPFLAGS=""
+OPENMP_CFLAGS=""
 OPENMP_LIBS=""
 
-if test -n "$OPENMP_CFLAGS"; then
-  echo "Using R OpenMP flags"
-  OPENMP_LIBS="$OPENMP_CFLAGS"
+# Ask R first
+OMP_FLAG=$(${R_HOME}/bin/R CMD config SHLIB_OPENMP_CFLAGS)
+
+if test -n "$OMP_FLAG"; then
+  echo "R provides OpenMP"
+  OPENMP_CFLAGS="$OMP_FLAG"
+  OPENMP_LIBS="$OMP_FLAG"
 else
-  echo "Trying macOS libomp..."
+  echo "R has no OpenMP, checking macOS..."
 
-  UNAME_S=$(uname -s)
-  UNAME_M=$(uname -m)
+  if [ "$(uname -s)" = "Darwin" ]; then
 
-  if [ "$UNAME_S" = "Darwin" ]; then
+    ARCH=$(uname -m)
 
-    if [ "$UNAME_M" = "arm64" ]; then
+    if [ "$ARCH" = "arm64" ]; then
       BREW=/opt/homebrew
     else
       BREW=/usr/local
     fi
 
     if [ -d "$BREW/opt/libomp" ]; then
+      echo "Using Homebrew libomp"
+
       OPENMP_CPPFLAGS="-I$BREW/opt/libomp/include"
       OPENMP_CFLAGS="-fopenmp"
       OPENMP_LIBS="-L$BREW/opt/libomp/lib -lomp"
+    else
+      echo "WARNING: libomp not found"
     fi
   fi
 fi
 
-# Linux needs -ldl
+# Linux gets -ldl
 DL_LIBS=""
 if [ "$(uname -s)" = "Linux" ]; then
   DL_LIBS="-ldl"
 fi
 
-# Substitute into Makevars
+echo "Generating src/Makevars..."
+
 sed \
-  -e "s|@OPENMP_CPPFLAGS@|${OPENMP_CPPFLAGS}|g" \
-  -e "s|@OPENMP_CFLAGS@|${OPENMP_CFLAGS}|g" \
-  -e "s|@OPENMP_LIBS@|${OPENMP_LIBS} ${DL_LIBS}|g" \
+  -e "s|@OPENMP_CPPFLAGS@|$OPENMP_CPPFLAGS|g" \
+  -e "s|@OPENMP_CFLAGS@|$OPENMP_CFLAGS|g" \
+  -e "s|@OPENMP_LIBS@|$OPENMP_LIBS $DL_LIBS|g" \
   src/Makevars.in > src/Makevars
+
+exit 0
