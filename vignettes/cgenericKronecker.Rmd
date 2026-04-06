@@ -3,11 +3,10 @@ title: "Kronecker product models with `cgeneric`"
 author: "Elias T Krainski and Håvard Rue"
 date: "`r format(Sys.time(), '%B, %Y')`"
 output:
-  - rmarkdown::html_vignette
   - rmarkdown::pdf_document
 vignette: >
   %\VignetteIndexEntry{Kronecker product models with `cgeneric`}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{R.rsp::asis}
   %\VignetteEncoding{UTF-8}
 bibliography: references.bib
 ---
@@ -23,6 +22,8 @@ knitr::opts_chunk$set(
   fig.path = "figures/cgK_",
   out.width = "100%"
 )
+library(INLAtools)
+library(INLA)
 ```
 
 # Abstract
@@ -34,6 +35,32 @@ with interaction between intrinsic models as scaling and the
 needed constraints are automatically set. 
 This approach can be used to implement the spacetime models proposed in 
 [@knorrheld2000stii](https://onlinelibrary.wiley.com/doi/10.1002/1097-0258%2820000915/30%2919%3A17/18%3C2555%3A%3AAID-SIM587%3E3.0.CO%3B2-%23).
+
+## The `cgeneric` model
+
+The `cgeneric` is a C struct that contain elements 
+associated with a Gaussian Markov Random Field - GMRF.
+This was implemented to make inference easier as it serve 
+as a query to the elements. 
+The elements include `graph`, `Q`,  `mu` and `log_norm_const` 
+to define a GMRF, and about its parameters:
+`initial` and `log_prior`.
+The simplest GMRF is the `iid`, where the precision is a
+diagonal matrix whose elemnts is equal to $\tau$.
+The `Defining models in R or C` vignette of the \pkg{INLA} 
+package illustrate the implmementation of the `iid`, 
+the `ar1`, the `generic0` models in detail.
+
+The purpose of such GMRF implementation is to allow users to 
+create new models and use the \pkg{INLA} package infrastructure 
+to perform fast Bayesian inference. 
+The benefit is great as \pkg{INLA} implements the state of the art 
+for inference using GMRF models as a model component in a 
+generalized additive mixed model - GAMM.
+
+The \pkg{INLAtools} package aim to provide functionalities 
+for working with `cgeneric` models. 
+
 
 ## The model definition
 
@@ -77,7 +104,6 @@ one dimensional domain such as time series, considering it with
 size $n_1$. 
 
 ```{r first} 
-library(Matrix)
 n1 <- 15
 (R1 <- crossprod(diff(Diagonal(n1), differences = 2)))
 ```
@@ -130,7 +156,6 @@ Therefore, one need to do a scaling, as proposed in
 in order to have a marginal precision parameter.
 We do this by default in the following code
 ```{r cg1}
-library(INLAtools)
 cg1 <- cgeneric(
     model = "generic0", 
     R = R1, ## precision structure matrix
@@ -193,10 +218,10 @@ image(Q)
 ## Fit the model to some data
 
 Simulate $k=5$ samples (replicates) from the 
-Kronecker product model
+Kronecker product model using the 
+`inla.qsample()` function from the INLA package.
 
 ```{r xx}
-library(INLA)
 k <- 5
 xx <- inla.qsample(
   n = k, 
