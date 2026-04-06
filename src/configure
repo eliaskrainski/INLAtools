@@ -1,0 +1,48 @@
+#!/bin/sh
+
+echo "Configuring OpenMP..."
+
+: ${R_HOME=$(R RHOME)}
+
+OPENMP_CFLAGS=$(${R_HOME}/bin/R CMD config SHLIB_OPENMP_CFLAGS)
+
+OPENMP_CPPFLAGS=""
+OPENMP_LIBS=""
+
+if test -n "$OPENMP_CFLAGS"; then
+  echo "Using R OpenMP flags"
+  OPENMP_LIBS="$OPENMP_CFLAGS"
+else
+  echo "Trying macOS libomp..."
+
+  UNAME_S=$(uname -s)
+  UNAME_M=$(uname -m)
+
+  if [ "$UNAME_S" = "Darwin" ]; then
+
+    if [ "$UNAME_M" = "arm64" ]; then
+      BREW=/opt/homebrew
+    else
+      BREW=/usr/local
+    fi
+
+    if [ -d "$BREW/opt/libomp" ]; then
+      OPENMP_CPPFLAGS="-I$BREW/opt/libomp/include"
+      OPENMP_CFLAGS="-fopenmp"
+      OPENMP_LIBS="-L$BREW/opt/libomp/lib -lomp"
+    fi
+  fi
+fi
+
+# Linux needs -ldl
+DL_LIBS=""
+if [ "$(uname -s)" = "Linux" ]; then
+  DL_LIBS="-ldl"
+fi
+
+# Substitute into Makevars
+sed \
+  -e "s|@OPENMP_CPPFLAGS@|${OPENMP_CPPFLAGS}|g" \
+  -e "s|@OPENMP_CFLAGS@|${OPENMP_CFLAGS}|g" \
+  -e "s|@OPENMP_LIBS@|${OPENMP_LIBS} ${DL_LIBS}|g" \
+  src/Makevars.in > src/Makevars

@@ -350,10 +350,6 @@ SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 					Rprintf("theta[%d] = %f\n", i, ret[1 + i]);
 		  }
 			UNPROTECT(1);
-		} else {
-		  if (debug > 0) {
-		    Rprintf("no intial\n");
-		  }
 		}
 	}
 
