@@ -1,8 +1,0 @@
-PKG_CPPFLAGS = @OPENMP_CPPFLAGS@
-PKG_CFLAGS   = @OPENMP_CFLAGS@
-
-PKG_LIBS = @OPENMP_LIBS@ \
-           $(LAPACK_LIBS) \
-           $(BLAS_LIBS) \
-           $(FLIBS) \
-           -lm

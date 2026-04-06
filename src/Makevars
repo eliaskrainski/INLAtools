@@ -1,0 +1,27 @@
+UNAME_S := $(shell uname -s)
+UNAME_M := $(shell uname -m)
+
+PKG_CFLAGS += $(SHLIB_OPENMP_CFLAGS)
+PKG_LIBS += $(SHLIB_OPENMP_CFLAGS) \
+            $(LAPACK_LIBS) \
+            $(BLAS_LIBS) \
+            $(FLIBS) \
+            -lm
+
+ifeq ($(UNAME_S),Darwin)
+
+  ifeq ($(UNAME_M),arm64)
+    BREW := /opt/homebrew
+  else
+    BREW := /usr/local
+  endif
+
+  PKG_CPPFLAGS += -I$(BREW)/opt/libomp/include
+  PKG_LIBS += -L$(BREW)/opt/libomp/lib -lomp
+  PKG_CFLAGS += -fopenmp
+
+endif
+
+ifeq ($UNAME_S),Linux)
+  PKG_CFLAGS += -ldl
+endif
