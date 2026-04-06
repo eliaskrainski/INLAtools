@@ -46,9 +46,9 @@ The elements include `graph`, `Q`,  `mu` and `log_norm_const`
 to define a GMRF, and about its parameters:
 `initial` and `log_prior`.
 The simplest GMRF is the `iid`, where the precision is a
-diagonal matrix whose elemnts is equal to $\tau$.
+diagonal matrix whose elements is equal to $\tau$.
 The `Defining models in R or C` vignette of the \pkg{INLA} 
-package illustrate the implmementation of the `iid`, 
+package illustrate the implementation of the `iid`, 
 the `ar1`, the `generic0` models in detail.
 
 The purpose of such GMRF implementation is to allow users to 
