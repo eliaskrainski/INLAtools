@@ -57,20 +57,31 @@ cgeneric_get <- function(model,
                    several.ok = TRUE)
   stopifnot(length(cmd)>0)
 
-  initheta <- try(.Call(
-    "inla_cgeneric_element_get",
-    "initial",
-    NULL,
-    as.integer(1),
-    cgdata$ints,
-    cgdata$doubles,
-    cgdata$characters,
-    cgdata$matrices,
-    cgdata$smatrices,
-    PACKAGE = "INLAtools"
-  ), silent = TRUE)
+  getInitFn <- function()
+    .Call(
+      "inla_cgeneric_element_get",
+      "initial",
+      NULL,
+      as.integer(1),
+      cgdata$ints,
+      cgdata$doubles,
+      cgdata$characters,
+      cgdata$matrices,
+      cgdata$smatrices,
+      PACKAGE = "INLAtools"
+    )
+  initheta <- try(getInitFn(), silent = TRUE)
   if(inherits(initheta, "try-error")) {
-    stop('Error trying to get "initial"!')
+    ## workaround: try useINLAprecomp = FALSE
+    sshlib <- strsplit(cgdata$characters$shlib, "/")[[1]]
+    lpkg <- tail(sshlib, 2)[1]
+    cgdata$characters$shlib <-
+      cgeneric_shlib(package = lpkg,
+                     useINLAprecomp = FALSE)
+    initheta <- try(getInitFn(), silent = TRUE)
+    if(inherits(initheta, "try-error"))
+      print(initheta)
+      stop('Error trying to get "initial"!')
   }
   if((length(cmd)==1) && (cmd=="initial")) {
     return(initheta)
