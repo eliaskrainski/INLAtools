@@ -92,9 +92,10 @@ cgeneric_get <- function(model,
       cgdata$smatrices,
       PACKAGE = "INLAtools"
     ), silent = TRUE)
-    if(inherits(initheta, "try-error"))
+    if(inherits(initheta, "try-error")) {
       print(initheta)
       stop('Error trying to get "initial"!')
+    }
   }
   if((length(cmd)==1) && (cmd=="initial")) {
     return(initheta)
