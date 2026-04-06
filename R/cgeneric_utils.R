@@ -78,6 +78,8 @@ cgeneric_get <- function(model,
     cgdata$characters$shlib <-
       cgeneric_shlib(package = lpkg,
                      useINLAprecomp = FALSE)
+    warning("Changed shlib to")
+    cat(cgdata$characters$shlib, "\n")
     initheta <- try(getInitFn(), silent = TRUE)
     if(inherits(initheta, "try-error"))
       print(initheta)
