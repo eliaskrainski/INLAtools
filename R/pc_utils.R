@@ -16,6 +16,7 @@ NULL
 #' `reference` will be used as fixed. If missing, all the
 #' parameters considered as known (fixed) and equal the
 #' corresponding reference value.
+#' @export
 pcParamCheck <- function(npars,
                          reference,
                          probability) {
@@ -54,6 +55,7 @@ pcParamCheck <- function(npars,
 #' @param d integer to specify the domain dimention
 #' @param log logical indicating if the density
 #' is to be returned in the log scale
+#' @export
 pclrange <- function(lrange, lam, d = 2, log = FALSE) {
   dh <- 0.5 * d
   out <- log(lam * dh) -dh * lrange - lam * exp(-dh * lrange)
