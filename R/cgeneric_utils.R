@@ -72,7 +72,7 @@ cgeneric_get <- function(model,
   if(inherits(initheta, "try-error")) {
     ## workaround: try useINLAprecomp = FALSE
     sshlib <- strsplit(cgdata$characters$shlib, "/")[[1]]
-    lpkg <- tail(sshlib, 2)[1]
+    lpkg <- utils::tail(sshlib, 2)[1]
     cgdata$characters$shlib <-
       cgeneric_shlib(package = lpkg,
                      useINLAprecomp = FALSE)
