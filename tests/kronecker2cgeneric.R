@@ -14,11 +14,13 @@ R1
 
 ## 2nd 
 (n2 <- nrow(
-     R2 <- sparseMatrix(
-         i = c(1L, 1L, 2L, 2L, 2L, 3L, 3L),
-         j = c(1L, 2L, 1L, 2L, 3L, 3L, 2L),
-         x = c(2,-1, -1,3,-1, 4, -1))
- ))
+     G2 <- sparseMatrix(
+         i = c(1L, 2L, 2L, 3L),
+         j = c(2L, 1L, 3L, 2L)
+     )
+ )
+)
+R2 <- Diagonal(n = n2, x = colSums(G2)) - G2
 R2
 
 R12 <- kronecker(R1, R2)
@@ -43,27 +45,38 @@ all.equal(Sparse(R12),
 if(require(INLA)) {
 
     ## create fake data to call inla()
-    data2 <- as.data.frame(
+    data2 <- data.frame(
         expand.grid(i1 = 1:n1,
-                    i2 = 1:n2)
+                    i2 = 1:n2),
+        y = NA
     )
-    ## additional index (combined i1 and i2)
-    data2$ii <- 1:nrow(data2)
-    ## no data
-    data2$y <- rep(NA, nrow(data2))
 
+    mfg <- y ~ 0 +
+        f(i2, model = 'generic0', Cmatrix = R2,
+          group = i1,
+          control.group = list(
+              model = 'besag', graph = G1,
+              scale.model = FALSE))
+
+    fitg <- inla(
+        formula = mfg,
+        data = data2,
+        control.mode = list(theta = 0, fixed = TRUE),
+        control.family = list(hyper = hfix),
+        control.compute = list(config = TRUE)
+    )
+
+    ## overall index 
     (n1*n2)==nrow(data2)
+    data2$ii <- 1:nrow(data2)
 
-    R1
-    head(data2,5)
-
-    m1f <- y ~ 0 +
+    mfcgk <- y ~ 0 +
         f(ii, model = 'generic0', Cmatrix = R12)
 
     hfix <- list(prec = list(initial = 10, fixed = TRUE))
 
-    fit1 <- INLA::inla(
-        formula = m1f,
+    fitcgk <- inla(
+        formula = mfcgk,
         data = data2,
         control.mode = list(theta = 0, fixed = TRUE),
         control.family = list(hyper = hfix),
@@ -73,20 +86,6 @@ if(require(INLA)) {
     all.equal(Sparse(R12),
               Sparse(prec(fit1)))
 
-    m2f <- y ~ 0 +
-        f(i2, model = 'generic0', Cmatrix = R2,
-          group = i1,
-          control.group = list(
-              model = 'besag', graph = G1,
-              scale.model = FALSE))
-
-    fit2 <- INLA::inla(
-        formula = m2f,
-        data = data2,
-        control.mode = list(theta = 0, fixed = TRUE),
-        control.family = list(hyper = hfix),
-        control.compute = list(config = TRUE)
-    )
 
     print(
         all.equal(Sparse(R12),
