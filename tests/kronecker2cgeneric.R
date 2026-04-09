@@ -1,4 +1,4 @@
-# Q = \tau (R2 \otimes R1)
+### Q = \tau (R2 \otimes R1)
 
 library(INLAtools)
 
@@ -50,23 +50,6 @@ g2 <- graph(cg2, optimize = !TRUE)
 g1
 g2
 
-kronecker(g1,g2)
-sum(kronecker(g1,g2))  ## n1*M2 + 
-
-ij1 <- graph(cg1, optimize = TRUE)
-ij2 <- graph(cg2, optimize = TRUE)
-str(ij1)
-str(ij2)
-
-stopifnot(all(ij1[[1]]<=ij1[[2]]))
-stopifnot(all(ij2[[1]]<=ij2[[2]]))
-
-(M1 <- length(ij1[[1]]))
-(M2 <- length(ij2[[1]]))
-(M1 + (M1-n1)) * (M2 + (M2-n2))
-M1-n1
-M2-n2
-
 if(require(INLA)) {
 
     ## create fake data to call inla()
@@ -83,13 +66,18 @@ if(require(INLA)) {
               model = 'besag', graph = G1,
               scale.model = FALSE))
 
-    fitg <- inla(
+    hfix <- list(prec = list(initial = 10, fixed = TRUE))
+
+    fit0 <- inla(
         formula = mfg,
         data = data2,
         control.mode = list(theta = 0, fixed = TRUE),
         control.family = list(hyper = hfix),
         control.compute = list(config = TRUE)
     )
+    
+    print(all.equal(Sparse(R12),
+                    Sparse(prec(fit0))))
 
     ## overall index 
     (n1*n2)==nrow(data2)
@@ -98,9 +86,7 @@ if(require(INLA)) {
     mfcgk <- y ~ 0 +
         f(ii, model = 'generic0', Cmatrix = R12)
 
-    hfix <- list(prec = list(initial = 10, fixed = TRUE))
-
-    fitcgk <- inla(
+    fit1 <- inla(
         formula = mfcgk,
         data = data2,
         control.mode = list(theta = 0, fixed = TRUE),
@@ -108,13 +94,9 @@ if(require(INLA)) {
         control.compute = list(config = TRUE)
     )
 
-    all.equal(Sparse(R12),
-              Sparse(prec(fit1)))
-
-
     print(
         all.equal(Sparse(R12),
-                  Sparse(prec(fit2)))
+                  Sparse(prec(fit1)))
     )
 
 }

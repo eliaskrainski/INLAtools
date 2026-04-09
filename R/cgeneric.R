@@ -290,7 +290,7 @@ cgeneric_shlib <- function(
       }
   }
 
-  nbit <- 8 * (.Machine$sizeof.pointer)
+  nbit <- as.integer(8 * (.Machine$sizeof.pointer))
   if(useINLAprecomp) {
     OS <- .Platform$OS.type
     OSb <- paste0(OS, "/", nbit, "bit/")
