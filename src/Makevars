@@ -1,6 +1,10 @@
+PKG_CPPFLAGS = -I/opt/homebrew/opt/libomp/include
+
 PKG_CFLAGS = $(SHLIB_OPENMP_CFLAGS)
-PKG_LIBS = $(SHLIB_OPENMP_CFLAGS) \
-           -Wl,-rpath,/opt/homebrew/opt/libomp/lib -Wl,-rpath,/usr/local/opt/libomp/lib \
+
+PKG_LIBS = $(SHLIB_OPENMP_CLDFLAGS) \
+           -Wl,-rpath,/opt/homebrew/opt/libomp/lib \
+           -Wl,-rpath,/usr/local/opt/libomp/lib \
            $(LAPACK_LIBS) \
            $(BLAS_LIBS) \
            $(FLIBS) \
