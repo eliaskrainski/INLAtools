@@ -62,7 +62,7 @@ install.packages("INLAtools")
 
 You can install the latest version of INLAtools from [GitHub](https://github.com/eliaskrainski/INLAtools) with
 ```{r ghinst, eval = FALSE}
-if(!require(pack)) install.packages("pack")
+if(!require(pak)) install.packages("pak")
 pak::pkg_install("eliaskrainski/INLAtools")
 ```
 

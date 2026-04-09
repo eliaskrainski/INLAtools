@@ -1,12 +1,12 @@
-## Q = \tau (R2 \otimes R1)
+# Q = \tau (R2 \otimes R1)
 
 library(INLAtools)
 
 ## first
 (n1 <- nrow(
      G1 <- sparseMatrix(
-         i = c(2, 3, 1, 4, 1, 4, 5, 2, 3, 3),
-         j = c(1, 1, 2, 2, 3, 3, 3, 4, 4, 5),
+         i = c(2, 3, 1, 4, 1, 5, 2, 3),
+         j = c(1, 1, 2, 2, 3, 3, 4, 5),
          )
  ))
 R1 <- Diagonal(n = n1, x = colSums(G1)) - G1
@@ -16,7 +16,8 @@ R1
 (n2 <- nrow(
      G2 <- sparseMatrix(
          i = c(1L, 2L, 2L, 3L),
-         j = c(2L, 1L, 3L, 2L)
+         j = c(2L, 1L, 3L, 2L),
+         dims = c(4L, 4L)
      )
  )
 )
@@ -41,6 +42,30 @@ cg12 <- kronecker(cg1, cg2)
 
 all.equal(Sparse(R12),
           Sparse(prec(cg12, theta = 0)))
+
+## Checks
+g1 <- graph(cg1, optimize = !TRUE)
+g2 <- graph(cg2, optimize = !TRUE)
+
+g1
+g2
+
+kronecker(g1,g2)
+sum(kronecker(g1,g2))  ## n1*M2 + 
+
+ij1 <- graph(cg1, optimize = TRUE)
+ij2 <- graph(cg2, optimize = TRUE)
+str(ij1)
+str(ij2)
+
+stopifnot(all(ij1[[1]]<=ij1[[2]]))
+stopifnot(all(ij2[[1]]<=ij2[[2]]))
+
+(M1 <- length(ij1[[1]]))
+(M2 <- length(ij2[[1]]))
+(M1 + (M1-n1)) * (M2 + (M2-n2))
+M1-n1
+M2-n2
 
 if(require(INLA)) {
 
@@ -93,3 +118,4 @@ if(require(INLA)) {
     )
 
 }
+

@@ -56,13 +56,12 @@ prec <- function(model, theta, optimize) {
 #' @export
 prec.default <- function(model, ...) {
   v <- vcov(model, ...)
-  return(chol2inv(chol(v)))
+  return(chol2inv(chol(as.matrix(v))))
 }
 #' @describeIn INLAtools-methods
 #' The `vcov` method for sparse matrices
 #' @param object Matrix supposed to be a
 #' sparse precision matrix
-#' @importFrom stats vcov
 vcov.Matrix <- function(object, ...) {
   object <- Matrix::Cholesky(object)
   return(solve(object))

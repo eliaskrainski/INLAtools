@@ -40,8 +40,6 @@
 #' spatial modelling. Spatial Statistics, vol. 8, p. 39-51.
 #' @return a `cgeneric` object, see [cgeneric()].
 #' @seealso [prior.cgeneric()]
-#' @importFrom methods as
-#' @importFrom Matrix as.matrix
 #' @export
 cgeneric_generic0 <-
   function(R,
@@ -62,13 +60,14 @@ cgeneric_generic0 <-
       dotArgs$debug <- FALSE
     }
 
-    R <- upperPadding(R)
+    stopifnot(nrow(R)==ncol(R))
+    stopifnot(nrow(R)>0)
+    n <- as.integer(nrow(R))
+    R <- upperPadding(
+      R + sparseMatrix(i = 1:n, j = 1:n, x = rep(0.0, n)))
     if(dotArgs$debug) {
       print(str(R))
     }
-
-    n <- as.integer(nrow(R))
-    stopifnot(n>0)
 
     if(scale | constr) {
       ## This work with dense matrices
@@ -136,7 +135,6 @@ cgeneric_generic0 <-
 #' The [cgeneric_iid] uses the [cgeneric_generic0]
 #' with the structure matrix as the identity.
 #' @param n integer required to specify the model size
-#' @importFrom Matrix Diagonal
 #' @export
 cgeneric_iid <-
   function(n,

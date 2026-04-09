@@ -21,6 +21,9 @@ cgeneric_get <- function(model,
                          theta,
                          optimize = TRUE) {
 
+  stopifnot(model$f$n>0)
+  n <- model$f$n
+
   ret <- NULL
   cmd[cmd == "log.prior"] <- "log_prior"
   cmd <- unique(cmd)
@@ -70,15 +73,24 @@ cgeneric_get <- function(model,
     PACKAGE = "INLAtools"
   ), silent = TRUE)
   if(inherits(initheta, "try-error")) {
-    ## workaround: try useINLAprecomp = FALSE
+    cat("Problem with the current `shlib`:")
+    print(attr(initheta, "condition")$message)
+    ## workaround: swap   shlib
+    ## Note: cgeneric Kronecker not considered
     sshlib <- strsplit(cgdata$characters$shlib, "/")[[1]]
     lpkg <- utils::tail(sshlib, 2)[1]
-    cgdata$characters$shlib <-
-      cgeneric_shlib(package = lpkg,
-                     useINLAprecomp = FALSE)
-    print(initheta)
-    print(str(cgdata))
-    warning(paste("Changed shlib to\n",
+    ish <- cgeneric_shlib(
+      package = lpkg,
+      useINLAprecomp = FALSE)
+    psh <- cgeneric_shlib(
+      package = lpkg,
+      useINLAprecomp = FALSE)
+    if(cgdata$characters$shlib == ish) {
+      cgdata$characters$shlib <- psh
+    } else {
+      cgdata$characters$shlib <- ish
+    }
+    warning(paste("Changed `shlib` to\n",
                   cgdata$characters$shlib))
     initheta <- try(.Call(
       "inla_cgeneric_element_get",
@@ -93,7 +105,7 @@ cgeneric_get <- function(model,
       PACKAGE = "INLAtools"
     ), silent = TRUE)
     if(inherits(initheta, "try-error")) {
-      print(initheta)
+      print(attr(initheta, "condition")$message)
       stop('Error trying to get "initial"!')
     }
   }
@@ -121,6 +133,22 @@ cgeneric_get <- function(model,
     ntheta <- 0L
   }
 
+  if(any(cmd %in% c("graph", "Q")) & (!optimize)) {
+    ij2Q <- function(ij, x = NULL) {
+      if(is.null(x)) {
+        x <- rep(1L, length(ij[[1]]))
+      }
+      Sparse(Matrix::sparseMatrix(
+        i = ij[[1]] + 1L,
+        j = ij[[2]] + 1L,
+        x = x,
+        symmetric = TRUE,
+        repr = "T",
+        dims = c(n, n)
+      ))
+    }
+  }
+
   if(length(cmd) == 1) {
     ret <- try(.Call(
       "inla_cgeneric_element_get",
@@ -135,6 +163,7 @@ cgeneric_get <- function(model,
       PACKAGE = "INLAtools"
     ), silent = TRUE)
     if(inherits(ret, "try-error")) {
+      print(attr(ret, "condition")$message)
       stop('Error trying to get "', cmd, '"!')
     }
 
@@ -156,13 +185,7 @@ cgeneric_get <- function(model,
           PACKAGE = "INLAtools"
         )
       }
-      ret <- Sparse(Matrix::sparseMatrix(
-        i = ij[[1]] + 1L,
-        j = ij[[2]] + 1L,
-        x = ret,
-        symmetric = TRUE,
-        repr = "T"
-      ))
+      ret <- ij2Q(ij, ret)
     }
     return(ret)
   }
@@ -191,40 +214,23 @@ cgeneric_get <- function(model,
 
   if(any(cmd == "Q")) {
     if(any(cmd == "graph")) {
-      ij <- ret$graph
-      ret$graph <- Sparse(
-        Matrix::sparseMatrix(
-          i = ret$graph[[1]] + 1L,
-          j = ret$graph[[2]] + 1L,
-          x = rep(1, length(ret$graph[[1]])),
-          symmetric = TRUE,
-          repr = "T"
-        )
-      )
-      x <- ret$Q
-      ret$Q <- ret$graph
-      ret$Q@x <- x
+      ret$Q <- ret$graph <- ij2Q(ret$graph, ret$Q)
+      ret$graph@x <- rep(1L, length(graph@x))
     } else {
-      ij <- .Call(
-        "inla_cgeneric_element_get",
-        "graph",
-        theta,
-        as.integer(ntheta),
-        cgdata$ints,
-        cgdata$doubles,
-        cgdata$characters,
-        cgdata$matrices,
-        cgdata$smatrices,
-        PACKAGE = "INLAtools"
-      )
-      ret$Q <- Sparse(
-        Matrix::sparseMatrix(
-          i = ij[[1]] + 1L,
-          j = ij[[2]] + 1L,
-          x = ret$Q,
-          symmetric = TRUE,
-          repr = "T"
-        )
+      ret$Q <- ij2Q(
+        .Call(
+          "inla_cgeneric_element_get",
+          "graph",
+          theta,
+          as.integer(ntheta),
+          cgdata$ints,
+          cgdata$doubles,
+          cgdata$characters,
+          cgdata$matrices,
+          cgdata$smatrices,
+          PACKAGE = "INLAtools"
+        ),
+        x = ret$Q
       )
     }
   }

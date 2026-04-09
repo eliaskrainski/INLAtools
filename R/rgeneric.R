@@ -88,7 +88,6 @@ summary.rgeneric <- function(object, ...) {
 #' @describeIn rgeneric-class
 #' A plot for a rgeneric object
 #' @param y not used
-#' @importFrom graphics image
 #' @export
 plot.rgeneric <- function(x, y, ...) {
   g <- graph(x)

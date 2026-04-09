@@ -13,7 +13,6 @@ NULL
 
 #' @rdname kronecker
 #' @useDynLib INLAtools
-#' @importFrom utils str
 #' @export
 #' @examples
 #' R <- Matrix(crossprod(diff(diag(4))))
@@ -281,7 +280,6 @@ setMethod(
 )
 #' @rdname kronecker
 #' @useDynLib INLAtools
-#' @importFrom utils str
 #' @export
 setMethod(
   "kronecker",
@@ -407,7 +405,6 @@ setMethod(
 )
 #' @rdname kronecker
 #' @useDynLib INLAtools
-#' @importFrom utils str
 #' @export
 setMethod(
   "kronecker",
@@ -530,7 +527,6 @@ setMethod(
   }
 )
 #' @rdname kronecker
-#' @importFrom utils str
 setMethod(
   "kronecker",
   c(X="rgeneric", Y = "rgeneric"),

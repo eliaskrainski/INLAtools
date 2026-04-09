@@ -66,7 +66,6 @@ cgeneric <- function(model, ...) {
 #'  and to use it). When using the inlabru package,
 #'  one can also provide a `mapper` which will be evaluated by
 #'  the bru_get_mapper inlabru's function.
-#' @importFrom methods is
 #' @export
 cgeneric.character <- function(
     model,
@@ -382,7 +381,6 @@ summary.cgeneric <- function(object, ...) {
 #' @describeIn cgeneric-class
 #' A plot for a cgeneric object
 #' @param y not used
-#' @importFrom graphics image
 #' @export
 plot.cgeneric <- function(x, y, ...) {
   g <- graph(x)
