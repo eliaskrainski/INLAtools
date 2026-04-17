@@ -1,7 +1,7 @@
 Package: INLAtools
 Type: Package
 Title: Functionalities for the 'INLA' Package
-Version: 0.1.2.903
+Version: 0.1.3
 Maintainer: Elias Teixeira Krainski <eliaskrainski@gmail.com>
 Authors@R: c(
  person(given = c("Elias"),
@@ -39,11 +39,9 @@ Description: Contain code to work with a C struct, in short
   that creates a new model from multiple cgeneric models.
   It also works with the rgeneric, the R version of the 
   cgeneric intended to easy try implementation of new GMRF models.
-  The Kronecker between two cgeneric models was used in 
-  Sterrantino et. al. (2024) <doi:10.1007/s10260-025-00788-y>,
-  and can be used to build the spatio-temporal intrinsic interaction 
-  models for what the needed constraints are automatically set, 
-  as illustrated in the vignette.
+  The Kronecker between two cgeneric models where each one needs 
+  a constraint, such as spatio-temporal intrinsic interaction 
+  models, the needed constraints are automatically set.
 URL: https://github.com/eliaskrainski/INLAtools
 BugReports: https://github.com/eliaskrainski/INLAtools/issues
 License: GPL (>=2) 
