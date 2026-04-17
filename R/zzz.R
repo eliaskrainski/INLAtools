@@ -1,7 +1,7 @@
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage(
-   paste("Welcome to the INLAtools package!\n",
-         "More at eliaskrainski.github.io/INLAtools")
+   paste0("Welcome to the INLAtools package!\n",
+          "More at eliaskrainski.github.io/INLAtools")
   )
 }
 
