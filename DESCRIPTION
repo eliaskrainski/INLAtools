@@ -1,12 +1,12 @@
 Package: INLAtools
 Type: Package
 Title: Functionalities for the 'INLA' Package
-Version: 0.1.3
-Maintainer: Elias Teixeira Krainski <eliaskrainski@gmail.com>
+Version: 0.1.4
+Maintainer: Elias Teixeira Krainski <elias.krainski@kaust.edu.sa>
 Authors@R: c(
  person(given = c("Elias"),
         family = "Teixeira Krainski",
-        email = "eliaskrainski@gmail.com",
+        email = "elias.krainski@kaust.edu.sa",
         role = c("cre", "aut", "cph"),
         comment = c(ORCID = "0000-0002-7063-2615")),
  person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
@@ -24,7 +24,7 @@ Description: Contain code to work with a C struct, in short
   prior for its parameters, useful for model inference. 
   It can be accessed from a C program and is the recommended 
   way to implement new GMRF models in the 'INLA' package 
-  (<https://www.r-inla.org>).
+  (<https://r-inla.org>).
   The 'INLAtools' implement functions to evaluate 
   each one of the model specifications from R.
   The implemented functionalities leverage the use 
