@@ -3,8 +3,7 @@
 \name{cgeneric_generic0}
 \alias{cgeneric_generic0}
 \alias{cgeneric_iid}
-\title{Build an \code{cgeneric} object for a \code{generic0} model.
-See details.}
+\title{Build a \code{cgeneric} object for a \code{generic0} model.}
 \usage{
 cgeneric_generic0(R, param, constr = TRUE, scale = TRUE, ...)
 
@@ -26,12 +25,12 @@ sum-to-zero constraint. Default is TRUE.}
 the model. See detais.}
 
 \item{...}{arguments (debug,useINLAprecomp,shlib)
-passed on to \code{\link[=cgeneric]{cgeneric()}}.}
+passed on to \code{cgeneric}.}
 
 \item{n}{integer required to specify the model size}
 }
 \value{
-a \code{cgeneric} object, see \code{\link[=cgeneric]{cgeneric()}}.
+a \code{cgeneric} object, see \code{\link[=cgeneric-class]{cgeneric-class()}}.
 }
 \description{
 Build data needed to implement a model whose

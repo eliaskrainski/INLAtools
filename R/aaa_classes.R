@@ -1,4 +1,5 @@
 #' Organize data for the latent GMRF C interface for `INLA`.
+#' @rdname cgeneric-class
 setClass(
   "cgeneric",
   slots = c(f = "list"),
@@ -18,6 +19,7 @@ setClass(
   }
 )
 #' Organize data for the latent GMRF R interface for `INLA`.
+#' @rdname rgeneric-class
 setClass(
   "rgeneric",
   slots = c(f = "list"),

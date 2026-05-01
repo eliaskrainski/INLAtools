@@ -1,7 +1,7 @@
 Package: INLAtools
 Type: Package
 Title: Functionalities for the 'INLA' Package
-Version: 0.1.3.902
+Version: 0.1.3.903
 Maintainer: Elias Teixeira Krainski <elias.krainski@kaust.edu.sa>
 Authors@R: c(
  person(given = c("Elias"),
@@ -55,5 +55,7 @@ Depends:
 Imports:
     methods,
     utils
+Suggests:
+    INLA
 LazyData: true
 LazyDataCompression: xz

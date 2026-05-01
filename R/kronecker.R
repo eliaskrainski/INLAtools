@@ -1,32 +1,25 @@
-#' Kronecker (product) between `cgeneric`/`rgeneric` models,
-#' implemented as [kronecker()] methods.
+#' Kronecker between `cgeneric`|`rgeneric` to implement interaction
+#' between GMRF models.
 #' @name kronecker
 #' @param X `cgeneric` or `rgeneric`
 #' @param Y `cgeneric` or `rgeneric`
 #' @param FUN see [kronecker()]
 #' @param make.dimnames see [kronecker()]
 #' @param ... see [kronecker()]
-#' @return if 'X' and 'Y' are `cgeneric`
-#' return a `cgeneric`, else a `rgeneric`.
+#' @returns A `cgeneric` object if kronecker between two `cgeneric`,
+#' otherwise a `rgeneric` object.
 NULL
 #> NULL
 
-#' @rdname kronecker
-#' @useDynLib INLAtools
+#' @describeIn kronecker
+#' Build a `cgeneric` to implement the interaction between
+#' two GMRF models each one implemented as a `cgeneric`.
 #' @export
-#' @examples
-#' R <- Matrix(crossprod(diff(diag(4))))
-#' m1 <- cgeneric("generic0", R = R, param = c(1, NA),
-#'   scale = FALSE, useINLAprecomp = FALSE)
-#' m2 <- cgeneric("iid", n = 3, param = c(1, 0.5),
-#'   useINLAprecomp = FALSE)
-#' k21 <- kronecker(m2, m1, useINLAprecomp = FALSE)
-#' prec(k21, theta = 0.0)
+#' @example demo/kronecker.R
 setMethod(
   "kronecker",
   c(X="cgeneric", Y = "cgeneric"),
   function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
-
     mcall <- match.call()
     if(is.null(mcall$debug)) {
       debug <-
@@ -278,14 +271,14 @@ setMethod(
     return(ret)
   }
 )
-#' @rdname kronecker
-#' @useDynLib INLAtools
+#' @describeIn kronecker
+#' Build a `rgeneric` to implement the interaction between two GMRF
+#' models, the first as a `cgeneric` and the second as a `rgeneric`.
 #' @export
 setMethod(
   "kronecker",
   c(X="cgeneric", Y = "rgeneric"),
   function(X, Y, FUN = "*", make.dimnames = FALSE, ...) {
-
     mcall <- match.call()
     if(is.null(mcall$debug)) {
       debug <-
@@ -403,8 +396,9 @@ setMethod(
     return(rmodel)
   }
 )
-#' @rdname kronecker
-#' @useDynLib INLAtools
+#' @describeIn kronecker
+#' Build a `rgeneric` to implement the interaction between two GMRF
+#' models, the first as a `rgeneric` and the second as a `cgeneric`.
 #' @export
 setMethod(
   "kronecker",
@@ -425,7 +419,7 @@ setMethod(
 
     ini1 <- rgeneric_get(X, "initial")
     nth1 <- length(ini1)
-    ini2 <- cgneric_get(Y, "initial")
+    ini2 <- cgeneric_get(Y, "initial")
     nth2 <- length(ini2)
 
     kmodel <- function(cmd = c("graph", "Q", "mu",
@@ -526,7 +520,9 @@ setMethod(
     return(rmodel)
   }
 )
-#' @rdname kronecker
+#' @describeIn kronecker
+#' Build a `rgeneric` to implement the interaction between
+#' two GMRF models each one implemented as a `rgeneric`.
 setMethod(
   "kronecker",
   c(X="rgeneric", Y = "rgeneric"),
@@ -713,7 +709,6 @@ kronecker_extraconstr <- function(c1, c2, n1, n2) {
 #'   mapper.
 #' @rdname multi_generic_model
 #' @export
-#' @example demo/kronecker3.R
 multi_generic_model <- function(models, ...) {
   stopifnot(is.list(models))
   stopifnot(length(models) >= 1L)

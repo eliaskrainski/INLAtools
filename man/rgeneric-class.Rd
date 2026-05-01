@@ -3,6 +3,8 @@
 \docType{class}
 \name{rgeneric-class}
 \alias{rgeneric-class}
+\alias{rgeneric}
+\alias{rgeneric.default}
 \alias{rgeneric.rgeneric}
 \alias{rgeneric.inla.rgeneric}
 \alias{print.rgeneric}
@@ -10,6 +12,10 @@
 \alias{plot.rgeneric}
 \title{Organize data for the latent GMRF R interface for \code{INLA}.}
 \usage{
+rgeneric(model, n, debug = FALSE, ...)
+
+\method{rgeneric}{default}(model, n, debug = FALSE, ...)
+
 \method{rgeneric}{rgeneric}(model, ...)
 
 \method{rgeneric}{inla.rgeneric}(model, ...)
@@ -21,6 +27,13 @@
 \method{plot}{rgeneric}(x, y, ...)
 }
 \arguments{
+\item{model}{an object used to define the model.
+See the 'rgeneric' vignette from the INLA package.}
+
+\item{n}{integer with the dimension of the model}
+
+\item{debug}{logical indicating debug state.}
+
 \item{...}{not used}
 
 \item{x}{a rgeneric object}
@@ -29,14 +42,43 @@
 
 \item{y}{not used}
 }
+\value{
+\code{rgeneric}/ \code{inla.rgeneric} object.
+}
 \description{
-Organize data for the latent GMRF R interface for \code{INLA}.
+A GMRF is defined from model parameters \eqn{\theta} that
+would parametrize a (sparse) precision matrix.
+
+The elements of a GMR are:
+\itemize{
+\item \code{graph} to define the non-zero precision matrix pattern.
+only the upper triangle including the diagonal is needed.
+\item \code{Q} vector where the
+\itemize{
+\item first element (N) is the size of the matrix,
+\item second element (M) is the number of non-zero
+elements in the upper part (including) diagonal
+\item the remaining (M) elements are the actual
+precision (upper triangle plus diagonal) elements
+whose order shall follow the graph definition.
+}
+\item \code{mu} the mean vector,
+\item \code{initial} vector with
+\itemize{
+\item first element as the number of the parameters in the model
+\item remaining elements should be the initials for the model parameters.
+}
+\item \code{log.norm.const} log of the normalizing constant.
+\item \code{log.prior} log of the prior for the model parameters.
+}
 }
 \section{Functions}{
 \itemize{
+\item \code{rgeneric(default)}: The rgeneric default method.
+
 \item \code{rgeneric(rgeneric)}: Returns the model object unchanged.
 
-\item \code{rgeneric(inla.rgeneric)}: Converts a regular \code{inla.rgeneric} object to \code{rgeneric}.
+\item \code{rgeneric(inla.rgeneric)}: Check and converts a regular \code{inla.rgeneric} object to \code{rgeneric}.
 
 \item \code{print(rgeneric)}: Print the rgeneric object
 
@@ -45,3 +87,7 @@ Organize data for the latent GMRF R interface for \code{INLA}.
 \item \code{plot(rgeneric)}: A plot for a rgeneric object
 
 }}
+\note{
+Recommended for prototyping, whereas
+\code{cgeneric} is recommended for production.
+}

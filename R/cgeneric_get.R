@@ -13,7 +13,6 @@
 #' the graph and precision are as a sparse matrix.
 #' If TRUE, graph only return the row/col indexes and
 #' precision return only the elements as a vector.
-#' @useDynLib INLAtools
 #' @return depends on `cmd`
 #' @seealso check the examples in [cgeneric_generic0()]
 cgeneric_get <- function(model,
@@ -215,7 +214,7 @@ cgeneric_get <- function(model,
   if(any(cmd == "Q")) {
     if(any(cmd == "graph")) {
       ret$Q <- ret$graph <- ij2Q(ret$graph, ret$Q)
-      ret$graph@x <- rep(1L, length(graph@x))
+      ret$graph@x <- rep(1L, length(ret$graph@x))
     } else {
       ret$Q <- ij2Q(
         .Call(
@@ -267,6 +266,9 @@ cgeneric_graph <- function(model, optimize) {
 #' Retrieve the precision of an `cgeneric` object
 #' @export
 cgeneric_Q <- function(model, theta, optimize) {
+  if(missing(optimize)) {
+    optimize <- FALSE
+  }
   cgeneric_get(model,
                cmd = "Q",
                theta = theta,

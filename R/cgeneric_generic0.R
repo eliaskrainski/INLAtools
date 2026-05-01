@@ -1,5 +1,4 @@
-#' Build an `cgeneric` object for a `generic0` model.
-#' See details.
+#' Build a `cgeneric` object for a `generic0` model.
 #' @description
 #' Build data needed to implement a model whose
 #' precision has a conditional precision parameter.
@@ -17,7 +16,7 @@
 #' @param scale logical indicating if it is to scale
 #' the model. See detais.
 #' @param ... arguments (debug,useINLAprecomp,shlib)
-#' passed on to [cgeneric()].
+#' passed on to `cgeneric`.
 #' @details
 #' The precision matrix is defined as
 #'  \deqn{Q = \tau R}
@@ -38,7 +37,7 @@
 #' Sigrunn Holbek Sørbye and Håvard Rue (2014).
 #' Scaling intrinsic Gaussian Markov random field priors in
 #' spatial modelling. Spatial Statistics, vol. 8, p. 39-51.
-#' @return a `cgeneric` object, see [cgeneric()].
+#' @return a `cgeneric` object, see [cgeneric-class()].
 #' @export
 cgeneric_generic0 <-
   function(R,
@@ -88,7 +87,9 @@ cgeneric_generic0 <-
     if(is.null(dotArgs$useINLAprecomp)) {
       dotArgs$useINLAprecomp <- TRUE
     }
-    INLAvcheck <- packageCheck("INLA", "25-10-28")
+    INLAvcheck <- packageCheck(
+      name = "INLA",
+      minimum_version = "25.10.28")
     if(is.na(INLAvcheck) & dotArgs$useINLAprecomp) {
       dotArgs$useINLAprecomp <- FALSE
       warning("INLA version is old. Setting 'useINLAprecomp = FALSE'!")

@@ -6,8 +6,8 @@
 \alias{kronecker,cgeneric,rgeneric-method}
 \alias{kronecker,rgeneric,cgeneric-method}
 \alias{kronecker,rgeneric,rgeneric-method}
-\title{Kronecker (product) between \code{cgeneric}/\code{rgeneric} models,
-implemented as \code{\link[=kronecker]{kronecker()}} methods.}
+\title{Kronecker between \code{cgeneric}|\code{rgeneric} to implement interaction
+between GMRF models.}
 \usage{
 \S4method{kronecker}{cgeneric,cgeneric}(X, Y, FUN = "*", make.dimnames = FALSE, ...)
 
@@ -29,19 +29,70 @@ implemented as \code{\link[=kronecker]{kronecker()}} methods.}
 \item{...}{see \code{\link[=kronecker]{kronecker()}}}
 }
 \value{
-if 'X' and 'Y' are \code{cgeneric}
-return a \code{cgeneric}, else a \code{rgeneric}.
+A \code{cgeneric} object if kronecker between two \code{cgeneric},
+otherwise a \code{rgeneric} object.
 }
 \description{
-Kronecker (product) between \code{cgeneric}/\code{rgeneric} models,
-implemented as \code{\link[=kronecker]{kronecker()}} methods.
+Kronecker between \code{cgeneric}|\code{rgeneric} to implement interaction
+between GMRF models.
 }
+\section{Functions}{
+\itemize{
+\item \code{kronecker(X = cgeneric, Y = cgeneric)}: Build a \code{cgeneric} to implement the interaction between
+two GMRF models each one implemented as a \code{cgeneric}.
+
+\item \code{kronecker(X = cgeneric, Y = rgeneric)}: Build a \code{rgeneric} to implement the interaction between two GMRF
+models, the first as a \code{cgeneric} and the second as a \code{rgeneric}.
+
+\item \code{kronecker(X = rgeneric, Y = cgeneric)}: Build a \code{rgeneric} to implement the interaction between two GMRF
+models, the first as a \code{rgeneric} and the second as a \code{cgeneric}.
+
+\item \code{kronecker(X = rgeneric, Y = rgeneric)}: Build a \code{rgeneric} to implement the interaction between
+two GMRF models each one implemented as a \code{rgeneric}.
+
+}}
 \examples{
-R <- Matrix(crossprod(diff(diag(4))))
-m1 <- cgeneric("generic0", R = R, param = c(1, NA),
-  scale = FALSE, useINLAprecomp = FALSE)
-m2 <- cgeneric("iid", n = 3, param = c(1, 0.5),
-  useINLAprecomp = FALSE)
-k21 <- kronecker(m2, m1, useINLAprecomp = FALSE)
-prec(k21, theta = 0.0)
+library(INLAtools)
+
+### Q = \tau (R2 \otimes R1)
+
+## first
+(n1 <- nrow(
+     G1 <- sparseMatrix(
+         i = c(2, 3, 1, 4, 1, 4, 5, 2, 3, 3),
+         j = c(1, 1, 2, 2, 3, 3, 3, 4, 4, 5),
+         )
+ ))
+R1 <- Diagonal(n = n1, x = colSums(G1)) - G1
+R1
+
+## 2nd 
+(n2 <- nrow(
+     R2 <- sparseMatrix(
+         i = c(1L, 1L, 2L, 2L, 2L, 3L, 3L),
+         j = c(1L, 2L, 1L, 2L, 3L, 3L, 2L),
+         x = c(2,-1, -1,3,-1, 4, -1))
+ ))
+R2
+
+## cgeneric models
+cg1 <- cgeneric(
+    model = "generic0", 
+    R = R1,
+    scale = FALSE,
+    param = c(1, 0.5)) ## P(sigma > 1) = 0.5
+cg2 <- cgeneric(
+    model = "generic0", 
+    R = R2,
+    scale = FALSE,
+    param = c(1, NA)) ## fix sigma, simga = 1
+
+## Kronecker of cgeneric models 1 and 2
+cg12 <- kronecker(cg1, cg2)
+
+all.equal(Sparse(kronecker(R1, R2)),
+          Sparse(cgeneric_Q(cg12, theta = 0)))
+
+
+
 }
