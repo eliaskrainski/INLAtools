@@ -37,7 +37,7 @@ cg2 <- cgeneric(
 cg12 <- kronecker(cg1, cg2)
 
 all.equal(Sparse(kronecker(R1, R2)),
-          Sparse(prec(cg12, theta = 0)))
+          Sparse(cgeneric_Q(cg12, theta = 0)))
 
 
 

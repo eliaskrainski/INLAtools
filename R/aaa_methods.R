@@ -4,7 +4,6 @@
 #' For a given model object query the `initial`,
 #' `mu`, log `prior`, `graph` or precision `prec`
 #' can be evaluated/retrieved.
-#' @param model object to represent a model
 #' @return the result of the desired query
 #' of the 'cgeneric' model.
 #' 'graph' and 'prec' can be either a vector
@@ -15,7 +14,8 @@ NULL
 #' @describeIn INLAtools-methods
 #' The `vcov` method for sparse matrices
 #' @param object Matrix supposed to be a
-#' sparse precision matrix
+#' sparse precision matrix.
+#' @param ... additional arguments (not used)
 vcov.Matrix <- function(object, ...) {
   object <- Matrix::Cholesky(object)
   return(solve(object))

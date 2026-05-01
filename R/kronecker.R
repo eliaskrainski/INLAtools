@@ -298,9 +298,9 @@ setMethod(
 
     n <- X$f$n * Y$f$n
 
-    ini1 <- initial(X)
+    ini1 <- cgeneric_get(X, "initial")
     nth1 <- length(ini1)
-    ini2 <- initial(Y)
+    ini2 <- rgeneric_get(Y, "initial")
     nth2 <- length(ini2)
 
     kmodel <- function(cmd = c("graph", "Q", "mu",
@@ -423,9 +423,9 @@ setMethod(
 
     n <- X$f$n * Y$f$n
 
-    ini1 <- initial(X)
+    ini1 <- rgeneric_get(X, "initial")
     nth1 <- length(ini1)
-    ini2 <- initial(Y)
+    ini2 <- cgneric_get(Y, "initial")
     nth2 <- length(ini2)
 
     kmodel <- function(cmd = c("graph", "Q", "mu",
@@ -544,9 +544,9 @@ setMethod(
 
     n <- X$f$n * Y$f$n
 
-    ini1 <- initial(X)
+    ini1 <- rgeneric_get(X, "initial")
     nth1 <- length(ini1)
-    ini2 <- initial(Y)
+    ini2 <- rgeneric_get(Y, "initial")
     nth2 <- length(ini2)
 
     kmodel <- function(cmd = c("graph", "Q", "mu",
