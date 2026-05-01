@@ -94,7 +94,7 @@ cgeneric_generic0 <-
       dotArgs$useINLAprecomp <- FALSE
       warning("INLA version is old. Setting 'useINLAprecomp = FALSE'!")
     }
-    dotArgs$shlib <- cgeneric_shlib(
+    dotArgs$shlib <- cgeneric_shlib_path(
       package = "INLAtools",
       useINLAprecomp = dotArgs$useINLAprecomp,
       debug = dotArgs$debug)

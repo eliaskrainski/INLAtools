@@ -48,7 +48,7 @@ setMethod(
       useINLAprecomp <- FALSE
       warning("INLA version is old. Setting 'useINLAprecomp = FALSE'!")
     }
-    shlib <- cgeneric_shlib(
+    shlib <- cgeneric_shlib_path(
       package = "INLAtools",
       useINLAprecomp = useINLAprecomp,
       debug = debug)

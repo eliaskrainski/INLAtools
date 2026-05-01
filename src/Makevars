@@ -1,9 +1,4 @@
-PKG_CFLAGS = $(SHLIB_OPENMP_CFLAGS)
-
-PKG_LIBS = $(SHLIB_OPENMP_CFLAGS) \
-           $(SHLIB_OPENMP_CLDFLAGS) \
-           -Wl,-rpath,/opt/homebrew/opt/libomp/lib -Wl,-rpath,/usr/local/opt/libomp/lib \
-           $(LAPACK_LIBS) \
+PKG_LIBS = $(LAPACK_LIBS) \
            $(BLAS_LIBS) \
            $(FLIBS) \
            $(SHLIB_LDFLAGS) \

@@ -79,10 +79,10 @@ cgeneric_get <- function(model,
     ## Note: cgeneric Kronecker not considered
     sshlib <- strsplit(cgdata$characters$shlib, "/")[[1]]
     lpkg <- utils::tail(sshlib, 2)[1]
-    ish <- cgeneric_shlib(
+    ish <- cgeneric_shlib_path(
       package = lpkg,
       useINLAprecomp = FALSE)
-    psh <- cgeneric_shlib(
+    psh <- cgeneric_shlib_path(
       package = lpkg,
       useINLAprecomp = FALSE)
     if(cgdata$characters$shlib == ish) {

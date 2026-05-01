@@ -26,7 +26,6 @@
  */
 
 #include "INLAtools.h"
-#include <R_ext/Rdynload.h>
 
 static R_CallMethodDef CallEntries[] = {
 	{"inla_cgeneric_element_get", (DL_FUNC) & inla_cgeneric_element_get, 8},

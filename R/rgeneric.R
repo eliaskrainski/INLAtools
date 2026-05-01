@@ -1,4 +1,4 @@
-#' @rdname rgeneric-class
+#' Organize data for the latent GMRF R interface for `INLA`.
 #' @param model an object used to define the model.
 #' See the 'rgeneric' vignette from the INLA package.
 #' @param debug logical indicating debug state.
@@ -14,7 +14,7 @@ rgeneric <- function(model,
   UseMethod("rgeneric")
 }
 #' The rgeneric default method.
-#' @rdname rgeneric-class
+#' @rdname rgeneric
 #' @export
 rgeneric.default <- function(model,
                              n,
@@ -53,20 +53,20 @@ rgeneric.default <- function(model,
   return(rmodel)
 }
 
-#' @describeIn rgeneric-class Returns the model object unchanged.
+#' @describeIn rgeneric Returns the model object unchanged.
 #' @export
 rgeneric.rgeneric <- function(model, ...) {
   return(model)
 }
 
-#' @describeIn rgeneric-class Converts a regular `inla.rgeneric` object to `rgeneric`.
+#' @describeIn rgeneric Converts a regular `inla.rgeneric` object to `rgeneric`.
 #' @export
 rgeneric.inla.rgeneric <- function(model, ...) {
   class(model) <- c("rgeneric", class(model))
   return(model)
 }
 
-#' @describeIn rgeneric-class
+#' @describeIn rgeneric
 #' Print the rgeneric object
 #' @param x a rgeneric object
 #' @param ... not used
@@ -75,7 +75,7 @@ print.rgeneric <- function(x, ...) {
   cat("rgeneric: ", x$f$rgeneric$model, ", n = ",
       x$f$rgeneric$n, "\n", sep = "")
 }
-#' @describeIn rgeneric-class
+#' @describeIn rgeneric
 #' A summary for a rgeneric object
 #' @param object a rgeneric object
 #' @param ... not used
@@ -85,7 +85,7 @@ summary.rgeneric <- function(object, ...) {
   cat("n = ", object$f$rgeneric$n, ", graph with",
       length(g@x), "non-zeros\n", sep = "")
 }
-#' @describeIn rgeneric-class
+#' @describeIn rgeneric
 #' A plot for a rgeneric object
 #' @param y not used
 #' @export
