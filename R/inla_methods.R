@@ -1,4 +1,4 @@
-#' Define the prec method for an inla output object
+#' Define the method to extract the precision from an inla output object.
 #' @param model an inla output
 #' @param ... used to pass the 'prior' argument,
 #' as logical (default is TRUE) to indicate if it is
@@ -8,7 +8,7 @@
 #' latent field at the mode of the hyperparameters
 #'
 #' @export
-prec.inla <- function(model, ...) {
+inlaQ <- function(model, ...) {
   if(is.null(model$misc$config$config)) {
     warning("inla.rerun() with config = TRUE in control.compute.")
     model$.args$control.compute$config <- TRUE

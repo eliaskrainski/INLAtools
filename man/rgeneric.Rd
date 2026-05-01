@@ -3,26 +3,11 @@
 \name{rgeneric}
 \alias{rgeneric}
 \alias{rgeneric.default}
-\alias{rgeneric.rgeneric}
-\alias{rgeneric.inla.rgeneric}
-\alias{print.rgeneric}
-\alias{summary.rgeneric}
-\alias{plot.rgeneric}
 \title{Organize data for the latent GMRF R interface for \code{INLA}.}
 \usage{
 rgeneric(model, n, debug = FALSE, ...)
 
 \method{rgeneric}{default}(model, n, debug = FALSE, ...)
-
-\method{rgeneric}{rgeneric}(model, ...)
-
-\method{rgeneric}{inla.rgeneric}(model, ...)
-
-\method{print}{rgeneric}(x, ...)
-
-\method{summary}{rgeneric}(object, ...)
-
-\method{plot}{rgeneric}(x, y, ...)
 }
 \arguments{
 \item{model}{an object used to define the model.
@@ -32,13 +17,8 @@ See the 'rgeneric' vignette from the INLA package.}
 
 \item{debug}{logical indicating debug state.}
 
-\item{...}{not used}
-
-\item{x}{a rgeneric object}
-
-\item{object}{a rgeneric object}
-
-\item{y}{not used}
+\item{...}{additional arguments to be used internally
+for the model, for example, additional data.}
 }
 \value{
 \code{rgeneric}/ \code{inla.rgeneric} object.
@@ -48,19 +28,3 @@ Organize data for the latent GMRF R interface for \code{INLA}.
 
 The rgeneric default method.
 }
-\section{Methods (by class)}{
-\itemize{
-\item \code{rgeneric(rgeneric)}: Returns the model object unchanged.
-
-\item \code{rgeneric(inla.rgeneric)}: Converts a regular \code{inla.rgeneric} object to \code{rgeneric}.
-
-}}
-\section{Methods (by generic)}{
-\itemize{
-\item \code{print(rgeneric)}: Print the rgeneric object
-
-\item \code{summary(rgeneric)}: A summary for a rgeneric object
-
-\item \code{plot(rgeneric)}: A plot for a rgeneric object
-
-}}

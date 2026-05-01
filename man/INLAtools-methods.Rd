@@ -2,44 +2,16 @@
 % Please edit documentation in R/aaa_methods.R
 \name{INLAtools-methods}
 \alias{INLAtools-methods}
-\alias{initial}
-\alias{mu}
-\alias{prior}
-\alias{graph}
-\alias{prec}
-\alias{prec.default}
 \alias{vcov.Matrix}
 \title{Methods to work with a \code{model}.}
 \usage{
-initial(model)
-
-mu(model, theta)
-
-prior(model, theta)
-
-graph(model, optimize)
-
-prec(model, theta, optimize)
-
-\method{prec}{default}(model, ...)
-
 \method{vcov}{Matrix}(object, ...)
 }
 \arguments{
-\item{model}{object to represent a model}
-
-\item{theta}{numeric vector.
-For \code{prior} it can be a numeric matrix,
-with number of lines equal the size of \code{theta}
-and each column as a different case.}
-
-\item{optimize}{logical indicating if it is to be
-returned only the elements and not as a sparse matrix.}
-
-\item{...}{additional arguments passed on}
-
 \item{object}{Matrix supposed to be a
 sparse precision matrix}
+
+\item{model}{object to represent a model}
 }
 \value{
 the result of the desired query
@@ -54,22 +26,6 @@ can be evaluated/retrieved.
 }
 \section{Functions}{
 \itemize{
-\item \code{initial()}: Retrieve the initial model parameter(s)
-
-\item \code{mu()}: Evaluate the model's mean
-
-\item \code{prior()}: Evaluate the log-prior for a given \code{theta}
-
-\item \code{graph()}: Retrieve the models' graph
-
-\item \code{prec()}: Retrieve the precision for a given \code{theta}
-
-\item \code{prec(default)}: The default precision method
-computes the inverse of the variance
-
 \item \code{vcov(Matrix)}: The \code{vcov} method for sparse matrices
 
 }}
-\seealso{
-\code{\link[=prior.cgeneric]{prior.cgeneric()}}
-}

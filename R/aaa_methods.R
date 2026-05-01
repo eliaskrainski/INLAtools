@@ -13,52 +13,6 @@ NULL
 #> NULL
 
 #' @describeIn INLAtools-methods
-#' Retrieve the initial model parameter(s)
-#' @export
-initial <- function(model) {
-  UseMethod("initial")
-}
-#' @describeIn INLAtools-methods
-#' Evaluate the model's mean
-#' @param theta numeric vector.
-#' For `prior` it can be a numeric matrix,
-#' with number of lines equal the size of `theta`
-#' and each column as a different case.
-#' @export
-mu <- function(model, theta) {
-  UseMethod("mu")
-}
-#' @describeIn INLAtools-methods
-#' Evaluate the log-prior for a given `theta`
-#' @seealso [prior.cgeneric()]
-#' @export
-prior <- function(model, theta) {
-  UseMethod("prior")
-}
-#' @describeIn INLAtools-methods
-#' Retrieve the models' graph
-#' @param optimize logical indicating if it is to be
-#' returned only the elements and not as a sparse matrix.
-#' @export
-graph <- function(model, optimize) {
-  UseMethod("graph")
-}
-#' @describeIn INLAtools-methods
-#' Retrieve the precision for a given `theta`
-#' @export
-prec <- function(model, theta, optimize) {
-  UseMethod("prec")
-}
-#' @describeIn INLAtools-methods
-#' The default precision method
-#' computes the inverse of the variance
-#' @param ... additional arguments passed on
-#' @export
-prec.default <- function(model, ...) {
-  v <- vcov(model, ...)
-  return(chol2inv(chol(as.matrix(v))))
-}
-#' @describeIn INLAtools-methods
 #' The `vcov` method for sparse matrices
 #' @param object Matrix supposed to be a
 #' sparse precision matrix

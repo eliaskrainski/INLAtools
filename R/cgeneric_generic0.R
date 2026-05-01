@@ -39,7 +39,6 @@
 #' Scaling intrinsic Gaussian Markov random field priors in
 #' spatial modelling. Spatial Statistics, vol. 8, p. 39-51.
 #' @return a `cgeneric` object, see [cgeneric()].
-#' @seealso [prior.cgeneric()]
 #' @export
 cgeneric_generic0 <-
   function(R,

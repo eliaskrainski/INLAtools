@@ -7,9 +7,8 @@
 \alias{graph.rgeneric}
 \alias{prec.rgeneric}
 \alias{prior.rgeneric}
-\title{\code{rgeneric_get} is an internal function used by
-\code{graph}, \code{pred}, \code{initial}, \code{mu} or \code{prior}
-methods for \code{rgeneric}.}
+\title{\code{rgeneric_get} is an internal function used to query
+\code{graph}, \code{Q}, \code{initial}, \code{mu} or \code{prior} from a \code{rgeneric}.}
 \usage{
 rgeneric_get(
   model,
@@ -18,15 +17,15 @@ rgeneric_get(
   ...
 )
 
-\method{initial}{rgeneric}(model)
+initial.rgeneric(model)
 
-\method{mu}{rgeneric}(model, theta)
+mu.rgeneric(model, theta)
 
-\method{graph}{rgeneric}(model, optimize)
+graph.rgeneric(model, optimize)
 
-\method{prec}{rgeneric}(model, theta, optimize)
+prec.rgeneric(model, theta, optimize)
 
-\method{prior}{rgeneric}(model, theta)
+prior.rgeneric(model, theta)
 }
 \arguments{
 \item{model}{a \code{rgeneric} object.}
@@ -34,7 +33,7 @@ rgeneric_get(
 \item{cmd}{an string to specify which model element to get}
 
 \item{theta}{numeric vector with the model parameters.
-If missing, the \code{\link[=initial]{initial()}} will be used.}
+If missing, the \code{initial} will be used.}
 
 \item{...}{additional arguments passed on to methods.
 E.g.: \code{optimize = FALSE} return the graph and precision
@@ -59,15 +58,15 @@ The functions listed below are for each \code{cmd} case.
 }
 \section{Functions}{
 \itemize{
-\item \code{initial(rgeneric)}: Retrive the initial parameter(s) of an \code{rgeneric} model.
+\item \code{initial.rgeneric()}: Retrive the initial parameter(s) of an \code{rgeneric} model.
 
-\item \code{mu(rgeneric)}: Evaluate the mean for an \code{rgeneric} model.
+\item \code{mu.rgeneric()}: Evaluate the mean for an \code{rgeneric} model.
 
-\item \code{graph(rgeneric)}: Retrieve the graph of an \code{rgeneric} object
+\item \code{graph.rgeneric()}: Retrieve the graph of an \code{rgeneric} object
 
-\item \code{prec(rgeneric)}: Retrieve the precision of an \code{rgeneric} object
+\item \code{prec.rgeneric()}: Retrieve the precision of an \code{rgeneric} object
 
-\item \code{prior(rgeneric)}: Evaluate the prior for an \code{rgeneric} model
+\item \code{prior.rgeneric()}: Evaluate the prior for an \code{rgeneric} model
 
 }}
 \examples{

@@ -1,6 +1,5 @@
-#' `rgeneric_get` is an internal function used by
-#' `graph`, `pred`, `initial`, `mu` or `prior`
-#' methods for `rgeneric`.
+#' `rgeneric_get` is an internal function used to query
+#' `graph`, `Q`, `initial`, `mu` or `prior` from a `rgeneric`.
 #' @description
 #' The `generic_get` retrieve a model property specified by
 #' `cmd` on an `rgeneric` object.
@@ -8,7 +7,7 @@
 #' @param model a `rgeneric` object.
 #' @param cmd an string to specify which model element to get
 #' @param theta numeric vector with the model parameters.
-#' If missing, the [initial()] will be used.
+#' If missing, the `initial` will be used.
 #' @param ... additional arguments passed on to methods.
 #' E.g.: `optimize = FALSE` return the graph and precision
 #' as a sparse matrix whereas `optimize = TRUE` retur the

@@ -68,6 +68,3 @@ Sigrunn Holbek Sørbye and Håvard Rue (2014).
 Scaling intrinsic Gaussian Markov random field priors in
 spatial modelling. Spatial Statistics, vol. 8, p. 39-51.
 }
-\seealso{
-\code{\link[=prior.cgeneric]{prior.cgeneric()}}
-}

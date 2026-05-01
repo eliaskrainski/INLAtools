@@ -2,14 +2,14 @@
 % Please edit documentation in R/cgeneric_utils.R
 \name{cgeneric_get}
 \alias{cgeneric_get}
-\alias{initial.cgeneric}
-\alias{mu.cgeneric}
-\alias{graph.cgeneric}
-\alias{prec.cgeneric}
-\alias{prior.cgeneric}
-\title{\code{cgeneric_get} is an internal function used by
-\code{graph}, \code{pred}, \code{initial}, \code{mu} or \code{prior}
-methods for \code{cgeneric}.}
+\alias{cgeneric_initial}
+\alias{cgeneric_mu}
+\alias{cgeneric_graph}
+\alias{cgeneric_Q}
+\alias{cgeneric_prior}
+\title{\code{cgeneric_get} is an internal function used to query
+\code{graph}, \code{Q}, \code{initial}, \code{mu} or \code{log_prior} from a
+\code{cgeneric} model.}
 \usage{
 cgeneric_get(
   model,
@@ -18,15 +18,15 @@ cgeneric_get(
   optimize = TRUE
 )
 
-\method{initial}{cgeneric}(model)
+cgeneric_initial(model)
 
-\method{mu}{cgeneric}(model, theta)
+cgeneric_mu(model, theta)
 
-\method{graph}{cgeneric}(model, optimize)
+cgeneric_graph(model, optimize)
 
-\method{prec}{cgeneric}(model, theta, optimize)
+cgeneric_Q(model, theta, optimize)
 
-\method{prior}{cgeneric}(model, theta)
+cgeneric_prior(model, theta)
 }
 \arguments{
 \item{model}{a \code{cgeneric} object.}
@@ -34,7 +34,7 @@ cgeneric_get(
 \item{cmd}{an string to specify which model element to get}
 
 \item{theta}{numeric vector with the model parameters.
-If missing, the \code{\link[=initial]{initial()}} will be used.}
+If missing, the \code{initial} will be used.}
 
 \item{optimize}{logical indicating if it is to be
 returned only the elements and not as a sparse matrix.}
@@ -53,15 +53,15 @@ The functions listed below are for each \code{cmd} case.
 }
 \section{Functions}{
 \itemize{
-\item \code{initial(cgeneric)}: Retrive the initial parameter(s) of an \code{cgeneric} model.
+\item \code{cgeneric_initial()}: Retrive the initial parameter(s) of an \code{cgeneric} model.
 
-\item \code{mu(cgeneric)}: Evaluate the mean for an \code{cgeneric} model.
+\item \code{cgeneric_mu()}: Evaluate the mean for an \code{cgeneric} model.
 
-\item \code{graph(cgeneric)}: Retrieve the graph of an \code{cgeneric} object
+\item \code{cgeneric_graph()}: Retrieve the graph of an \code{cgeneric} object
 
-\item \code{prec(cgeneric)}: Retrieve the precision of an \code{cgeneric} object
+\item \code{cgeneric_Q()}: Retrieve the precision of an \code{cgeneric} object
 
-\item \code{prior(cgeneric)}: Evaluate the prior for an \code{cgeneric} model
+\item \code{cgeneric_prior()}: Evaluate the prior for an \code{cgeneric} model
 
 }}
 \examples{
