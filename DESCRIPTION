@@ -24,7 +24,7 @@ Description: Contain code to work with a C struct, in short
   prior for its parameters, useful for model inference. 
   It can be accessed from a C program and is the recommended 
   way to implement new GMRF models in the 'INLA' package 
-  (<https://r-inla.org>).
+  (<https://www.r-inla.org>).
   The 'INLAtools' implement functions to evaluate 
   each one of the model specifications from R.
   The implemented functionalities leverage the use 

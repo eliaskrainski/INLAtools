@@ -15,7 +15,6 @@ NULL
 #' Build a `cgeneric` to implement the interaction between
 #' two GMRF models each one implemented as a `cgeneric`.
 #' @export
-#' @example demo/kronecker.R
 setMethod(
   "kronecker",
   c(X="cgeneric", Y = "cgeneric"),
