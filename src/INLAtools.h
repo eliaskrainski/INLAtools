@@ -34,6 +34,9 @@
 #include <strings.h>
 #if defined(INLA_EXTERNAL_PACKAGE)
 #include <ltdl.h>
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
 #else 
 #include <dlfcn.h>
 #include <R.h>
@@ -43,10 +46,6 @@
 #include <R_ext/Utils.h>	// needed to allow user interrupts
 #endif
 #include "cgeneric.h"
-
-#if defined(_OPENMP)
-#include <omp.h>
-#endif
 
 #if !defined(Calloc)
 #define Calloc(n_, type_)  (type_ *)calloc((n_), sizeof(type_))
@@ -72,10 +71,11 @@ typedef int fortran_charlen_t;
 
 #define F_ONE ((fortran_charlen_t)1)
 
-#if !defined(INLA_EXTERNAL_PACKAGE)
+#if defined(INLA_EXTERNAL_PACKAGE)
+inla_cgeneric_func_tp inla_cgeneric_generic0;
+inla_cgeneric_func_tp inla_cgeneric_kronecker;
+#else 
 SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 			       SEXP doubles, SEXP chars, SEXP mats, SEXP smats);
 #endif
-inla_cgeneric_func_tp inla_cgeneric_generic0;
-inla_cgeneric_func_tp inla_cgeneric_kronecker;
 
