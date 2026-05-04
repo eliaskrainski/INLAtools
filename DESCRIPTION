@@ -1,59 +1,48 @@
-Package: INLAtools
 Type: Package
+Package: INLAtools
 Title: Functionalities for the 'INLA' Package
 Version: 0.1.4
-Maintainer: Elias Teixeira Krainski <elias.krainski@kaust.edu.sa>
 Authors@R: c(
- person(given = c("Elias"),
-        family = "Teixeira Krainski",
-        email = "elias.krainski@kaust.edu.sa",
-        role = c("cre", "aut", "cph"),
-        comment = c(ORCID = "0000-0002-7063-2615")),
- person("Finn", "Lindgren", email = "finn.lindgren@gmail.com",
-        role = c("aut"),
-        comment = c(ORCID = "0000-0002-5833-2011")),
- person(given = "Haavard",
-        family = "Rue’",
-        role = "aut",
-        comment = c(ORCID = "0000-0002-0222-1881"))
-        )
-Description: Contain code to work with a C struct, in short
-  cgeneric, to define a Gaussian Markov random (GMRF) model.
-  The cgeneric contain code to specify GMRF elements such as
-  the graph and the precision matrix, and also the initial and 
-  prior for its parameters, useful for model inference. 
-  It can be accessed from a C program and is the recommended 
-  way to implement new GMRF models in the 'INLA' package 
-  (<https://www.r-inla.org>).
-  The 'INLAtools' implement functions to evaluate 
-  each one of the model specifications from R.
-  The implemented functionalities leverage the use 
-  of 'cgeneric' models and provide a way to debug 
-  the code as well to work with the prior for the 
-  model parameters and to sample from it. 
-  The `generic0` can be used to implement intrinsic models with the
-  scaling as proposed in 
-  Sørbye & Rue (2014) <doi:10.1016/j.spasta.2013.06.004>, 
-  and the required contraints.
-  A very useful functionality is the Kronecker product method 
-  that creates a new model from multiple cgeneric models.
-  It also works with the rgeneric, the R version of the 
-  cgeneric intended to easy try implementation of new GMRF models.
-  The Kronecker between two cgeneric models where each one needs 
-  a constraint, such as spatio-temporal intrinsic interaction 
-  models, the needed constraints are automatically set.
+    person("Elias", "Teixeira Krainski", , "elias.krainski@kaust.edu.sa", role = c("cre", "aut", "cph"),
+           comment = c(ORCID = "0000-0002-7063-2615")),
+    person("Finn", "Lindgren", , "finn.lindgren@gmail.com", role = "aut",
+           comment = c(ORCID = "0000-0002-5833-2011")),
+    person("Haavard", "Rue’", role = "aut",
+           comment = c(ORCID = "0000-0002-0222-1881"))
+  )
+Maintainer: Elias Teixeira Krainski <elias.krainski@kaust.edu.sa>
+Description: Contain code to work with a C struct, in short cgeneric, to
+    define a Gaussian Markov random (GMRF) model.  The cgeneric contain
+    code to specify GMRF elements such as the graph and the precision
+    matrix, and also the initial and prior for its parameters, useful for
+    model inference.  It can be accessed from a C program and is the
+    recommended way to implement new GMRF models in the 'INLA' package
+    (<https://www.r-inla.org>).  The 'INLAtools' implement functions to
+    evaluate each one of the model specifications from R.  The implemented
+    functionalities leverage the use of 'cgeneric' models and provide a
+    way to debug the code as well to work with the prior for the model
+    parameters and to sample from it.  The `generic0` can be used to
+    implement intrinsic models with the scaling as proposed in Sørbye &
+    Rue (2014) <doi:10.1016/j.spasta.2013.06.004>, and the required
+    constraints.  A very useful functionality is the Kronecker product
+    method that creates a new model from multiple cgeneric models.  It
+    also works with the rgeneric, the R version of the cgeneric intended
+    to easy try implementation of new GMRF models.  The Kronecker between
+    two cgeneric models where each one needs a constraint, such as
+    spatio-temporal intrinsic interaction models, the needed constraints
+    are automatically set.
+License: GPL (>=2)
 URL: https://github.com/eliaskrainski/INLAtools
 BugReports: https://github.com/eliaskrainski/INLAtools/issues
-License: GPL (>=2) 
-Encoding: UTF-8
-RoxygenNote: 7.3.3
-NeedsCompilation: yes
-Roxygen: list(markdown = TRUE)
 Depends:
-    R (>= 4.3),
-    Matrix
+    Matrix,
+    R (>= 4.3)
 Imports:
     methods,
     utils
+Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
+NeedsCompilation: yes
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3

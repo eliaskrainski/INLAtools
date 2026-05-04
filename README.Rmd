@@ -134,7 +134,7 @@ The resulting Kronecker product model is
 cg12 <- kronecker(cg1, cg2)
 (N <- cg12$f$n)
 tau <- 4
-Q <- prec(cg12, theta = log(tau))
+Q <- cgeneric_Q(cg12, theta = log(tau))
 image(Q)
 ```
 

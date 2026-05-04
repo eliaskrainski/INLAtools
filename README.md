@@ -37,6 +37,12 @@ fitting a model. You can install it with
 
 ``` r
 install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE) 
+#> Installing package into '/tmp/RtmpwRJbMF/temp_libpath14dfcf7fa00cc0'
+#> (as 'lib' is unspecified)
+#> also installing the dependency 'runjags'
+#> Warning in install.packages("INLA", repos = c(getOption("repos"), INLA =
+#> "https://inla.r-inla-download.org/R/testing"), : installation of package
+#> 'runjags' had non-zero exit status
 ```
 
 You can install the current [CRAN](https://CRAN.R-project.org) version
@@ -50,7 +56,7 @@ You can install the latest version of INLAtools from
 [GitHub](https://github.com/eliaskrainski/INLAtools) with
 
 ``` r
-if(!require(pack)) install.packages("pack")
+if(!require(pak)) install.packages("pak")
 pak::pkg_install("eliaskrainski/INLAtools")
 ```
 
@@ -123,6 +129,8 @@ is applied by default in the following code
 
 ``` r
 library(INLAtools)
+#> Welcome to the INLAtools package!
+#> More at eliaskrainski.github.io/INLAtools
 cg1 <- cgeneric(
     model = "generic0", 
     R = R1, ## precision structure matrix
@@ -150,7 +158,7 @@ cg12 <- kronecker(cg1, cg2)
 (N <- cg12$f$n)
 #> [1] 105
 tau <- 4
-Q <- prec(cg12, theta = log(tau))
+Q <- cgeneric_Q(cg12, theta = log(tau))
 image(Q)
 ```
 
@@ -165,6 +173,7 @@ Simulate $k=5$ samples (replicates) from the Kronecker product model
 
 ``` r
 library(INLA)
+#> 
 k <- 5
 xx <- inla.qsample(
   n = k, 
@@ -172,17 +181,14 @@ xx <- inla.qsample(
   constr = cg12$f$extraconstr, 
   seed = 1
 )
-#> Warning in inla.qsample(n = k, Q = Q + Diagonal(N, 1e-09), constr =
-#> cg12$f$extraconstr, : Since 'seed!=0', parallel model is disabled and serial
-#> model is selected
 apply(xx, 2, summary)
 #>              sample:1      sample:2      sample:3      sample:4      sample:5
-#> Min.    -1.244648e+00 -1.921912e+00 -8.876438e-01 -8.104778e-01 -1.195814e+00
-#> 1st Qu. -4.227779e-01 -3.927393e-01 -2.466590e-01 -2.647159e-01 -2.574486e-01
-#> Median   8.474875e-03  5.005799e-02 -2.834700e-02  2.188409e-02 -2.665859e-02
-#> Mean     1.310260e-12  6.705232e-13 -1.156909e-13  1.568421e-14  1.811621e-12
-#> 3rd Qu.  4.315216e-01  4.220449e-01  2.283570e-01  2.644287e-01  3.051809e-01
-#> Max.     1.166829e+00  1.814481e+00  1.762854e+00  8.952275e-01  9.702740e-01
+#> Min.    -1.244634e+00 -1.866194e+00 -9.745458e-01 -1.987392e+00 -1.801329e+00
+#> 1st Qu. -4.227840e-01 -3.219279e-01 -3.223740e-01 -3.912217e-01 -2.869913e-01
+#> Median   8.482090e-03 -4.438326e-02  5.705059e-03 -4.288614e-02 -3.924669e-02
+#> Mean    -7.466504e-13 -2.836749e-13 -4.164574e-13  9.863080e-13  2.913949e-13
+#> 3rd Qu.  4.315254e-01  3.253503e-01  3.321958e-01  3.896462e-01  3.117685e-01
+#> Max.     1.166816e+00  1.207106e+00  1.704586e+00  2.204671e+00  2.146385e+00
 ```
 
 Plot each replicate per group
@@ -197,16 +203,16 @@ dataf <- data.frame(
 )
 head(dataf, 10)
 #>    i1 i2  i r            x
-#> 1   1  1  1 1 -0.034627310
-#> 2   1  2  2 1  0.002663662
-#> 3   1  3  3 1 -0.562134599
-#> 4   1  4  4 1 -0.493268677
-#> 5   1  5  5 1 -0.228196430
-#> 6   1  6  6 1  0.695164763
-#> 7   1  7  7 1  0.620398591
-#> 8   2  1  8 1  0.199000683
-#> 9   2  2  9 1  0.027308755
-#> 10  2  3 10 1 -0.520617123
+#> 1   1  1  1 1 -0.034621728
+#> 2   1  2  2 1  0.002660055
+#> 3   1  3  3 1 -0.562124644
+#> 4   1  4  4 1 -0.493262069
+#> 5   1  5  5 1 -0.228181017
+#> 6   1  6  6 1  0.695150255
+#> 7   1  7  7 1  0.620379148
+#> 8   2  1  8 1  0.199005668
+#> 9   2  2  9 1  0.027305534
+#> 10  2  3 10 1 -0.520608235
 
 library(ggplot2)
 ggplot(dataf) + theme_minimal() + 
@@ -236,12 +242,12 @@ Summary of the intercept and $\tau$ posterior marginals
 ``` r
 fit$summary.fixed
 #>                 mean         sd 0.025quant 0.5quant 0.975quant     mode
-#> (Intercept) 3.003789 0.01024122     2.9837 3.003792   3.023864 3.003792
-#>                      kld
-#> (Intercept) 6.774597e-11
+#> (Intercept) 3.006393 0.01037582    2.98604 3.006395   3.026732 3.006396
+#>                     kld
+#> (Intercept) 6.59997e-11
 fit$summary.hyperpar
-#>                  mean        sd 0.025quant 0.5quant 0.975quant     mode
-#> Theta1 for i 1.641144 0.1169112   1.411485 1.641344   1.869711 1.641741
+#>                 mean        sd 0.025quant 0.5quant 0.975quant     mode
+#> Theta1 for i 1.65327 0.1147072    1.42753 1.653617   1.877111 1.654305
 ```
 
 Scatterplot of the posterior mode and simulated
@@ -263,11 +269,11 @@ pm.sigma <- inla.tmarginal(
 1/sqrt(tau)
 #> [1] 0.5
 inla.zmarginal(pm.sigma)
-#> Mean            0.440921 
-#> Stdev           0.0256279 
-#> Quantile  0.025 0.392806 
-#> Quantile  0.25  0.423121 
-#> Quantile  0.5   0.440094 
-#> Quantile  0.75  0.457789 
-#> Quantile  0.975 0.493443
+#> Mean            0.438227 
+#> Stdev           0.0249956 
+#> Quantile  0.025 0.391351 
+#> Quantile  0.25  0.420859 
+#> Quantile  0.5   0.437402 
+#> Quantile  0.75  0.454666 
+#> Quantile  0.975 0.489505
 ```
