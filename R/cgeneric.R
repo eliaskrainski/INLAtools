@@ -56,7 +56,7 @@
 #'  The `cgeneric_shlib_path` function returns a `character`
 #'  with the path to the shared lib.
 #' @export
-#' @example 
+#' @examples
 #' cg <- cgeneric("iid", n = 10, param = c(1, 0.05))
 #' cg
 cgeneric <- function(model, ...) {
