@@ -41,7 +41,7 @@ cg2 <- cgeneric(
 cg12 <- kronecker(cg1, cg2)
 
 all.equal(Sparse(R12),
-          Sparse(prec(cg12, theta = 0)))
+          Sparse(cgeneric_Q(cg12, theta = 0)))
 
 ## Checks
 g1 <- graph(cg1, optimize = !TRUE)
@@ -77,7 +77,7 @@ if(require(INLA)) {
     )
     
     print(all.equal(Sparse(R12),
-                    Sparse(prec(fit0))))
+                    Sparse(cgeneric_Q(fit0))))
 
     ## overall index 
     (n1*n2)==nrow(data2)
@@ -96,7 +96,7 @@ if(require(INLA)) {
 
     print(
         all.equal(Sparse(R12),
-                  Sparse(prec(fit1)))
+                  Sparse(cgeneric_Q(fit1)))
     )
 
 }

@@ -92,7 +92,7 @@ if(require(INLA)) {
     nt+n
     str(kh4cg$f$extraconstr)
     
-    image(prec(kh4cg, theta = 0))
+    image(cgeneric_Q(kh4cg, theta = 0))
     
     fit.k2cg0 <- inla(
         formula = update(model0, .~.+f(spacetime, model = kh4cg)), 

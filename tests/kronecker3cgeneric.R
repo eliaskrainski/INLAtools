@@ -46,7 +46,7 @@ cg3 <- cgeneric(
 
 ## kronecker 2x1
 cg21 <- kronecker(cg2, cg1)
-cg21Q <- prec(cg21, theta = 0)
+cg21Q <- cgeneric_Q(cg21, theta = 0)
 
 ## compare
 R21 <- kronecker(R2, R1)
@@ -55,7 +55,7 @@ all.equal(Sparse(R21),
 
 ## kronecker 3x(2x1)
 cg321 <- kronecker(cg3, cg21)
-cg321Q <- prec(cg321, theta = 0)
+cg321Q <- cgeneric_Q(cg321, theta = 0)
 
 R321 <- kronecker(R3, R21)
 all.equal(Sparse(R321),
@@ -97,7 +97,7 @@ if(require(INLA)) {
         control.compute = list(config = TRUE)
     )
 
-    Q1 <- prec(fit1)
+    Q1 <- cgeneric_Q(fit1)
 
     print(
         all.equal(Sparse(R321),
@@ -115,7 +115,7 @@ if(require(INLA)) {
     )
 
 
-    Q2 <- prec(fit2)
+    Q2 <- cgeneric_Q(fit2)
 
     print(
         all.equal(Sparse(R321),

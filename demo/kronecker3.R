@@ -6,7 +6,7 @@ R2 <- Matrix(crossprod(diff(diag(3))))
 R2
 m2 <- cgeneric("generic0", R = R2, param = c(1, NA), scale = FALSE)
 m3 <- cgeneric("iid", n = 2, param = c(1, 0.5))
-prec(m3, theta = 0.0)
+cgeneric_Q(m3, theta = 0.0)
 multi123 <- multi_generic_model(
   list(m1 = m1, m2 = m2, m3 = m3)
 )

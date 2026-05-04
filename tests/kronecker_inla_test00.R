@@ -59,7 +59,7 @@ ires1 <- inla(
 )
 
 library(INLAtools)
-Qinla <- prec(ires1)
+Qinla <- cgeneric_Q(ires1)
 
 all.equal(Q21, Qinla)
 
