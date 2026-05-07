@@ -146,3 +146,7 @@ The \code{graph} and \code{Q} non-zero pattern should match,
 its elements should be ordered by row,
 and only its upper part stored.
 }
+\examples{
+cg <- cgeneric("iid", n = 10, param = c(1, 0.05))
+cg
+}

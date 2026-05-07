@@ -64,12 +64,12 @@
 #endif
 
 #if __GNUC__ > 7
-typedef size_t fortran_charlen_t;
+typedef size_t FORTRAN_CHARLEN_T;
 #else
-typedef int fortran_charlen_t;
+typedef int FORTRAN_CHARLEN_T;
 #endif
 
-#define F_ONE ((fortran_charlen_t)1)
+#define F_ONE ((FORTRAN_CHARLEN_T)1)
 
 #if defined(INLA_EXTERNAL_PACKAGE)
 inla_cgeneric_func_tp inla_cgeneric_generic0;
