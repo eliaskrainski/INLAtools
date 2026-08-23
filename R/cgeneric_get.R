@@ -105,7 +105,16 @@ cgeneric_get <- function(model,
     ), silent = TRUE)
     if(inherits(initheta, "try-error")) {
       print(attr(initheta, "condition")$message)
-      stop('Error trying to get "initial"!')
+      try(iq <- do.call(
+        paste0("INLA", ":", ":", "inla.cgeneric.q"),
+        model), silent = TRUE)
+      if(inherits(iq, "try-error"))
+        stop('Error trying to get "initial"!')
+      if(any(cmd %in% "log_prior"))
+        stop("The log prior only works if a shared lib is available!")
+      names(iq)[1] <- "initial"
+      if(length(iq)==1) return(iq[[cmd]])
+      return(iq)
     }
   }
   if((length(cmd)==1) && (cmd=="initial")) {

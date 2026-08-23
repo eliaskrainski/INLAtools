@@ -40,11 +40,33 @@ setMethod(
       useINLAprecomp <- FALSE
       warning("INLA version is old. Setting 'useINLAprecomp = FALSE'!")
     }
-    shlib <- cgeneric_shlib_path(
-      package = "INLAtools",
-      useINLAprecomp = useINLAprecomp,
-      debug = debug)
-
+    if(INLAvcheck<"26.08.22") {
+      shlib <- cgeneric_shlib_path(
+        package = "INLAtools",
+        useINLAprecomp = useINLAprecomp,
+        debug = debug)
+    } else {
+      shlib <- cgeneric_shlib_path(
+        package = "INLAtools",
+        useINLAprecomp = FALSE,
+        debug = debug)
+      Xsshlib <- strsplit(X$f$cgeneric$data$characters$shlib, "/")[[1]]
+      Xpkg <- utils::tail(Xsshlib, 2)[1]
+      if(Xpkg=="libs")
+        Xpkg <- utils::tail(Xsshlib, 3)[1]
+      X$f$cgeneric$data$characters$shlib <- cgeneric_shlib_path(
+        package = Xpkg,
+        useINLAprecomp = FALSE,
+        debug = debug)
+      Ysshlib <- strsplit(Y$f$cgeneric$data$characters$shlib, "/")[[1]]
+      Ypkg <- utils::tail(Ysshlib, 2)[1]
+      if(Ypkg=="libs")
+        Ypkg <- utils::tail(Ysshlib, 3)[1]
+      Y$f$cgeneric$data$characters$shlib <- cgeneric_shlib_path(
+        package = Ypkg,
+        useINLAprecomp = FALSE,
+        debug = debug)
+    }
     cmodel <- "inla_cgeneric_kronecker"
 
     n1 <- as.integer(X$f$n)

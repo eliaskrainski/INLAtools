@@ -111,7 +111,7 @@ cgeneric_generic0 <-
 ## setup extraconstr
     Ae <- dotArgs$extraconstr
     if(!is.null(Ae)) {
-      stopifnot(!(names(Ae) %in% c("A", "e")))
+      stopifnot(all(c("A", "e") %in% names(Ae)))
       stopifnot(ncol(Ae$A)==n)
       stopifnot(nrow(Ae$A)==length(Ae$e))
     }

@@ -43,13 +43,17 @@ export(rgeneric_mu)
 export(rgeneric_prior)
 export(upperPadding)
 exportMethods(kronecker)
-importFrom(Matrix,Diagonal)
-importFrom(Matrix,as.matrix)
-importFrom(Matrix,diag)
-importFrom(Matrix,sparseMatrix)
+importFrom(Matrix,
+  Diagonal,
+  as.matrix,
+  diag,
+  sparseMatrix
+)
 importFrom(graphics,image)
-importFrom(methods,as)
-importFrom(methods,is)
+importFrom(methods,
+  as,
+  is
+)
 importFrom(stats,vcov)
 importFrom(utils,str)
 useDynLib(INLAtools, .registration = TRUE)
