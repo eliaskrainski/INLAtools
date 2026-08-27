@@ -37,7 +37,7 @@
 #if defined(_OPENMP)
 #include <omp.h>
 #endif
-#else 
+#else
 #include <dlfcn.h>
 #include <R.h>
 #include <Rdefines.h>
@@ -74,7 +74,9 @@ typedef int FORTRAN_CHARLEN_T;
 #if defined(INLA_EXTERNAL_PACHAGES)
 inla_cgeneric_func_tp inla_cgeneric_generic0;
 inla_cgeneric_func_tp inla_cgeneric_kronecker;
-#else 
+#else
+inla_cgeneric_func_tp inla_cgeneric_generic0;
+inla_cgeneric_func_tp inla_cgeneric_kronecker;
 SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints,
 			       SEXP doubles, SEXP chars, SEXP mats, SEXP smats);
 #endif
