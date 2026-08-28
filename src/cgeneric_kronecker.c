@@ -30,7 +30,7 @@
 typedef struct {
 	inla_cgeneric_data_tp *dataM1;
 	inla_cgeneric_data_tp *dataM2;
-#if defined(INLA_EXTERNAL_PACHAGES)
+#if defined(INLA_EXTERNAL_PACKAGES)
         lt_dlhandle handle1;
         lt_dlhandle handle2;
 #else
@@ -123,8 +123,8 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 #endif
 	    if (!(data->cache)) {
 		assert(!strcasecmp(data->ints[ni1 + ni2]->name, "idx1u"));
-		assert(!strcasecmp(data->ints[ni1 + ni2 + 1]->name, "idx2u"));	
-		assert(!strcasecmp(data->smats[nsm1 + nsm2]->name, "Kgraph"));	
+		assert(!strcasecmp(data->ints[ni1 + ni2 + 1]->name, "idx2u"));
+		assert(!strcasecmp(data->smats[nsm1 + nsm2]->name, "Kgraph"));
 
 		cache_tp *d12cache = Calloc(1, cache_tp);
 		d12cache->dataM1 = Calloc(1, inla_cgeneric_data_tp);
@@ -167,21 +167,22 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 		if (nsm2 > 0) {
 		    d12cache->dataM2->smats = &data->smats[nsm1];
 		}
-#if defined(INLA_EXTERNAL_PACHAGES)
+#if defined(INLA_EXTERNAL_PACKAGES)
 	      	static int ck_ltdl_init = 1;
                 if (ck_ltdl_init) {
                         lt_dlinit();
                   }
 		ck_ltdl_init = 0;
-		d12cache->handle1 = lt_dlopen(&d12cache->dataM1->chars[1]->chars[0]);
+		d12cache->handle1 = lt_dlopen(NULL); //&d12cache->dataM1->chars[1]->chars[0]);
 #else
 		d12cache->handle1 =  dlopen(&d12cache->dataM1->chars[1]->chars[0], RTLD_LAZY);
 #endif
 		if (!d12cache->handle1) {
-#if defined(INLA_EXTERNAL_PACHAGES)
-		    fprintf(stderr,"\n\n\t*** ERROR *** Failed to load shared library '%s': %s\n\n",
-			    &d12cache->dataM1->chars[1]->chars[0], lt_dlerror());
-		    abort();
+#if defined(INLA_EXTERNAL_PACKAGES)
+//		    fprintf(stderr,"\n\n\t*** ERROR *** Failed to load shared library '%s': %s\n\n",
+fprintf(stderr, "Not using '%s'\n",
+        &d12cache->dataM1->chars[1]->chars[0]);//, lt_dlerror());
+	//	    abort();
 #else
 		    Rf_error("Failed to load shared library '%s': %s",
 			     &d12cache->dataM1->chars[1]->chars[0],  dlerror());
@@ -189,16 +190,17 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 		}
 		if (strcmp(&d12cache->dataM1->chars[1]->chars[0],
 			   &d12cache->dataM2->chars[1]->chars[0]) != 0) {
-#if defined(INLA_EXTERNAL_PACHAGES)
-			d12cache->handle2 = lt_dlopen(&d12cache->dataM2->chars[1]->chars[0]);
+#if defined(INLA_EXTERNAL_PACKAGES)
+			d12cache->handle2 = lt_dlopen(NULL);//&d12cache->dataM2->chars[1]->chars[0]);
 #else
 		    d12cache->handle2 = dlopen(&d12cache->dataM2->chars[1]->chars[0],  RTLD_LAZY);
 #endif
 		    if (!d12cache->handle2) {
-#if defined(INLA_EXTERNAL_PACHAGES)
-			fprintf(stderr,"\n\n\t*** ERROR *** Failed to load shared library '%s': %s\n\n",
-				&d12cache->dataM2->chars[0]->chars[0], lt_dlerror());
-			abort();
+#if defined(INLA_EXTERNAL_PACKAGES)
+//			fprintf(stderr,"\n\n\t*** ERROR *** Failed to load shared library '%s': %s\n\n",
+fprintf(stderr, "Not using '%s'\n",
+        &d12cache->dataM2->chars[0]->chars[0]);//, lt_dlerror());
+			//abort();
 #else
 			Rf_error("Failed to load shared library '%s': %s",
 				 &d12cache->dataM2->chars[0]->chars[0],	 dlerror());
@@ -207,7 +209,7 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 		} else {
 		    d12cache->handle2 = d12cache->handle1;
 		}
-#if defined(INLA_EXTERNAL_PACHAGES)
+#if defined(INLA_EXTERNAL_PACKAGES)
 		*(void **)(&d12cache->model1_func) = lt_dlsym(d12cache->handle1, &d12cache->dataM1->chars[0]->chars[0]);
 		*(void **)(&d12cache->model2_func) = lt_dlsym(d12cache->handle2, &d12cache->dataM2->chars[0]->chars[0]);
 #else
@@ -356,12 +358,12 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 
 	case INLA_CGENERIC_QUIT:
 		{
-#if defined(INLA_EXTERNAL_PACHAGES)
-			lt_dlclose(d12cache->handle1);
+#if defined(INLA_EXTERNAL_PACKAGES)
+/*			lt_dlclose(d12cache->handle1);
 			if (strcmp(&d12cache->dataM1->chars[1]->chars[0],
 			           &d12cache->dataM2->chars[1]->chars[0]) != 0) {
 				lt_dlclose(d12cache->handle2);
-			}
+			           }*/
 #else
 			dlclose(d12cache->handle1);
 			if (strcmp(&d12cache->dataM1->chars[1]->chars[0],
