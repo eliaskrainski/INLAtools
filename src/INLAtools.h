@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
-#if defined(INLA_EXTERNAL_PACHAGES)
+#if defined(INLA_EXTERNAL_PACKAGES)
 #include <ltdl.h>
 #if defined(_OPENMP)
 #include <omp.h>
@@ -71,7 +71,7 @@ typedef int FORTRAN_CHARLEN_T;
 
 #define F_ONE ((FORTRAN_CHARLEN_T)1)
 
-#if defined(INLA_EXTERNAL_PACHAGES)
+#if defined(INLA_EXTERNAL_PACKAGES)
 inla_cgeneric_func_tp inla_cgeneric_generic0;
 inla_cgeneric_func_tp inla_cgeneric_kronecker;
 #else 
