@@ -294,6 +294,10 @@ cgeneric_shlib_path <- function(
           useINLAprecomp <- TRUE
       }
   }
+  INLAvcheck <- packageCheck("INLA", "25-10-28")
+  if(INLAvcheck>="26.08.22") {
+    useINLAprecomp <- FALSE
+  }
 
   nbit <- as.integer(8 * (.Machine$sizeof.pointer))
   if(useINLAprecomp) {

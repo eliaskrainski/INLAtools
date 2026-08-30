@@ -21,12 +21,14 @@ R1
  ))
 R2
 
-## cgeneric models
+## cgeneric model1
 cg1 <- cgeneric(
     model = "generic0", 
     R = R1,
     scale = FALSE,
     param = c(1, 0.5)) ## P(sigma > 1) = 0.5
+
+## cgeneric model2
 cg2 <- cgeneric(
     model = "generic0", 
     R = R2,
