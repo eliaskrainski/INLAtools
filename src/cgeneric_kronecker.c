@@ -26,6 +26,9 @@
  */
 
 #include "INLAtools.h"
+#if defined(_WIN32)
+#       include <windows.h>
+#endif
 
 typedef struct {
     inla_cgeneric_data_tp *dataM1;
@@ -48,23 +51,20 @@ __attribute__((used)) __attribute__((visibility("default")))
 #if defined(__cplusplus)
 extern "C"
 #endif
-#if defined(_WIN32)
-#       include <windows.h>
-#endif
 #endif
 
 double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 				inla_cgeneric_data_tp *data)
 {
     // concatenated data approach of the lists
-    
+
     // Merge cgeneric data from model1 (M1) and model2 (M2)
     // to define a Kronecker product model (KM) with precision as
     // Q = Q1 (x) Q2
     // where
     // Q1 is the precision for M1
     // Q2 is the precision for M2
-    
+
     // cmd: length 1 string
     // theta: {theta1, theta[d12cache->nth1]}
     // data: {data1, data2}, but data1->ints[0]->ints[0...10] contains
@@ -95,15 +95,15 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
     // data->ints[ni1+ni2+1] contain nu2 index
     // data->smatrices[nsm1+nsm2] contains the graph
     // where ->x is the order
-    
+
     double *ret1 = NULL;	// to store output from M1.
     double *ret2 = NULL;	// to store output from M2.
     double *ret = NULL;	// to return;
-    
+
     int i, j, k, M1, M2, n, M;
     int ni1, nd1, nc1, nm1, nsm1;
     int ni2, nd2, nc2, nm2, nsm2;
-    
+
     // int n1 = data->ints[0]->ints[0];
     ni1 = data->ints[0]->ints[1];
     nd1 = data->ints[0]->ints[2];
@@ -111,7 +111,7 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
     nm1 = data->ints[0]->ints[4];
     nsm1 = data->ints[0]->ints[5];
     M1 = data->ints[0]->ints[6];
-    
+
     // int n2 = data->ints[ni1]->ints[0];
     ni2 = data->ints[0]->ints[7];
     nd2 = data->ints[0]->ints[8];
@@ -121,13 +121,13 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
     M2 = data->ints[0]->ints[12];
     n = data->ints[0]->ints[13];
     M = data->ints[0]->ints[14];
-    
+
     assert(ni1 > 1);
     assert(ni2 > 1);
     assert(nc1 > 1);
     assert(nc2 > 1);
     assert(data->n_chars > 5);
-    
+
     if (!(data->cache)) {
 #ifdef _OPENMP
 #pragma omp critical (Name_5bd4b7198feb5550e84446518f90d47072338c18)
@@ -136,11 +136,11 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 	    assert(!strcasecmp(data->ints[ni1 + ni2]->name, "idx1u"));
 	    assert(!strcasecmp(data->ints[ni1 + ni2 + 1]->name, "idx2u"));
 	    assert(!strcasecmp(data->smats[nsm1 + nsm2]->name, "Kgraph"));
-	    
+
 	    cache_tp *d12cache = Calloc(1, cache_tp);
 	    d12cache->dataM1 = Calloc(1, inla_cgeneric_data_tp);
 	    d12cache->dataM2 = Calloc(1, inla_cgeneric_data_tp);
-	    
+
 	    d12cache->dataM1->n_ints = ni1;
 	    d12cache->dataM1->ints = &data->ints[0];
 	    d12cache->dataM1->n_doubles = nd1;
@@ -159,7 +159,7 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 	    if (nsm1 > 0) {
 		d12cache->dataM1->smats = &data->smats[0];
 	    }
-	    
+
 	    d12cache->dataM2->n_ints = ni2;
 	    d12cache->dataM2->ints = &data->ints[ni1];
 	    d12cache->dataM2->n_doubles = nd2;
@@ -258,26 +258,26 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 	    data->cache = (void *)d12cache;
 	}
     }
-    
+
     assert(data->cache);
     cache_tp *d12cache = (cache_tp *) data->cache;
-    
+
     switch (cmd) {
     case INLA_CGENERIC_VOID:
     {
 	assert(!(cmd == INLA_CGENERIC_VOID));
 	break;
     }
-    
+
     case INLA_CGENERIC_GRAPH:
     {
-	
+
 	assert(M == data->smats[nsm1 + nsm2]->n);
-	
+
 	ret = Calloc(2 + 2 * M, double);
 	ret[0] = n;
 	ret[1] = M;
-	
+
 	// collect i
 	for (i = 0; i < M; i++) {
 	    ret[2 + i] = data->smats[nsm1 + nsm2]->i[i];
@@ -286,29 +286,29 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 	for (i = 0; i < M; i++) {
 	    ret[2 + M + i] = data->smats[nsm1 + nsm2]->j[i];
 	}
-	
+
 	break;
     }
-    
+
     case INLA_CGENERIC_Q:
     {
 	ret = Calloc(2 + M, double);
 	ret[0] = -1;	/* REQUIRED */
 	ret[1] = M;
-	
+
 	ret1 = d12cache->model1_func(INLA_CGENERIC_Q,
 				     &theta[0], d12cache->dataM1);
 	ret2 = d12cache->model2_func(INLA_CGENERIC_Q,
 				     &theta[d12cache->nth1],
 				     d12cache->dataM2);
-	
+
 	int nu1 = data->ints[ni1 + ni2]->len;
 	int nu2 = data->ints[ni1 + ni2 + 1]->len;
-	
+
 	double retE[M];
 	double daux;
 	int ox;
-	
+
 	k = 0;
 	for (i = 0; i < M1; i++) {
 	    daux = ret1[2 + i];
@@ -316,7 +316,7 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 		retE[k++] = daux * ret2[2 + j];
 	    }
 	}
-	
+
 	if ((nu1 > 0) & (nu2 > 0)) {
 	    for (i = 0; i < nu1; i++) {
 		daux =  ret1[2 + data->ints[ni1 + ni2]->ints[i]];
@@ -326,16 +326,16 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 		}
 	    }
 	}
-	
+
 	assert(k == data->smats[nsm1 + nsm2]->n);
 	for (k = 0; k < data->smats[nsm1 + nsm2]->n; k++) {
 	    ox = (int)data->smats[nsm1 + nsm2]->x[k];
 	    ret[2 + k] = retE[ox];
 	}
-	
+
 	break;
     }
-    
+
     case INLA_CGENERIC_MU:
     {
 	// return (N, mu)
@@ -344,38 +344,38 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 	ret[0] = 0;
 	break;
     }
-    
+
     case INLA_CGENERIC_INITIAL:
     {
 	// return c(M, initials)
 	// where M is the number of hyperparameters
-	
+
 	ret1 = d12cache->model1_func(INLA_CGENERIC_INITIAL,
 				     NULL, d12cache->dataM1);
 	ret2 = d12cache->model2_func(INLA_CGENERIC_INITIAL,
 				     NULL, d12cache->dataM2);
-	
+
 	int nth1 = (int)ret1[0], nth2 = (int)ret2[0];
-	
+
 	ret = Calloc(1 + nth1 + nth2, double);
 	ret[0] = nth1 + nth2;
-	
+
 	for (i = 0; i < nth1; i++) {
 	    ret[1 + i] = ret1[1 + i];
 	}
-	
+
 	for (i = 0; i < nth2; i++) {
 	    ret[1 + nth1 + i] = ret2[1 + i];
 	}
-	
+
 	break;
     }
-    
+
     case INLA_CGENERIC_LOG_NORM_CONST:
     {
 	break;
     }
-    
+
     case INLA_CGENERIC_LOG_PRIOR:
     {
 	// return c(LOG_PRIOR)
@@ -384,12 +384,12 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
 	ret2 = d12cache->model2_func(INLA_CGENERIC_LOG_PRIOR,
 				     &theta[d12cache->nth1],
 				     d12cache->dataM2);
-	
+
 	ret = Calloc(1, double);
 	ret[0] = ret1[0] + ret2[0];
 	break;
     }
-    
+
     case INLA_CGENERIC_QUIT:
     {
 #if defined(INLA_EXTERNAL_PACKAGES)
@@ -410,10 +410,10 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta,
     default:
 	break;
     }
-    
+
     free(ret1);
     free(ret2);
-    
+
     return (ret);
 }
 
