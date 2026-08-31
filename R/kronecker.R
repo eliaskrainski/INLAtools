@@ -159,6 +159,10 @@ setMethod(
       jj <- jj0
     }
 
+    if(debug) {
+      print(str(list(ii=ii, jj=jj)))
+    }
+
     ## check
     stopifnot(all(ii <= jj))
 
@@ -170,6 +174,9 @@ setMethod(
       jj = jj[jjord][iiord],
       ord = jjord[iiord]
     )
+    if(debug) {
+      print(str(ije))
+    }
 
     ## initial data
     ret <- structure(
