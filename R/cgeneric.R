@@ -295,7 +295,7 @@ cgeneric_shlib_path <- function(
       }
   }
   INLAvcheck <- packageCheck("INLA", "25-10-28")
-  if(INLAvcheck>="26.08.22") {
+  if(is.na(INLAvcheck) || (INLAvcheck>="26.08.22")) {
     useINLAprecomp <- FALSE
   }
 

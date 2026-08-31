@@ -97,11 +97,11 @@ if(require(INLA)) {
         control.compute = list(config = TRUE)
     )
 
-    Q1 <- cgeneric_Q(fit1)
+    Q1fitted <- fit1$misc$configs$config[[1]]$Q
 
     print(
-        all.equal(Sparse(R321),
-                  Sparse(Q1))
+        all.equal(Sparse(upperPadding(R321)),
+                  Sparse(Q1fitted))
     )
 
     ## 'fit' cg321
@@ -114,12 +114,11 @@ if(require(INLA)) {
         control.compute = list(config = TRUE)
     )
 
-
-    Q2 <- cgeneric_Q(fit2)
+    Q2fitted <- fit2$misc$configs$config[[1]]$Q
 
     print(
-        all.equal(Sparse(R321),
-                  Sparse(Q2))
+        all.equal(Sparse(upperPadding(R321)),
+                  Sparse(Q2fitted))
     )
 
 }

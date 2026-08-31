@@ -58,9 +58,10 @@ cmode <- list(
     theta = theta.fixed,
     fixed = TRUE,
     restart = FALSE)
+ccomp <- list(config = TRUE)
 
 dataf <- data.frame(
-    y = rpois(n*n2, 10),
+    y = rep(NA, n*n2),
     i = rep(1:n, each = n2),
     j = rep(1:n2, n))
 
@@ -69,34 +70,38 @@ ires1 <- inla(
               control.group = list(model = 'rw1', scale.model = FALSE)),
     family = "poisson",
     data = dataf,
-    control.mode = cmode
+    control.mode = cmode,
+    control.compute = ccomp
 )
 
-Qinla1 <- cgeneric_Q(ires1)
+Qinla1 <- ires1$misc$configs$config[[1]]$Q
 
-all.equal(Q21, Qinla1)
+all.equal(Sparse(upperPadding(Q21)),
+          Sparse(Qinla1))
 
 ## kronecker model
 k21 <- kronecker(m2, m1)
 
 q21 <- cgeneric_Q(k21, theta = c(theta.fixed))
 
-all.equal(q21, Q21)
-          
-all.equal(Qinla1, q21)
+all.equal(q21, Sparse(Q21))
+
+all.equal(Sparse(Qinla1),
+          Sparse(upperPadding(q21)))
 
 ires2 <- inla(
     y ~ 0 + f(i, model = k21),
-    data = data.frame(y = 1, i = 1:(n * n2)),
-    family = "poisson", 
+    data = data.frame(y = NA, i = 1:(n * n2)),
+    family = "poisson",
+    control.compute = list(config = TRUE),
     control.mode =
         list(theta = c(theta.fixed),
              fixed = TRUE)
 )
 
-Qinla2 <- cgeneric_Q(ires2)
-
-all.equal(q21, Qinla2)
+Qinla2 <- ires2$misc$configs$config[[1]]$Q
+all.equal(Sparse(upperPadding(q21)),
+          Sparse(Qinla2))
 
 detach("package:INLAtools", unload = TRUE)
 library(INLAtools)

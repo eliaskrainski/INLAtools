@@ -33,18 +33,18 @@ m1 <- cgeneric(
 str(m1)
 str(m1$f$cgeneric$data$smatrices,1)
 
-str(initial(m1))
+str(cgeneric_initial(m1))
 
-mu(m1)
+cgeneric_mu(m1)
 
 theta1 <- 0
-prior(m1, theta = theta1)
+cgeneric_prior(m1, theta = theta1)
 
-str(g1ij <- graph(m1, optimize = TRUE))
+str(g1ij <- cgeneric_graph(m1, optimize = TRUE))
 str(g1ij)
 table(g1ij[[1]]<=g1ij[[2]])
 
-str(graph(m1))
+str(cgeneric_graph(m1))
 
 str(cgeneric_Q(m1, theta = theta1))
 

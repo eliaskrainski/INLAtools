@@ -24,31 +24,31 @@ R1
 R2 <- Diagonal(n = n2, x = colSums(G2)) - G2
 R2
 
-R12 <- kronecker(R1, R2)
+R12 <- kronecker(Sparse(R1), Sparse(R2))
 R12
 
-## cgeneric models
+## build a cgeneric generic0 model with R1, Q = \tau * R1: model 1
 cg1 <- cgeneric(
     model = "generic0", R = R1,
     constr = FALSE, scale = FALSE,
     param = c(1, 0.5)) ## P(sigma > 1) = 0.5
+
+
+## build a cgeneric generic0 model with R2,
+## but fix the precision to 1, Q = 1 * R2: model 2 
 cg2 <- cgeneric(
     model = "generic0", R = R2,
     constr = FALSE, scale = FALSE,
     param = c(1, NA)) ## fix sigma, simga = 1
 
-## Kronecker of cgeneric models 1 and 2
+## build a cgeneric model where the precision is 
+## the Kronecker Q = \tau R1 (o) R2 
 cg12 <- kronecker(cg1, cg2)
 
-all.equal(Sparse(R12),
-          Sparse(cgeneric_Q(cg12, theta = 0)))
-
-## Checks
-g1 <- graph(cg1, optimize = !TRUE)
-g2 <- graph(cg2, optimize = !TRUE)
-
-g1
-g2
+## Check
+stopifnot(all.equal(
+    Sparse(R12),
+    Sparse(cgeneric_Q(cg12, theta = 0))))
 
 if(require(INLA)) {
 
@@ -76,9 +76,10 @@ if(require(INLA)) {
         control.compute = list(config = TRUE)
     )
     
-    print(all.equal(Sparse(R12),
-                    Sparse(cgeneric_Q(fit0))))
-
+    Qfitted <- fit0$misc$configs$config[[1]]$Q
+    stopifnot(all.equal(Sparse(upperPadding(R12)),
+                        Sparse(Qfitted)))
+    
     ## overall index 
     (n1*n2)==nrow(data2)
     data2$ii <- 1:nrow(data2)
@@ -94,10 +95,9 @@ if(require(INLA)) {
         control.compute = list(config = TRUE)
     )
 
-    print(
-        all.equal(Sparse(R12),
-                  Sparse(cgeneric_Q(fit1)))
-    )
+    Qfitted1 <- fit1$misc$configs$config[[1]]$Q
+    stopifnot(all.equal(Sparse(upperPadding(R12)),
+                        Sparse(Qfitted1)))
 
 }
 

@@ -58,8 +58,9 @@ ires1 <- inla(
     control.compute = ccpt
 )
 
-library(INLAtools)
-Qinla <- cgeneric_Q(ires1)
+Qu <- ires1$misc$configs$config[[1]]$Q
 
-all.equal(Q21, Qinla)
+all.equal(inla.as.sparse(Q21),
+          inla.as.sparse(Qu+t(Qu)-Diagonal(nrow(Qu), diag(Qu))))
+
 

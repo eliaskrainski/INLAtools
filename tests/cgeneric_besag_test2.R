@@ -116,7 +116,7 @@ unlist(inla.zmarginal(inla.tmarginal(
 lprec.seq <- seq(-3, 5, 0.1)
 prec.seq <- exp(lprec.seq)
 cg.lpprior <- sapply(lprec.seq, function(x)
-    prior(m1, theta = x))
+    cgeneric_prior(m1, theta = x))
 cg.pprior <- inla.tmarginal(
     fun = function(x) exp(x),
     marginal = cbind(x=lprec.seq, y=exp(cg.lpprior)))
