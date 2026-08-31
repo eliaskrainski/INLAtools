@@ -268,13 +268,13 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 
 			if (1) {
 				double *to = retE + k;
-				double *from = ret2;
+				double *from = ret2 + 2;
 #pragma omp simd
 				for (int j = 0; j < M2; j++) {
 					to[j] = daux * from[j];
 				}
 				k += M2;
-			} else {
+			} else { // old, not parallel loop:
 				for (int j = 0; j < M2; j++) {
 					retE[k++] = daux * ret2[2 + j];
 				}
