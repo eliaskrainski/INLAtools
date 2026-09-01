@@ -30,8 +30,8 @@ Description: Contain code to work with a C struct, in short cgeneric, to
     It also works with the rgeneric, the R version of the cgeneric intended
     to easy try implementation of new GMRF models before making it for production.
     The constraints of a Kronecker between two cgeneric models, such as
-    spatio-temporal intrinsic interaction models, see
-  [Knorr-Held (2000)](https://onlinelibrary.wiley.com/doi/10.1002/1097-0258%2820000915/30%2919%3A17/18%3C2555%3A%3AAID-SIM587%3E3.0.CO%3B2-%23),
+    spatio-temporal intrinsic interaction models, see Knorr-Held (2000) 
+    (<https://onlinelibrary.wiley.com/doi/10.1002/1097-0258%2820000915/30%2919%3A17/18%3C2555%3A%3AAID-SIM587%3E3.0.CO%3B2-%23>),
     are automatically set, as shown in the example 
     at <https://github.com/eliaskrainski/INLAtools>.
 License: GPL (>=2)
