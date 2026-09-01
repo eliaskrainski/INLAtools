@@ -22,38 +22,42 @@ knitr::opts_chunk$set(
 [![](https://cranlogs.r-pkg.org/badges/INLAtools)](https://cran.r-project.org/package=INLAtools)
 <!-- badges: end -->
 
-Contain code to work with a C struct, in short
-  cgeneric, to define a Gaussian Markov random (GMRF) model.
-  The cgeneric contain code to specify GMRF elements such as
-  the graph and the precision matrix, and also the initial and 
-  prior for its parameters, useful for model inference. 
-  It can be accessed from a C program and is the recommended 
-  way to implement new GMRF models in the 'INLA' package 
-  (<https://www.r-inla.org>).
-  The 'INLAtools' implement functions to evaluate 
-  each one of the model specifications from R.
-  The implemented functionalities leverage the use 
-  of 'cgeneric' models and provide a way to debug 
-  the code as well to work with the prior for the 
-  model parameters and to sample from it. 
-  A very useful functionality is the Kronecker product method 
-  that creates a new model from multiple cgeneric models.
-  It also works with the rgeneric, the R version of the 
-  cgeneric intended to easy try implementation of new GMRF models.
-  The Kronecker between two cgeneric models can be used to build the 
-  spatio-temporal intrinsic interaction models
-  [Knorr-Held (2000)](https://onlinelibrary.wiley.com/doi/10.1002/1097-0258%2820000915/30%2919%3A17/18%3C2555%3A%3AAID-SIM587%3E3.0.CO%3B2-%23)
-  for what the needed constraints are automatically set
-  as in the example below.
+Contain code to work with a C struct, in short cgeneric, to
+    define a Gaussian Markov random (GMRF) model. The cgeneric contain
+    required data to specify GMRF elements such as the graph and the
+    precision matrix, as well hyper-parameters definition, such as 
+    initial values and the prior, which are useful for model inference. 
+    It can be accessed from a C program and is the
+    recommended way to implement new GMRF models in the 'INLA' package
+    (<https://www.r-inla.org>). We also provide access from R, 
+    useful for code debug and evaluate the prior for multiple parameter sets.
+    The implemented functionalities leverage the use of 'cgeneric' models.
+    In order to illustrate it, a model named `generic0` is included.
+    It can be used to implement intrinsic models and scale it by default,
+    as proposed in Sørbye & Rue (2014) <doi:10.1016/j.spasta.2013.06.004>, 
+    as well defining the required constraints.
+    A very useful functionality is the Kronecker product
+    method that creates a new model from multiple cgeneric models.
+    It also works with the rgeneric, the R version of the cgeneric intended
+    to easy try implementation of new GMRF models before making it for production.
+    The constraints of a Kronecker between two cgeneric models, such as
+    spatio-temporal intrinsic interaction models, see
+  [Knorr-Held (2000)](https://onlinelibrary.wiley.com/doi/10.1002/1097-0258%2820000915/30%2919%3A17/18%3C2555%3A%3AAID-SIM587%3E3.0.CO%3B2-%23),
+    are automatically set, as shown in the example 
+    bellow.
 
 ## Installation
 
-The 'INLA' package is a suggested one, but you will need it 
-for actually fitting a model. You can install it with
-```{r eval = !require(INLA)}
-install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE) 
+The 'INLA' package suggested for model fitting. 
+You can install it with
+```{r eval = !require(INLA), warning=FALSE, message=FALSE, comment=FALSE}
+install.packages(
+  pkgs = "INLA",
+  repos = c(
+    getOption("repos"),
+    INLA="https://inla.r-inla-download.org/R/testing"), 
+  dependencies = TRUE) 
 ```
-
 
 You can install the current [CRAN](https://CRAN.R-project.org) version of INLAtools:
 ```{r cran-installation, eval = FALSE}
@@ -76,7 +80,7 @@ given as
 library(Matrix)
 ## first
 n1 <- 15
-(R1 <- crossprod(diff(Diagonal(n1))))
+(R1 <- crossprod(diff(Diagonal(n1), differences = 2)))
 ```
 
 
@@ -104,9 +108,6 @@ $\tau \mathbf{R}$ where the matrix $\mathbf{R}$ is the
 precision structure matrix and $\tau$ is the precision parameter. 
 A precision parameter multiplied by a precision structure is 
 a local precision. 
-A scaling, as proposed in 
-[Sørbye & Rue (2014)](https://www.sciencedirect.com/science/article/pii/S2211675313000407),
-is applied by default in the following code
 ```{r cg1}
 library(INLAtools)
 cg1 <- cgeneric(
@@ -117,22 +118,76 @@ cg1 <- cgeneric(
 where the prior is a PC-prior, as proposed in 
 [Simpson et. al. (2017)](https://projecteuclid.org/journals/statistical-science/volume-32/issue-1/Penalising-Model-Component-Complexity--A-Principled-Practical-Approach-to/10.1214/16-STS576.full).
 
+Notice that this model is intrinsically stationary,
+so that using it as prior makes it an improper prior. 
+The usual way to make it proper is to account for its
+null space and define a constraint. 
+It is done by default (`constr = TRUE`)
+and the returned object already contain 
+the 'extraconstr' to set it:
+```{r cg1ctr}
+str(cg1$f$extraconstr)
+```
+
+The implemented method to define such a constraint has 
+complexity of $\mathcal{O}(n^3)$ because it perform the 
+singular value decomposition. 
+This is also used to scale the model.
+This scaling, as proposed in 
+[Sørbye & Rue (2014)](https://www.sciencedirect.com/science/article/pii/S2211675313000407),
+is applied by default (`scale = TRUE`) and requires the 
+generalized inverse of the $\textbf{R}$ matrix. 
+
+If one know already what is the null space, 
+it can be used in the `extraconstr` argument. 
+Also, the `INLA` package provides a computationally efficient way 
+to scale the model. 
+Therefore, for large structure matrices, the better is to 
+1) define a constraint with a known null space,
+2) use it in `INLA::inla.scale.model()` to scale the model
+3) use both to define the `cgneric` model. 
+We will do this procedure for the second model.
+
 For the second model we also use the `cgeneric0` but
 fix the parameter to 1,
 leaving the precision matrix from the first model
 as the one for the resulting precision matrix.
-
-```{r cg2}
+Instead of using `scale = TRUE` and `constr = TRUE` (default), 
+we consider an efficient (for larger models) way:
+```{r cg2eff}
+Ae2 <- list(A = matrix(1, 1, ncol(R2)), e=0) ## sum-to-zero constraint
+R2scaled <- INLA:::inla.scale.model(Q = R2, constr = Ae2)
 cg2 <- cgeneric(
-    model = "generic0", 
-    R = R2, ## precision structure matrix
-    param = c(1, NA)) ## fix sigma = 1
+  model = "generic0", 
+  R = R2scaled, 
+  param = c(1, NA), ## fix the precision/variance parameter
+  extraconstr = Ae2,
+  scale = FALSE, ### already scaled
+  constr = FALSE ## already accounted
+)
+str(cg2$f$extraconstr)
 ```
 
 The resulting Kronecker product model is
 ```{r cg12}
 cg12 <- kronecker(cg1, cg2)
 (N <- cg12$f$n)
+```
+
+Because each of the two model has one constraint, 
+this new `cgeneric` model account for multiple constraints, 
+the set of constraints in one model is replicated along each 
+dimension of the other one. 
+In the case of the resulting set of constraint contain 
+redundant ones, these are removed.
+For the our example, the final number of constraints is 
+$n_2+n_1-1$:
+```{r kconstr}
+str(cg12$f$extraconstr)
+```
+
+
+```{r Q}
 tau <- 4
 Q <- cgeneric_Q(cg12, theta = log(tau))
 image(Q)
