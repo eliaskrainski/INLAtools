@@ -34,7 +34,7 @@
 typedef struct {
 	inla_cgeneric_data_tp *dataM1;
 	inla_cgeneric_data_tp *dataM2;
-#if !defined(INLA_EXTERNAL_PACKAGES)
+#if !defined(INLA_WITH_EXTERNAL_PACKAGES)
 	void *handle1;
 	void *handle2;
 #endif
@@ -44,7 +44,7 @@ typedef struct {
 } cache_tp;
 
 
-#if defined(INLA_EXTERNAL_PACKAGES)
+#if defined(INLA_WITH_EXTERNAL_PACKAGES)
 // Force the compiler to keep this symbol even with aggressive LTO enabled
 __attribute__((used)) __attribute__((visibility("default")))
 #       if defined(__cplusplus)
@@ -126,7 +126,9 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 	assert(data->n_chars > 5);
 
 	if (!(data->cache)) {
+#ifdef _OPENMP
 #pragma omp critical (Name_5bd4b7198feb5550e84446518f90d47072338c18)
+#endif
 		if (!(data->cache)) {
 			assert(!strcasecmp(data->ints[ni1 + ni2]->name, "idx1u"));
 			assert(!strcasecmp(data->ints[ni1 + ni2 + 1]->name, "idx2u"));
@@ -173,7 +175,7 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 			if (nsm2 > 0) {
 				d12cache->dataM2->smats = &data->smats[nsm1];
 			}
-#if !defined(INLA_EXTERNAL_PACKAGES)
+#if !defined(INLA_WITH_EXTERNAL_PACKAGES)
 			d12cache->handle1 = dlopen(&d12cache->dataM1->chars[1]->chars[0], RTLD_LAZY);
 			if (!d12cache->handle1) {
 				Rf_error("Failed to load shared library '%s': %s", &d12cache->dataM1->chars[1]->chars[0], dlerror());
@@ -264,21 +266,16 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 
 		int k = 0;
 		for (int i = 0; i < M1; i++) {
-			daux = ret1[2 + i];
-
-			if (1) {
-				double *to = retE + k;
-				double *from = ret2 + 2;
+		  daux = ret1[2 + i];
+		  double *to = retE + k;
+		  double *from = ret2 + 2;
+#ifdef _OPENMP
 #pragma omp simd
-				for (int j = 0; j < M2; j++) {
-					to[j] = daux * from[j];
-				}
-				k += M2;
-			} else { // old, not parallel loop:
-				for (int j = 0; j < M2; j++) {
-					retE[k++] = daux * ret2[2 + j];
-				}
-			}
+#endif
+		  for (int j = 0; j < M2; j++) {
+		    to[j] = daux * from[j];
+		  }
+		  k += M2;
 		}
 
 		if ((nu1 > 0) & (nu2 > 0)) {
@@ -360,7 +357,7 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 	case INLA_CGENERIC_QUIT:
 	{
 
-#if   !defined(INLA_EXTERNAL_PACKAGES)
+#if   !defined(INLA_WITH_EXTERNAL_PACKAGES)
 		dlclose(d12cache->handle1);
 		if (d12cache->handle1 != d12cache->handle2) {
 			dlclose(d12cache->handle2);
