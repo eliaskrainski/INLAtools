@@ -72,6 +72,7 @@ cgeneric_get <- function(model,
     PACKAGE = "INLAtools"
   ), silent = TRUE)
   if(inherits(initheta, "try-error")) {
+    print(cgdata$characters)
     cat("Problem with the current `shlib`:")
     print(attr(initheta, "condition")$message)
     ## workaround: swap   shlib
@@ -104,7 +105,6 @@ cgeneric_get <- function(model,
       PACKAGE = "INLAtools"
     ), silent = TRUE)
     if(inherits(initheta, "try-error")) {
-      print(attr(initheta, "condition")$message)
       try(iq <- do.call(
         paste0("INLA", ":", ":", "inla.cgeneric.q"),
         model), silent = TRUE)

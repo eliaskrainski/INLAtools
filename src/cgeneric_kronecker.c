@@ -176,29 +176,40 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 				d12cache->dataM2->smats = &data->smats[nsm1];
 			}
 #if !defined(INLA_WITH_EXTERNAL_PACKAGES)
+			if(d12cache->dataM1->ints[1]->ints[0]) {
+			  Rprintf("M1 shlib: %s\n", &d12cache->dataM1->chars[1]->chars[0]);
+			}
 			d12cache->handle1 = dlopen(&d12cache->dataM1->chars[1]->chars[0], RTLD_LAZY);
 			if (!d12cache->handle1) {
-				Rf_error("Failed to load shared library '%s': %s", &d12cache->dataM1->chars[1]->chars[0], dlerror());
+			  Rprintf("M1 shlib: %s\n", &d12cache->dataM1->chars[1]->chars[0]);
+			  Rf_error("Failed to load shared library '%s': %s", &d12cache->dataM1->chars[1]->chars[0], dlerror());
 				exit(1);
 			}
-			if (!strcmp(&d12cache->dataM1->chars[1]->chars[0], &d12cache->dataM2->chars[1]->chars[0])) {
-				d12cache->handle2 = dlopen(&d12cache->dataM2->chars[1]->chars[0], RTLD_LAZY);
+			if(d12cache->dataM2->ints[1]->ints[0]) {
+			  Rprintf("M2 shlib: %s\n", &d12cache->dataM2->chars[1]->chars[0]);
+			}
+			if (strcmp(&d12cache->dataM1->chars[1]->chars[0], &d12cache->dataM2->chars[1]->chars[0]) != 0) {
+			  d12cache->handle2 = dlopen(&d12cache->dataM2->chars[1]->chars[0], RTLD_LAZY);
 				if (!d12cache->handle2) {
-					Rf_error("Failed to load shared library '%s': %s", &d12cache->dataM2->chars[0]->chars[0], dlerror());
+				  Rprintf("M2 shlib: %s\n", &d12cache->dataM2->chars[1]->chars[0]);
+				  Rf_error("Failed to load shared library '%s': %s", &d12cache->dataM2->chars[0]->chars[0], dlerror());
 					exit(1);
 				}
 			} else {
 				d12cache->handle2 = d12cache->handle1;
-
 			}
 			*(void **)(&d12cache->model1_func) = dlsym(d12cache->handle1, &d12cache->dataM1->chars[0]->chars[0]);
 //			const char *error = NULL;
 			if (!d12cache->model1_func) {
-				Rf_error("Fail to get %s\n%s\n", &d12cache->dataM1->chars[0]->chars[0], dlerror());
+			  Rprintf("M1 symbol: %s\n", &d12cache->dataM1->chars[0]->chars[0]);
+			  Rprintf("M1 shlib: %s\n", &d12cache->dataM1->chars[1]->chars[0]);
+			  Rf_error("Fail to get %s\n%s\n", &d12cache->dataM1->chars[0]->chars[0], dlerror());
 				exit(1);
 			}
 			*(void **)(&d12cache->model2_func) = dlsym(d12cache->handle2, &d12cache->dataM2->chars[0]->chars[0]);
 			if (!d12cache->model2_func) {
+			  Rprintf("M2 symbol: %s\n", &d12cache->dataM2->chars[0]->chars[0]);
+			  Rprintf("M2 shlib: %s\n", &d12cache->dataM2->chars[1]->chars[0]);
 			  Rf_error("Fail to get %s\n%s\n", &d12cache->dataM2->chars[0]->chars[0], dlerror());
 				exit(1);
 			}
