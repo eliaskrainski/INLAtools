@@ -34,7 +34,10 @@
 typedef struct {
 	inla_cgeneric_data_tp *dataM1;
 	inla_cgeneric_data_tp *dataM2;
-#if !defined(INLA_WITH_EXTERNAL_PACKAGES)
+#if defined(INLA_WITH_EXTERNAL_PACKAGES)
+  lt_dlhandle handle1;
+	lt_dlhandle handle2;
+#else
 	void *handle1;
 	void *handle2;
 #endif
@@ -175,14 +178,65 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 			if (nsm2 > 0) {
 				d12cache->dataM2->smats = &data->smats[nsm1];
 			}
-#if !defined(INLA_WITH_EXTERNAL_PACKAGES)
+#if defined(INLA_WITH_EXTERNAL_PACKAGES)
+			static int ltdl_cgkron = 0;
+			d12cache->model1_func = (inla_cgeneric_func_tp *) inla_cgeneric_mapper(&d12cache->dataM1->chars[0]->chars[0]);
+			if(!d12cache->model1_func) { // not in main INLA program, use from the shlib
+			  if (ltdl_cgkron) {
+			    if(lt_dlinit() != 0) {
+			      fprintf(stderr,"\n\n\t*** ERROR *** Failed to start libltdl:\n %s\n\n", lt_dlerror());
+			      abort();
+			    }
+			  }
+			  ltdl_cgkron = 1;
+			  d12cache->handle1 = lt_dlopen(&d12cache->dataM1->chars[1]->chars[0]);
+			  if (!d12cache->handle1) {
+			    fprintf(stderr,"\n\n\t*** ERROR *** Failed to load shared library '%s':\n\n%s\n\n",
+               &d12cache->dataM1->chars[1]->chars[0], lt_dlerror());
+			    abort();
+			  }
+			  *(void **)(&d12cache->model1_func) =
+			    lt_dlsym(d12cache->handle1, &d12cache->dataM1->chars[0]->chars[0]);
+			  if(!d12cache->model1_func){
+			    lt_dlclose(d12cache>-handle1);
+			  }
+			}
+			assert(d12cache->model1_func && "model1_func not found");
+			d12cache->model2_func = (inla_cgeneric_func_tp *) inla_cgeneric_mapper(&d12cache->dataM2->chars[0]->chars[0]);
+			if(!d12cache->model2_func) { // not in main INLA program, use from the shlib
+			  if (ltdl_cgkron==0) {
+			    if(lt_dlinit() != 0) {
+			      fprintf(stderr,"\n\n\t*** ERROR *** Failed to start libltdl:\n %s\n\n", lt_dlerror());
+			      abort();
+			    }
+			  }
+			  ltdl_cgkron = 1;
+			  if(strcmp(&d12cache->dataM1->chars[1]->chars[0], &d12cache->dataM2->chars[1]->chars[0]) != 0) {
+			    d12cache->handle2 = lt_dlopen(&d12cache->dataM2->chars[1]->chars[0]);
+			    if (!d12cache->handle2) {
+			      fprintf(stderr,"\n\n\t*** ERROR *** Failed to load shared library '%s':\n\n%s\n\n",
+                 &d12cache->dataM2->chars[1]->chars[0], lt_dlerror());
+			      abort();
+			    }
+			  } else {
+			    d12cache->handle2 = d12cache->handle1;
+			  }
+			  *(void **)(&d12cache->model2_func) =
+			    lt_dlsym(d12cache->handle2, &d12cache->dataM2->chars[0]->chars[0]);
+			  if(!d12cache->model2_func){
+			    lt_dlclose(d12cache>-handle2);
+			  }
+			}
+			assert(d12cache->model2_func && "model2_func not found");
+#else
 			if(d12cache->dataM1->ints[1]->ints[0]) {
 			  Rprintf("M1 shlib: %s\n", &d12cache->dataM1->chars[1]->chars[0]);
 			}
 			d12cache->handle1 = dlopen(&d12cache->dataM1->chars[1]->chars[0], RTLD_LAZY);
 			if (!d12cache->handle1) {
 			  Rprintf("M1 shlib: %s\n", &d12cache->dataM1->chars[1]->chars[0]);
-			  Rf_error("Failed to load shared library '%s': %s", &d12cache->dataM1->chars[1]->chars[0], dlerror());
+			  Rf_error("Failed to load shared library '%s':\n %s\n",
+              &d12cache->dataM1->chars[1]->chars[0], dlerror());
 				exit(1);
 			}
 			if(d12cache->dataM2->ints[1]->ints[0]) {
@@ -192,7 +246,8 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 			  d12cache->handle2 = dlopen(&d12cache->dataM2->chars[1]->chars[0], RTLD_LAZY);
 				if (!d12cache->handle2) {
 				  Rprintf("M2 shlib: %s\n", &d12cache->dataM2->chars[1]->chars[0]);
-				  Rf_error("Failed to load shared library '%s': %s", &d12cache->dataM2->chars[0]->chars[0], dlerror());
+				  Rf_error("Failed to load shared library '%s':\n %s\n",
+               &d12cache->dataM2->chars[0]->chars[0], dlerror());
 					exit(1);
 				}
 			} else {
@@ -213,12 +268,6 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 			  Rf_error("Fail to get %s\n%s\n", &d12cache->dataM2->chars[0]->chars[0], dlerror());
 				exit(1);
 			}
-#else
-			d12cache->model1_func = (inla_cgeneric_func_tp *) inla_cgeneric_mapper(&d12cache->dataM1->chars[0]->chars[0]);
-			d12cache->model2_func = (inla_cgeneric_func_tp *) inla_cgeneric_mapper(&d12cache->dataM2->chars[0]->chars[0]);
-			assert(d12cache->model1_func && "model1_func not found");
-			assert(d12cache->model2_func && "model2_func not found");
-
 #endif
 			double *ret = d12cache->model1_func(INLA_CGENERIC_INITIAL, NULL, d12cache->dataM1);
 			d12cache->nth1 = (int) ret[0];
@@ -368,11 +417,22 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 	case INLA_CGENERIC_QUIT:
 	{
 
-#if   !defined(INLA_WITH_EXTERNAL_PACKAGES)
-		dlclose(d12cache->handle1);
-		if (d12cache->handle1 != d12cache->handle2) {
-			dlclose(d12cache->handle2);
-		}
+#if defined(INLA_WITH_EXTERNAL_PACKAGES)
+	  if(ltdl_cgkron>0) {
+	    if(d12cache->handle1) {
+	      lt_dlclose(d12cache>-handle1);
+	    }
+	    if(d12cache->handle2) {
+	      lt_dlclose(d12cache>-handle2);
+	    }
+	  }
+#else
+	  if(d12cache->handle1) {
+	    dlclose(d12cache->handle1);
+	  }
+	  if(d12cache->handle2) {
+	    dlclose(d12cache->handle2);
+	  }
 #endif
 		// ==============> ?????
 		// Free(d12cache);
