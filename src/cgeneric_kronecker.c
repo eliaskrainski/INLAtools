@@ -100,6 +100,9 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 	double *ret2 = NULL;				       // to store output from M2.
 	double *ret = NULL;				       // to return;
 
+#if defined(INLA_WITH_EXTERNAL_PACKAGES)
+	static int ltdl_cgkron = 0;
+#endif
 	int M1, M2, n, M;
 	int ni1, nd1, nc1, nm1, nsm1;
 	int ni2, nd2, nc2, nm2, nsm2;
@@ -179,10 +182,9 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 				d12cache->dataM2->smats = &data->smats[nsm1];
 			}
 #if defined(INLA_WITH_EXTERNAL_PACKAGES)
-			static int ltdl_cgkron = 0;
 			d12cache->model1_func = (inla_cgeneric_func_tp *) inla_cgeneric_mapper(&d12cache->dataM1->chars[0]->chars[0]);
 			if(!d12cache->model1_func) { // not in main INLA program, use from the shlib
-			  if (ltdl_cgkron) {
+			  if (ltdl_cgkron == 0) {
 			    if(lt_dlinit() != 0) {
 			      fprintf(stderr,"\n\n\t*** ERROR *** Failed to start libltdl:\n %s\n\n", lt_dlerror());
 			      abort();
@@ -198,13 +200,13 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 			  *(void **)(&d12cache->model1_func) =
 			    lt_dlsym(d12cache->handle1, &d12cache->dataM1->chars[0]->chars[0]);
 			  if(!d12cache->model1_func){
-			    lt_dlclose(d12cache>-handle1);
+			    lt_dlclose(d12cache->handle1);
 			  }
 			}
 			assert(d12cache->model1_func && "model1_func not found");
 			d12cache->model2_func = (inla_cgeneric_func_tp *) inla_cgeneric_mapper(&d12cache->dataM2->chars[0]->chars[0]);
 			if(!d12cache->model2_func) { // not in main INLA program, use from the shlib
-			  if (ltdl_cgkron==0) {
+			  if (ltdl_cgkron == 0) {
 			    if(lt_dlinit() != 0) {
 			      fprintf(stderr,"\n\n\t*** ERROR *** Failed to start libltdl:\n %s\n\n", lt_dlerror());
 			      abort();
@@ -224,7 +226,7 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 			  *(void **)(&d12cache->model2_func) =
 			    lt_dlsym(d12cache->handle2, &d12cache->dataM2->chars[0]->chars[0]);
 			  if(!d12cache->model2_func){
-			    lt_dlclose(d12cache>-handle2);
+			    lt_dlclose(d12cache->handle2);
 			  }
 			}
 			assert(d12cache->model2_func && "model2_func not found");
@@ -420,10 +422,10 @@ double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cg
 #if defined(INLA_WITH_EXTERNAL_PACKAGES)
 	  if(ltdl_cgkron>0) {
 	    if(d12cache->handle1) {
-	      lt_dlclose(d12cache>-handle1);
+	      lt_dlclose(d12cache->handle1);
 	    }
 	    if(d12cache->handle2) {
-	      lt_dlclose(d12cache>-handle2);
+	      lt_dlclose(d12cache->handle2);
 	    }
 	  }
 #else
