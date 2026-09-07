@@ -54,6 +54,11 @@ __attribute__((used)) __attribute__((visibility("default")))
 extern "C"
 #       endif
 #endif
+
+double *inla_cgeneric_kronecker_dev(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgeneric_data_tp *data) {
+   return inla_cgeneric_kronecker(cmd, &theta[0], &data[0]);
+}
+
 double *inla_cgeneric_kronecker(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgeneric_data_tp *data)
 {
 	// concatenated data approach of the lists

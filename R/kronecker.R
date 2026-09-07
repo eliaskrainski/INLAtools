@@ -67,7 +67,11 @@ setMethod(
         useINLAprecomp = FALSE,
         debug = debug)
     }
+
     cmodel <- "inla_cgeneric_kronecker"
+    if(!is.null(mcall$developing)) {
+      cmodel <- paste0(cmodel, "_dev")
+    }
 
     n1 <- as.integer(X$f$n)
     n2 <- as.integer(Y$f$n)
