@@ -11,7 +11,10 @@ inlaQ(model, ...)
 
 \item{...}{used to pass the 'prior' argument,
 as logical (default is TRUE) to indicate if it is
-to retrieve the prior or the posterior precision.}
+to retrieve the prior or the posterior precision,
+'id.config' to inform which config it is to be taken,
+if not provided it will take the one with highest
+log-posterior.}
 }
 \description{
 Define the method to extract the precision from an inla output object.

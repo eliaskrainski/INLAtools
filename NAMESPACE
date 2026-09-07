@@ -41,6 +41,7 @@ export(rgeneric_graph)
 export(rgeneric_initial)
 export(rgeneric_mu)
 export(rgeneric_prior)
+export(stats.inla)
 export(upperPadding)
 exportMethods(kronecker)
 importFrom(Matrix,
