@@ -66,7 +66,8 @@ myQfn <- function(M,lQu) {
                         M[i,l]*lQu[[l]][iupp]*M[j,l]
             } else {
                 for(l in 1:K)
-                    out[ii,jj] <- out[ii,jj] + M[i,l]*qcompletefn(lQu[[l]])*M[j,l]
+                    out[ii,jj] <- out[ii,jj] +
+                        M[i,l]*qcompletefn(lQu[[l]])*M[j,l]
             }
         }
     }

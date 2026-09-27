@@ -73,11 +73,10 @@ typedef int FORTRAN_CHARLEN_T;
 #define F_ONE ((FORTRAN_CHARLEN_T)1)
 
 #if defined(INLA_WITH_EXTERNAL_PACKAGES)
-inla_cgeneric_func_tp inla_cgeneric_generic0;
-inla_cgeneric_func_tp inla_cgeneric_kronecker;
 inla_cgeneric_func_tp *inla_cgeneric_mapper(char *name);
 #else
-inla_cgeneric_func_tp inla_cgeneric_generic0;
-inla_cgeneric_func_tp inla_cgeneric_kronecker;
 SEXP inla_cgeneric_element_get(SEXP Rcmd, SEXP Stheta, SEXP Sntheta, SEXP ints, SEXP doubles, SEXP chars, SEXP mats, SEXP smats);
 #endif
+inla_cgeneric_func_tp inla_cgeneric_generic0;
+inla_cgeneric_func_tp inla_cgeneric_kronecker;
+inla_cgeneric_func_tp inla_cgeneric_wmodel;

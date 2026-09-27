@@ -420,9 +420,9 @@ setMethod(
       }
     }
 
-    # Note: kron(X,Y) gives X-major ordering (the X-index varies slowly, the
-    # Y-index varies quickly), which requires the mappers to be in reverse
-    # order, multi(Y,X):
+    ## Note: kron(X,Y) gives X-major ordering (the X-index varies slowly, the
+    ## Y-index varies quickly), which requires the mappers to be in reverse
+    ## order, multi(Y,X):
     rmodel$mapper <- multi_generic_model_mapper(list(Y, X))
 
     return(rmodel)
