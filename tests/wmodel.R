@@ -14,22 +14,31 @@ library(Matrix)
 
 ### 1) check the computation of Q
 ## play with
-iW <- matrix(1:4,2)
+iW <- matrix(c(2,-1,-3,4),2)
 iW
 
-## and
-n1 <- 3
-r1 <- matrix(1:(n1^2),n1,n1)
-qk <- bdiag(r1,r1)
+## A spd matrix
+r1 <- matrix(c(4,-3,2, -3,3,-1, 2,-1,2), 3)
+r1
+chol(r1)
+n1 <- ncol(r1)
+
+## bdiag of r1 and r2*2
+lQ <- list(r1, r1*3)
+qk <- bdiag(lQ)
 qk
 
 I1 <- Diagonal(n = n1)
 iWI1 <- kronecker(iW, I1)
-iWI1
-round(iWI1 %*% qk)
 
+iW
+iWI1
+qk
+(a1 <- iWI1 %*% qk)
+
+a1
 t(iWI1)
-round(iWI1 %*% qk %*% t(iWI1))
+a1 %*% t(iWI1)
 
 Qfn <- function(M,lQ) {
     K <- ncol(M)
@@ -41,31 +50,41 @@ Qfn <- function(M,lQ) {
     }
     return(out)
 }
-myQfn <- function(M,lQ) {
-### 1st) multiply each Q_k with each element of W
-###      |  M[1,1]Q_1  M[1,2]Q_1  ...  M[1,k]Q_1  |
-###      |  M[2,1]Q_2  M[2,2]Q_2  ...  M[2,k]Q_2  |
-###      |     ...           ...          ...     |
-###      |  M[k,1]Q_k  M[k,2]Q_k  ...  M[k,k]Q_k  |
-### 2nd) Q : Q[ii,jj] = sum_k M[i,k] * Q_i * M[k,j]
+
+myQfn <- function(M,lQ,only1=FALSE) {
     K <- ncol(M)
     n <- ncol(lQ[[1]])
-    aux <- matrix(0, n*K, n*K)
-    ### combined 1st and 2nd:
+    out <- aux <- matrix(0, n*K, n*K)
+### 1st) multiply each Q_k with each element of W
+###      |  M[1,1]Q_1  M[1,2]Q_2  ...  M[1,K]Q_K  |
+### Q* = |  M[2,1]Q_1  M[2,2]Q_2  ...  M[2,K]Q_K  |
+###      |     ...           ...          ...     |
+###      |  M[k,1]Q_1  M[k,2]Q_2  ...  M[K,K]Q_K  |
+    for(i in 1:K) {
+        ii <- (i-1)*n + 1:n
+        for(j in 1:K) {
+            jj <- (j-1)*n + 1:n
+            aux[ii,jj] <- M[i,j] * lQ[[j]]
+        }
+    }
+    if(only1) return(aux)
+### 2nd) Q : Q[ii,jj] = sum_i sum_j Q*[ii,jj]M[j,i]
     for(i in 1:K) {
         ii <- (i-1)*n + 1:n
         for(j in 1:K) {
             jj <- (j-1)*n + 1:n
             for(l in 1:K)
-                aux[ii, jj] <- aux[ii,jj] + M[i,l] * lQ[[i]] * M[j,l]
+                out[ii,jj] <- out[ii,jj] + M[i,l]*lQ[[l]]*M[j,l]
         }
     }
-    return(aux)
+    return(out)
 }
 
-a <- as.matrix(iWI1 %*% bdiag(r1,r1) %*% t(iWI1))
-all.equal(a, Qfn(iW,list(r1,r1)))
-all.equal(a, myQfn(iW,list(r1,r1)))
+all.equal(as.matrix(a1),myQfn(iW,lQ,TRUE))
+
+b <- as.matrix(a1 %*% t(iWI1))
+stopifnot(all.equal(b, Qfn(iW,lQ)))
+stopifnot(all.equal(b, myQfn(iW,lQ)))
 
 ### 2) the actual W matrix
 th2w <- function(th, i) {
@@ -75,6 +94,7 @@ th2w <- function(th, i) {
     w[-i] <- th
     return(w/sqrt(sum(w^2)))
 }
+
 
 if(FALSE) {
     
@@ -87,6 +107,33 @@ if(FALSE) {
     
     rm(rW)
 
+}
+
+if(FALSE) {
+
+    rwfn <- function(K)
+        t(sapply(1:K, function(i) th2w(rnorm(K-1),i)))
+    summary(replicate(1000, sum(rowSums(rwfn(3)^2))))
+    summary(replicate(1000, sum(rowSums(rwfn(4)^2))))
+    summary(replicate(1000, sum(rowSums(rwfn(5)^2))))
+    summary(replicate(1000, sum(rowSums(rwfn(15)^2))))
+    
+    r2fn <- function(n)
+        crossprod(matrix(rnorm(n*n),n))
+    summary(replicate(1000, sum(diag(chol(r2fn(10))))))
+    summary(replicate(1000, sum(diag(chol(r2fn(20))))))
+    summary(replicate(1000, sum(diag(chol(r2fn(30))))))
+
+    kk = 5; nn = 10
+    summary(replicate(20, {
+        iW <- solve(rwfn(kk))
+        iWI <- kronecker(iW, diag(nn));
+        lq <- lapply(1:kk, function(j) r2fn(nn))
+        a <- iWI %*% as.matrix(bdiag(lq)) %*% t(iWI)
+        b <- myQfn(iW, lq)
+        mean((a-b)^2)
+    }))
+    
 }
 
 K <- 3
@@ -111,6 +158,8 @@ Q0 <- Sparse(
 Q0
 
 cov2cor(chol2inv(chol(as.matrix(Q0))))
+
+
 
 ### sampling check with W
 Z <- matrix(rnorm(K*1e4), 1e4)
