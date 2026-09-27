@@ -4,6 +4,6 @@
 #' @importFrom stats vcov
 #' @importFrom utils str
 #' @importFrom graphics image
-#' @importFrom Matrix diag Diagonal as.matrix sparseMatrix
+#' @importFrom Matrix t diag Diagonal as.matrix sparseMatrix
 #' @useDynLib INLAtools, .registration = TRUE
 NULL
