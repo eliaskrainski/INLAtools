@@ -69,6 +69,7 @@ myQfn <- function(M,lQ,only1=FALSE) {
     }
     if(only1) return(aux)
 ### 2nd) Q : Q[ii,jj] = sum_i sum_j Q*[ii,jj]M[j,i]
+    ## combined 1st and 2nd steps loops
     for(i in 1:K) {
         ii <- (i-1)*n + 1:n
         for(j in 1:K) {
