@@ -33,7 +33,11 @@ double *inla_cgeneric_wmodel_dev(inla_cgeneric_cmd_tp cmd, double *theta, inla_c
 
 double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgeneric_data_tp *data)
 {
-	// cgeneric model to combine K weight vectors with
+
+  double *retMc = NULL;			// to store output from Mc.
+  double *ret = NULL;				// to return;
+
+  // cgeneric model to combine K weight vectors with
 	// a cgeneric N dimension model Mc to define a W model with precision as
 	//   Q = [ W (o) I_N ] (x) bdiag(Q_1, ..., Q_K) (x) [ W' (o) I_N ]
 	// where
@@ -71,10 +75,12 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	// theta: {nthW, theta[dCache->nthMc]}
 	// data:
 	// dataMc->ints[0]->ints[0...8] contains
-	//  [nMc, niMc, ndMc, ncMc, nmMc, nsMc, niW, ndW, Mc, n, M]
+	//  [nMc, niMc, ndMc, ncMc, nmMc, nsMc, Mc,
+	//   K, niW, ndW, ncW, nmW, nsW, n, M]
 	int nMc; // the size of the Mc model
 	int Mc;  // nMc + number of non-zeros in the upper side of Q_j
-	int n;   // size of the combined model, equal K times nMc
+	int K;   // W model dimension
+	int N;   // size of the combined model, equal K times nMc
 	int M;   // n + number of non-zeros in the upper side of Q
 	// so that
 	//  data->ints[<niMc] contain ints for Mc
@@ -88,17 +94,22 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	int ncMc = data->ints[0]->ints[3];
 	int nmMc = data->ints[0]->ints[4];
 	int nsMc = data->ints[0]->ints[5];
-	int niW = data->ints[0]->ints[6];
-	int ndW = data->ints[0]->ints[7];
-	Mc = data->ints[0]->ints[8];
-	n = data->ints[0]->ints[9];
-	M = data->ints[0]->ints[10];
+	Mc = data->ints[0]->ints[6];
+	K = data->ints[0]->ints[7];
+	int niW = data->ints[0]->ints[8];
+	int ndW = data->ints[0]->ints[9];
+	int ncW = data->ints[0]->ints[10];
+	int nmW = data->ints[0]->ints[11];
+	int nsW = data->ints[0]->ints[12];
+	N = data->ints[0]->ints[13];
+	M = data->ints[0]->ints[14];
 	assert(niMc > 1);
 	assert(ncMc > 1);
 	assert(data->n_chars > 3);
 
-	printf("nMc =%d, %d %d %d %d %d %d\n",
-        nMc, niMc, ndMc, ncMc, nmMc, niW, ndW);
+	printf("(%d) %d %d %d %d %d %d\nK: (%d) %d %d %d %d %d N=%d M=%d\n",
+        nMc, niMc, ndMc, ncMc, nmMc, nsMc, Mc,
+        K, niW, ndW, ncW, nmW, nsW, N, M);
 
 	// ( TO BE defined ) additionally:
 	// ( TO BE defined ) data->ints[niMc+niW] contain nu1 index
@@ -106,11 +117,7 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	// ( TO BE defined ) data->smatrices[nsMc+nsm2] contains the graph
 	// ( TO BE defined ) where ->x is the order
 
-	int K = data->ints[niMc]->ints[0];
 	int nthW = K*(K-1);
-	printf("K = %d, nthW = %d \n", K, nthW);
-	double *retMc = NULL;			// to store output from Mc.
-	double *ret = NULL;				// to return;
 
 	if (!(data->cache)) {
 #ifdef _OPENMP
@@ -125,7 +132,7 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 
 			cache_tp *dCache = Calloc(1, cache_tp);
 #if defined(INLA_WITH_EXTERNAL_PACKAGES)
-			static int dCache->ltdl_cgkron = 0;
+			static int dCache->ltdl_cgwm = 0;
 #endif
 			dCache->dataMc = Calloc(1, inla_cgeneric_data_tp);
 
@@ -151,13 +158,13 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 #if defined(INLA_WITH_EXTERNAL_PACKAGES)
 			dCache->modelMc_func = (inla_cgeneric_func_tp *) inla_cgeneric_mapper(&dCache->dataMc->chars[0]->chars[0]);
 			if(!dCache->modelMc_func) { // not in main INLA program, use from the shlib
-			  if (dCache->ltdl_cgkron == 0) {
+			  if (dCache->ltdl_cgwm == 0) {
 			    if(lt_dlinit() != 0) {
 			      fprintf(stderr,"\n\n\t*** ERROR *** Failed to start libltdl:\n %s\n\n", lt_dlerror());
 			      abort();
 			    }
 			  }
-			  dCache->ltdl_cgkron = 1;
+			  dCache->ltdl_cgwm = 1;
 			  dCache->handleMc = lt_dlopen(&dCache->dataMc->chars[1]->chars[0]);
 			  if (!dCache->handleMc) {
 			    fprintf(stderr,"\n\n\t*** ERROR *** Failed to load shared library '%s':\n\n%s\n\n",
@@ -186,6 +193,9 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 			    Rprintf("The shlib is loaded\n");
 			  }
 			}
+			if(dCache->dataMc->ints[1]->ints[0]) {
+			  Rprintf("Getting symbol  %s\n", &dCache->dataMc->chars[0]->chars[0]);
+			}
 			*(void **)(&dCache->modelMc_func) = dlsym(dCache->handleMc, &dCache->dataMc->chars[0]->chars[0]);
 			//			const char *error = NULL;
 			if (!dCache->modelMc_func) {
@@ -212,25 +222,24 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	if(theta) {
 	  k = 0;
 	  for(i=0; i<K; i++) {
-	    xaux[0] = 1.0;
-	    for(j=0; i<(K-1); j++) {
-	      xaux[1+j] = theta[k++];
+	    xaux[i] = 1.0;
+	    if(i>0) {
+	      for(j=0; j<i; j++) {
+	        xaux[j] = theta[k++];
+	      }
+	    }
+	    if(i<K) {
+	      for(j=i+1; j<K; j++) {
+	        xaux[j] = theta[k++];
+	      }
 	    }
 	    daux = 0.0;
 	    for(j=0;j<K;j++) {
-	      daux += SQR(xaux[i]);
+	      daux += SQR(xaux[j]);
 	    }
 	    daux = sqrt(daux);
-	    if(i>0) {
-	      for(j=0; j<i; j++) {
-	        W[i*K+j] = xaux[1+j]/daux;
-	      }
-	    }
-	    W[i*K+i] = xaux[0]/daux;
-	    if(i<K) {
-	      for(j=i+1; j<K; j++) {
-	        W[i*K+j] = xaux[1+j]/daux;
-	      }
+	    for(j=0; j<K; j++) {
+	      W[i*K+j] = xaux[j]/daux;
 	    }
 	  }
 
@@ -259,7 +268,7 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	  printf("M = %d\n", M);
 		ret = Calloc(2 + 2 * M, double);
 		assert(ret);
-		ret[0] = n;
+		ret[0] = N;
 		ret[1] = M;
 
 		for (i = 0; i < M; i++) {
@@ -282,7 +291,7 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 		retMc = dCache->modelMc_func(INLA_CGENERIC_Q, &theta[0], dCache->dataMc);
 
 		// number of non-zero at the upper side
-		int nu1 = data->ints[niMc]->len;
+		int nu1 = data->ints[niMc+1]->len;
 
 		/*
 		 double retE[M];
@@ -337,20 +346,27 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 		// return c(M, initials)
 		// where M is the number of hyperparameters
 
+
+		printf("ini\n");
+
 		retMc = dCache->modelMc_func(INLA_CGENERIC_INITIAL, NULL, dCache->dataMc);
 
-	  printf("retMc %2.4f %2.4f", retMc[0], retMc[1]);
+		int nparamsMc = (int) (retMc[0] * K);
+	  printf("retMc %d %2.4f\n", nparamsMc, retMc[0]);
 
-		assert(dCache->nthMc = (int) retMc[0]); // number of param in Mc
-		ret = Calloc(1 + nthW + (dCache->nthMc)*K, double);
+		ret = Calloc(1 + nthW + nparamsMc, double);
 		assert(ret);
-		ret[0] = dCache->nthMc*K + nthW;
+		ret[0] = nthW + nparamsMc;
 
 		for(i=0; i<nthW; i++) {
 		  ret[1+i] = 1.0/sqrt(K);
 		}
-		for(i=0; i<K; i++) {
-		  Memcopy(ret + nthW + 1 + i*K, retMc + 1, dCache->nthMc, double);
+		if(dCache->nthMc>0) {
+		  k = nthW+1;
+		  for(i=0; i<K; i++) {
+		    for(j=0; j<dCache->nthMc; j++)
+		    ret[k++] = retMc[1+j];
+		  }
 		}
 		break;
 	}
@@ -378,7 +394,7 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	{
 
 #if defined(INLA_WITH_EXTERNAL_PACKAGES)
-	  if(dCache->ltdl_cgkron>0) {
+	  if(dCache->ltdl_cgwm>0) {
 	    if(dCache->handleMc) {
 	      lt_dlclose(dCache->handleMc);
 	    }
