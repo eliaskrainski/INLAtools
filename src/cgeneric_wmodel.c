@@ -74,11 +74,11 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	// cmd: length 1 string
 	// theta: {nthW, theta[dCache->nthMc]}
 	// data:
-	// dataMc->ints[0]->ints[0...8] contains
+	// dataMc->ints[0]->ints[0...14] contains
 	//  [nMc, niMc, ndMc, ncMc, nmMc, nsMc, Mc,
 	//   K, niW, ndW, ncW, nmW, nsW, n, M]
 	int nMc; // the size of the Mc model
-	int Mc;  // nMc + number of non-zeros in the upper side of Q_j
+	int McU;  // number of non-zeros in the upper side of Q_j
 	int K;   // W model dimension
 	int N;   // size of the combined model, equal K times nMc
 	int M;   // n + number of non-zeros in the upper side of Q
@@ -94,7 +94,7 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	int ncMc = data->ints[0]->ints[3];
 	int nmMc = data->ints[0]->ints[4];
 	int nsMc = data->ints[0]->ints[5];
-	Mc = data->ints[0]->ints[6];
+	McU = data->ints[0]->ints[6];
 	K = data->ints[0]->ints[7];
 	int niW = data->ints[0]->ints[8];
 	int ndW = data->ints[0]->ints[9];
@@ -107,8 +107,8 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	assert(ncMc > 1);
 	assert(data->n_chars > 3);
 
-	printf("(%d) %d %d %d %d %d %d\nK: (%d) %d %d %d %d %d N=%d M=%d\n",
-        nMc, niMc, ndMc, ncMc, nmMc, nsMc, Mc,
+	printf("nMc: (%d) %d %d %d %d %d %d\nK  : (%d) %d %d %d %d %d N=%d M=%d\n",
+        nMc, niMc, ndMc, ncMc, nmMc, nsMc, McU,
         K, niW, ndW, ncW, nmW, nsW, N, M);
 
 	// ( TO BE defined ) additionally:
@@ -125,10 +125,10 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 #endif
 		if (!(data->cache)) {
 		  assert(!strcasecmp(data->ints[0]->name, "n"));
-		  assert(!strcasecmp(data->ints[niMc]->name, "K"));
-//		  assert(!strcasecmp(data->ints[niMc + niW]->name, "idx1u"));
-	//		assert(!strcasecmp(data->ints[niMc + niW + 1]->name, "idx2u"));
-		//	assert(!strcasecmp(data->smats[nsMc]->name, "Kgraph"));
+		  assert(!strcasecmp(data->ints[niMc]->name, "iQlower"));
+		  assert(!strcasecmp(data->ints[niMc+1]->name, "ii"));
+		  assert(!strcasecmp(data->ints[niMc+2]->name, "jj"));
+		  assert(!strcasecmp(data->smats[nsMc]->name, "Qgraph"));
 
 			cache_tp *dCache = Calloc(1, cache_tp);
 #if defined(INLA_WITH_EXTERNAL_PACKAGES)
@@ -144,7 +144,7 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 			}
 			dCache->dataMc->n_chars = ncMc;
 			if (ncMc > 0) {
-				dCache->dataMc->chars = &data->chars[2];	// first two is for KM!
+				dCache->dataMc->chars = &data->chars[2]; // first 2 are for Wmodel
 			}
 			dCache->dataMc->n_mats = nmMc;
 			if (nmMc > 0) {
@@ -217,7 +217,7 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	assert(data->cache);
 	cache_tp *dCache = (cache_tp *) data->cache;
 
-	int i, j, k, K2 = K*K;
+	int i, j, l, k, K2 = K*K;
 	double daux, xaux[K], W[K2];
 	if(theta) {
 	  k = 0;
@@ -265,17 +265,16 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 
 		assert(M == data->smats[nsMc]->n);
 
-	  printf("M = %d\n", M);
 		ret = Calloc(2 + 2 * M, double);
 		assert(ret);
 		ret[0] = N;
 		ret[1] = M;
 
 		for (i = 0; i < M; i++) {
-			ret[2 + i] = data->ints[niMc+2]->ints[i];
+			ret[2 + i] = data->ints[niMc+1]->ints[i];
 		}
 		for (i = 0; i < M; i++) {
-			ret[2 + M + i] = data->ints[niMc+3]->ints[i];
+			ret[2 + M + i] = data->ints[niMc+2]->ints[i];
 		}
 
 		break;
@@ -285,49 +284,32 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	{
 		ret = Calloc(2 + M, double);
 		assert(ret);
+		memset(ret+2, 0.0, M*sizeof(double));
 		ret[0] = -1;				       /* REQUIRED */
 		ret[1] = M;
 
-		retMc = dCache->modelMc_func(INLA_CGENERIC_Q, &theta[0], dCache->dataMc);
-
-		// number of non-zero at the upper side
-		int nu1 = data->ints[niMc+1]->len;
-
-		/*
-		 double retE[M];
-		double daux;
-		int ox;
-		int k = 0;
-		for (int i = 0; i < Mc; i++) {
-		  daux = retMc[2 + i];
-		  double *to = retE + k;
-		  double *from = ret2 + 2;
-#ifdef _OPENMP
-#pragma omp simd
-#endif
-		  for (int j = 0; j < M2; j++) {
-		    to[j] = daux * from[j];
+		double retMcK[McU * K];
+		for(i=0; i<K; i++) {
+		  retMc = dCache->modelMc_func(INLA_CGENERIC_Q, &theta[0], dCache->dataMc);
+		  Memcopy(retMcK, retMc + 1, McU, double);
+		}
+		int offset = 2, a, b, il, jl;
+		for(i=0; i<K; i++) {
+		  offset = 2 + i*McU;
+		  for(j=i; j<K; j++) {
+		    for(l=0; l<K; l++) {
+		      il = i*K + l;
+		      jl = j*K + l;
+		      for(k=0; k<McU; k++) {
+		        a = offset + k;
+		        b = l*McU + k;
+		        ret[a] += retMcK[b] * W[il] * W[jl];
+		      }
+		    }
+		    offset += McU;
 		  }
-		  k += M2;
 		}
 
-		if ((nu1 > 0) & (nu2 > 0)) {
-			for (int i = 0; i < nu1; i++) {
-				daux = retMc[2 + data->ints[niMc + niW]->ints[i]];
-				for (int j = 0; j < nu2; j++) {
-					retE[k + j] = daux * ret2[2 + data->ints[niMc + niW + 1]->ints[j]];
-				}
-				k += nu2;
-			}
-		}
-		// ==============> does this works IF nu1==0 or nu2==0 ????
-		assert(k == data->smats[nsMc + nsm2]->n);
-
-		for (k = 0; k < data->smats[nsMc + nsm2]->n; k++) {
-			ox = (int) data->smats[nsMc + nsm2]->x[k];
-			ret[2 + k] = retE[ox];
-		}
-*/
 		break;
 	}
 
@@ -346,21 +328,19 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 		// return c(M, initials)
 		// where M is the number of hyperparameters
 
-
-		printf("ini\n");
-
 		retMc = dCache->modelMc_func(INLA_CGENERIC_INITIAL, NULL, dCache->dataMc);
-
 		int nparamsMc = (int) (retMc[0] * K);
-	  printf("retMc %d %2.4f\n", nparamsMc, retMc[0]);
 
 		ret = Calloc(1 + nthW + nparamsMc, double);
 		assert(ret);
 		ret[0] = nthW + nparamsMc;
 
+		// initials for W
 		for(i=0; i<nthW; i++) {
-		  ret[1+i] = 1.0/sqrt(K);
+		  ret[1+i] = 1.0; // w[-i]/w[i] assuming all equal
 		}
+
+		// same initials for each instance
 		if(dCache->nthMc>0) {
 		  k = nthW+1;
 		  for(i=0; i<K; i++) {
@@ -368,6 +348,7 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 		    ret[k++] = retMc[1+j];
 		  }
 		}
+
 		break;
 	}
 
