@@ -7,17 +7,23 @@
 ## V(x) = [ W (o) I_n ] bdiag(V_1, ... , V_k) [ W' (o) I_n ]
 ##      = \sum_k (W.k W.k') (o) V_k
 ## Q(x) = [ M (o) I_n ] bdiag(Q_1, ... , Q_k) [ M' (o) I_n ]
-##      = \sum_k (M.k M.k') (o) Q_k
+##      = \sum_k ( M.k M.k') (o) Q_k   { ALTERNATIVE }
 ## with Q_k = V_k^{-1}, M = W^{-1}
+## ALTERNATIVE way to compute Q as
+## a sum of kroneker products
+##    Q(x) = \sum_k ( M[,k] (M[,k])' ) (o) Q_k
 
 library(Matrix)
 
 ### 1) check the computation of Q
-## play with
-iW <- matrix(c(2,-1,-3,4),2)
+## play with W^{-1} (some visual easier looking) 
+iW <- matrix(c(2,-3,-1,4), 2)
 iW
 
-## A spd matrix
+solve(iW) 
+rowSums(solve(iW)^2) ## not quite, but just to play with
+
+## (visual easier looking) spd matrix
 r1 <- matrix(c(4,-3,2, -3,3,-1, 2,-1,2), 3)
 r1
 chol(r1)
@@ -40,7 +46,7 @@ a1
 t(iWI1)
 a1 %*% t(iWI1)
 
-Qfn <- function(M,lQ) {
+Qfn1 <- function(M,lQ) {
     K <- ncol(M)
     n <- ncol(lQ[[1]])
     out <- matrix(0, K*n, K*n)
@@ -51,7 +57,7 @@ Qfn <- function(M,lQ) {
     return(out)
 }
 
-myQfn <- function(M,lQ,only1=FALSE) {
+Qfn2 <- function(M,lQ,only1=FALSE) {
     K <- ncol(M)
     n <- ncol(lQ[[1]])
     out <- aux <- matrix(0, n*K, n*K)
@@ -81,11 +87,11 @@ myQfn <- function(M,lQ,only1=FALSE) {
     return(out)
 }
 
-all.equal(as.matrix(a1),myQfn(iW,lQ,TRUE))
+all.equal(as.matrix(a1),Qfn2(iW,lQ,TRUE))
 
 b <- as.matrix(a1 %*% t(iWI1))
-stopifnot(all.equal(b, Qfn(iW,lQ)))
-stopifnot(all.equal(b, myQfn(iW,lQ)))
+stopifnot(all.equal(b, Qfn1(iW,lQ)))
+stopifnot(all.equal(b, Qfn2(iW,lQ)))
 
 ### 2) the actual W matrix
 th2w <- function(th, i) {
@@ -131,11 +137,24 @@ if(FALSE) {
         iWI <- kronecker(iW, diag(nn));
         lq <- lapply(1:kk, function(j) r2fn(nn))
         a <- iWI %*% as.matrix(bdiag(lq)) %*% t(iWI)
-        b <- myQfn(iW, lq)
+        b <- Qfn1(iW, lq)
+        mean((a-b)^2)
+    }))
+    
+    summary(replicate(20, {
+        iW <- solve(rwfn(kk))
+        iWI <- kronecker(iW, diag(nn));
+        lq <- lapply(1:kk, function(j) r2fn(nn))
+        a <- iWI %*% as.matrix(bdiag(lq)) %*% t(iWI)
+        b <- Qfn2(iW, lq)
         mean((a-b)^2)
     }))
     
 }
+
+###############################################################
+###  HAVE A LOOK AT THE MARGINAL COVARIANCE of samples
+###############################################################
 
 K <- 3
 W <- t(sapply(1:K, function(i) th2w(c(i/K,-i/(i+2)),i)))
@@ -159,8 +178,6 @@ Q0 <- Sparse(
 Q0
 
 cov2cor(chol2inv(chol(as.matrix(Q0))))
-
-
 
 ### sampling check with W
 Z <- matrix(rnorm(K*1e4), 1e4)
@@ -186,12 +203,15 @@ iWI1 <- kronecker(iW, I1)
 round(iWI1,2)
 round(t(iWI1), 2)
 
+## test having each Q_k = Q0
+## so the marginal (between rows) are the same
 Qlsame <- lapply(1:K, function(k) Q0) 
 
 ### cholesky of Q_k (not of V_k)
 LQlsame <- lapply(Qlsame, chol)
 lQlsame <- lapply(LQlsame, as.matrix)
 
+### drawn big number of samples to approximate the theoretical
 nsim <- 10000
 xx <- lapply(1:nsim, function(i) {
     x <- matrix(rnorm(K*n1),n1)
@@ -206,7 +226,8 @@ cor(do.call('rbind', xx))
 chol2inv(chol(as.matrix(Q0)))
 cov(t(do.call('cbind', xx)))
 
-## different Q
+## different Q: now the between-row marginals are a mixture
+## (preserve the "pattern" as only the variance of Q_k differ)
 Qlk <- lapply(1:K, function(k) Q0 * k) 
 Qk <- Sparse(bdiag(Qlk))
 

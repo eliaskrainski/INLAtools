@@ -7,8 +7,11 @@
 ## V(x) = [ W (o) I_n ] bdiag(V_1, ... , V_k) [ W' (o) I_n ]
 ##      = \sum_k (W.k W.k') (o) V_k
 ## Q(x) = [ M (o) I_n ] bdiag(Q_1, ... , Q_k) [ M' (o) I_n ]
-##      = \sum_k (M.k M.k') (o) Q_k
+##      = \sum_k ( M.k M.k') (o) Q_k   { ALTERNATIVE }
 ## with Q_k = V_k^{-1}, M = W^{-1}
+## ALTERNATIVE way to compute Q as
+## a sum of kroneker products
+##    Q(x) = \sum_k ( M[,k] (M[,k])' ) (o) Q_k
 
 library(Matrix)
 
@@ -45,15 +48,40 @@ t(iWI1)
 a <- a1 %*% t(iWI1)
 a
 
-myQfn <- function(M,lQu) {
+iW
+
+tcrossprod(iW[, 1])
+lq[[1]]
+kronecker(tcrossprod(iW[, 1]), lq[[1]])
+
+tcrossprod(iW[, 2])
+lq[[2]]
+kronecker(tcrossprod(iW[, 2]), lq[[2]])
+
+## add lower elements
+qcompletefn <- function(u) {
+    u + t(u) - diag(diag(u))
+}        
+
+Qfn1 <- function(M, lQu) {
+    K <- ncol(M)
+    n <- ncol(lQu[[1]])
+    iupp <- upper.tri(diag(n*K), diag = TRUE)
+    out <- matrix(0, n*K, n*K)
+    for(k in 1:K) {
+        tmp <- kronecker(tcrossprod(M[, k]),
+                         qcompletefn(lQu[[k]]))
+        out[iupp] <- out[iupp] + tmp[iupp]
+    }
+    return(out)
+}
+
+Qfn2 <- function(M,lQu) {
 ### see wmodel.R for checks
 ### M   : square matrix
 ### lQu : list of upper matrices 
     K <- ncol(M)
     n <- ncol(lQu[[1]])
-    qcompletefn <- function(u) {
-        u + t(u) - diag(diag(u))
-    }        
     iupp <- upper.tri(diag(n), diag = TRUE)
     out <- matrix(0, n*K, n*K)
     for(i in 1:K) {
@@ -78,7 +106,8 @@ au <- as.matrix(a);
 au[lower.tri(a)] <- 0
 au
 
-all.equal(au, myQfn(iW, lqu))
+all.equal(au, Qfn1(iW, lqu))
+all.equal(au, Qfn2(iW, lqu))
 
 ### 2) the actual W matrix
 th2w <- function(th, i) {
@@ -104,7 +133,19 @@ summary(replicate(20, {
         lqu <- lapply(lq, function(x) x*upper.tri(x,diag=TRUE))
     a <- iWI %*% as.matrix(bdiag(lq)) %*% t(iWI)
     au <- a; au[lower.tri(a)] <- 0
-    b <- myQfn(iW, lqu)
+    b <- Qfn1(iW, lqu)
+    mean((au-b)^2)
+}))
+
+kk = 5; nn = 10
+summary(replicate(20, {
+    iW <- solve(rwfn(kk))
+    iWI <- kronecker(iW, diag(nn));
+    lq <- lapply(1:kk, function(j) rq2fn(nn))
+        lqu <- lapply(lq, function(x) x*upper.tri(x,diag=TRUE))
+    a <- iWI %*% as.matrix(bdiag(lq)) %*% t(iWI)
+    au <- a; au[lower.tri(a)] <- 0
+    b <- Qfn2(iW, lqu)
     mean((au-b)^2)
 }))
 
