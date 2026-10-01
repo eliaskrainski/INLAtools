@@ -261,8 +261,8 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	  // compute W^{-1}
 	  dgesv_(&K, &K, &Ww[0], &K, &ipiv[0], &iW[0], &K, &info, F_ONE);
 
-	  printMat(W, K, K, "W:\n");
-	  printMat(iW, K, K, "inverse of W:\n");
+//	  printMat(W, K, K, "W:\n");
+	//  printMat(iW, K, K, "inverse of W:\n");
 
 	  //  c3: order as exp(theta[oprm_1])>exp(theta[oprm_2])>...>exp(theta[oprm_K])
 	  if(nthMc>0) {
@@ -284,7 +284,7 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	      }
 	    }
 	  }
-	  printMat(thetaMc, K, nthMc, "thetaMc\n");
+	  //printMat(thetaMc, K, nthMc, "thetaMc\n");
 
 	}
 
