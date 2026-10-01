@@ -46,13 +46,11 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	//
 	// Q_k: the precision matrix from the k-th Mc instance
 	//  is build with q>=0 parameter(s)
-	//  (we will start with q=1 and extend later, and this will be the)
-	// theta[v]: parameter of Mc that varies over the K instances
 
 	// constraints:
 	//  c1: \sum_j W_{ij}^2 = 1
 	//  c2: W_{ii}>0
-	//  c3: theta[v] ordered as exp(theta[v]_1)>exp(theta[v]_2)>...>exp(theta[v]_K)
+	//  c3: order as exp(theta[oprm_1])>exp(theta[oprm_2])>...>exp(theta[oprm_K])
 
 	// model parameters:
 	//  theta[0, ..., K(K-1)-1, K(K-1), ..., K(K-1)q-1]
@@ -95,29 +93,24 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	int nmMc = data->ints[0]->ints[4];
 	int nsMc = data->ints[0]->ints[5];
 	McU = data->ints[0]->ints[6];
-	K = data->ints[0]->ints[7];
+	K = data->ints[0]->ints[7];  /*
 	int niW = data->ints[0]->ints[8];
 	int ndW = data->ints[0]->ints[9];
 	int ncW = data->ints[0]->ints[10];
 	int nmW = data->ints[0]->ints[11];
-	int nsW = data->ints[0]->ints[12];
+	int nsW = data->ints[0]->ints[12]; */
 	N = data->ints[0]->ints[13];
 	M = data->ints[0]->ints[14];
 	assert(niMc > 1);
 	assert(ncMc > 1);
 	assert(data->n_chars > 3);
-
-	printf("nMc: (%d) %d %d %d %d %d %d\nK  : (%d) %d %d %d %d %d N=%d M=%d\n",
-        nMc, niMc, ndMc, ncMc, nmMc, nsMc, McU,
-        K, niW, ndW, ncW, nmW, nsW, N, M);
-
-	// ( TO BE defined ) additionally:
-	// ( TO BE defined ) data->ints[niMc+niW] contain nu1 index
-	// ( TO BE defined ) data->ints[niMc+niW+1] contain nu2 index
-	// ( TO BE defined ) data->smatrices[nsMc+nsm2] contains the graph
-	// ( TO BE defined ) where ->x is the order
-
 	int nthW = K*(K-1);
+
+	/*
+	printf("nMc: (%d) %d %d %d %d %d %d\nK  : (%d) %d %d %d %d %d N=%d M=%d\n%d\n",
+        nMc, niMc, ndMc, ncMc, nmMc, nsMc, McU,
+        K, niW, ndW, ncW, nmW, nsW, N, M, nthW);
+	 */
 
 	if (!(data->cache)) {
 #ifdef _OPENMP
@@ -125,10 +118,11 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 #endif
 		if (!(data->cache)) {
 		  assert(!strcasecmp(data->ints[0]->name, "n"));
-		  assert(!strcasecmp(data->ints[niMc]->name, "iQlower"));
-		  assert(!strcasecmp(data->ints[niMc+1]->name, "ii"));
-		  assert(!strcasecmp(data->ints[niMc+2]->name, "jj"));
-		  assert(!strcasecmp(data->smats[nsMc]->name, "Qgraph"));
+		  assert(!strcasecmp(data->ints[niMc]->name, "idParam"));
+		  assert(!strcasecmp(data->ints[niMc+1]->name, "idxMc"));
+		  assert((nMc+McU) == data->ints[niMc]->len);
+		  assert(!strcasecmp(data->ints[niMc+2]->name, "ii"));
+		  assert(!strcasecmp(data->ints[niMc+3]->name, "jj"));
 
 			cache_tp *dCache = Calloc(1, cache_tp);
 #if defined(INLA_WITH_EXTERNAL_PACKAGES)
@@ -217,10 +211,25 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	assert(data->cache);
 	cache_tp *dCache = (cache_tp *) data->cache;
 
-	int i, j, l, k, K2 = K*K;
-	double daux, xaux[K], W[K2];
+	int i, j, k, kk, K2 = K*K;
+	int info, ipiv[K];
+	int nthMc = dCache->nthMc;
+	int nparamsMc = nthMc * K;
+	double thetaMc[nparamsMc+1]; // just to not have it as length 0
+	double daux, xaux[K];
+	double W[K2], Ww[K2], iW[K2]; // W, copy and W^{-1}
 	if(theta) {
-	  k = 0;
+/*
+	  printf("theta for W\n");
+	  for(i=0; i<nthW; i++) {
+	    printf("%d %2.6f \n", i, theta[i]);
+	  }
+	  printf("theta for Mc params\n");
+	  for(i=0; i<nparamsMc; i++) {
+	    printf("%d %2.6f \n", nthW+i, theta[nthW+i]);
+	  } */
+
+	  k = 0; kk = 0;
 	  for(i=0; i<K; i++) {
 	    xaux[i] = 1.0;
 	    if(i>0) {
@@ -239,17 +248,43 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	    }
 	    daux = sqrt(daux);
 	    for(j=0; j<K; j++) {
-	      W[i*K+j] = xaux[j]/daux;
+	      W[kk] = xaux[j]/daux;
+	      Ww[kk] = W[kk]; // copy of W to use for W^{-1}
+	      if(i==j) {
+	        iW[kk++] = 1.0;
+	      } else {
+	        iW[kk++] = 0.0;
+	      }
 	    }
 	  }
 
-	  k=0;
-	  for(i=0; i<K; i++) {
-	    for(j=0; j<K; j++) {
-	      printf("%2.4f ", W[k++]);
+	  // compute W^{-1}
+	  dgesv_(&K, &K, &Ww[0], &K, &ipiv[0], &iW[0], &K, &info, F_ONE);
+
+	  printMat(W, K, K, "W:\n");
+	  printMat(iW, K, K, "inverse of W:\n");
+
+	  //  c3: order as exp(theta[oprm_1])>exp(theta[oprm_2])>...>exp(theta[oprm_K])
+	  if(nthMc>0) {
+	    daux = 0.0;
+	    k = nthW + nparamsMc -1;
+	    for(i=0; i<K; i++) {
+	      daux += exp(theta[k]);
+	      thetaMc[nparamsMc-i*nthMc-1] = log(daux);
+	      k -= nthMc;
 	    }
-	    printf("\n");
+	    if(nthMc>1) {
+	      k = 1;
+	      for(i=0; i<K; i++){
+	        for(j=1; j<nthMc; j++) {
+	          thetaMc[k] = theta[nthW+k];
+	          k++;
+	        }
+	        k++;
+	      }
+	    }
 	  }
+	  printMat(thetaMc, K, nthMc, "thetaMc\n");
 
 	}
 
@@ -271,10 +306,10 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 		ret[1] = M;
 
 		for (i = 0; i < M; i++) {
-			ret[2 + i] = data->ints[niMc+1]->ints[i];
+			ret[2 + i] = data->ints[niMc+2]->ints[i];
 		}
 		for (i = 0; i < M; i++) {
-			ret[2 + M + i] = data->ints[niMc+2]->ints[i];
+			ret[2 + M + i] = data->ints[niMc+3]->ints[i];
 		}
 
 		break;
@@ -284,31 +319,49 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 	{
 		ret = Calloc(2 + M, double);
 		assert(ret);
-		memset(ret+2, 0.0, M*sizeof(double));
+//		memset(ret+2, 0.0, M*sizeof(double));
 		ret[0] = -1;				       /* REQUIRED */
 		ret[1] = M;
+		double ret0[M];
 
-		double retMcK[McU * K];
+		int i1, i2, ithetak=0;
+		double iwk[K], iWk2[K*K];
+
 		for(i=0; i<K; i++) {
-		  retMc = dCache->modelMc_func(INLA_CGENERIC_Q, &theta[0], dCache->dataMc);
-		  Memcopy(retMcK, retMc + 1, McU, double);
-		}
-		int offset = 2, a, b, il, jl;
-		for(i=0; i<K; i++) {
-		  offset = 2 + i*McU;
-		  for(j=i; j<K; j++) {
-		    for(l=0; l<K; l++) {
-		      il = i*K + l;
-		      jl = j*K + l;
-		      for(k=0; k<McU; k++) {
-		        a = offset + k;
-		        b = l*McU + k;
-		        ret[a] += retMcK[b] * W[il] * W[jl];
-		      }
-		    }
-		    offset += McU;
+
+		  // column iW[,k]
+		  k = i;
+		  for(i1=0; i1<K; i1++) {
+		    iwk[i1] = iW[k];
+		    k += K;
 		  }
+//		  printMat(iwk, 1, K, "iW[,k]:\n");
+
+		  // compute iW[,k] iW[,k]'
+		  kk = 0;
+		  for(i1=0; i1<K; i1++) {
+		      for(i2=0; i2<K; i2++) {
+		        iWk2[kk++] = iwk[i1] * iwk[i2];
+		    }
+		  }
+//		  printMat(iWk2, K, K, "iW[,k] iW[,k]':\n");
+
+		  retMc = dCache->modelMc_func(INLA_CGENERIC_Q, &thetaMc[ithetak], dCache->dataMc);
+		  ithetak += nthMc;
+
+		  if(i==0) {
+		    MuQ2kroneckerU(&K, &nMc, &McU, &dCache->dataMc->ints[niMc+1]->ints[0],
+                     &iWk2[0], &retMc[2], &ret0[0]);
+		  } else {
+		    addMuQ2kroneckerU(&K, &nMc, &McU, &dCache->dataMc->ints[niMc+1]->ints[0],
+                        &iWk2[0], &retMc[2], &ret0[0]);
+		  }
+		  Free(retMc);
 		}
+
+      for(i=0; i<M; i++) {
+        ret[2+i] = ret0[dCache->dataMc->ints[niMc+4]->ints[i]];
+      }
 
 		break;
 	}
@@ -329,7 +382,6 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 		// where M is the number of hyperparameters
 
 		retMc = dCache->modelMc_func(INLA_CGENERIC_INITIAL, NULL, dCache->dataMc);
-		int nparamsMc = (int) (retMc[0] * K);
 
 		ret = Calloc(1 + nthW + nparamsMc, double);
 		assert(ret);
@@ -363,10 +415,28 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 		ret = Calloc(1, double);
 		assert(ret);
 		ret[0] = 0.0;
+		k = nthW;
+		kk = 0;
+		double lam, r;
+		double dm = (double)(K-1); // dimension of the prior
+		double w0ref = 1.0/SQR(K);
 		for(i=0; i<K; i++) {
-		  j = nthW + i*dCache->nthMc;
-		  retMc = dCache->modelMc_func(INLA_CGENERIC_LOG_PRIOR, &theta[j], dCache->dataMc);
+		  retMc = dCache->modelMc_func(INLA_CGENERIC_LOG_PRIOR, &thetaMc[k], dCache->dataMc);
+		  k += nthMc;
 		  ret[0] += retMc[0];
+		  daux = 0;
+		  for(j=0; j<K; j++) {
+		    daux += SQR(W[kk] - w0ref);
+		    kk++;
+		  }
+		  r = sqrt(daux);
+		  lam = dCache->dataMc->doubles[ndMc]->doubles[k];
+		  ret[0] += log(lam) - lam * r;
+		  if(K>1) {
+		    ret[0] += lgamma(dm * 0.5);
+		    ret[0] -= (dm*0.5) * log(M_PI);
+		    ret[0] -= (dm -1.0) * log(r);
+		  }
 		}
 		break;
 	}

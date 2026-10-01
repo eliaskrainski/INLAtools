@@ -46,6 +46,12 @@ a1
 t(iWI1)
 a1 %*% t(iWI1)
 
+Qfn <- function(M, lQ) {
+    n <- ncol(lQ[[1]])
+    MI <- kronecker(M, diag(n))
+    MI %*% bdiag(lQ) %*% t(MI)
+}
+
 Qfn1 <- function(M,lQ) {
     K <- ncol(M)
     n <- ncol(lQ[[1]])
@@ -90,6 +96,7 @@ Qfn2 <- function(M,lQ,only1=FALSE) {
 all.equal(as.matrix(a1),Qfn2(iW,lQ,TRUE))
 
 b <- as.matrix(a1 %*% t(iWI1))
+stopifnot(all.equal(b, as.matrix(Qfn(iW,lQ))))
 stopifnot(all.equal(b, Qfn1(iW,lQ)))
 stopifnot(all.equal(b, Qfn2(iW,lQ)))
 

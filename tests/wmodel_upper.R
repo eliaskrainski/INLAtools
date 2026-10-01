@@ -48,22 +48,24 @@ t(iWI1)
 a <- a1 %*% t(iWI1)
 a
 
-iW
-
-tcrossprod(iW[, 1])
-lq[[1]]
-kronecker(tcrossprod(iW[, 1]), lq[[1]])
-
-tcrossprod(iW[, 2])
-lq[[2]]
-kronecker(tcrossprod(iW[, 2]), lq[[2]])
+## Qfn
+Qfn <- function(M, lq) {
+    n <- nrow(lq[[1]])
+    MI <- kronecker(M, diag(n))
+    out <- as.matrix(MI %*% bdiag(lq) %*% t(MI))
+    out[lower.tri(out)] <- 0
+    out
+}
 
 ## add lower elements
 qcompletefn <- function(u) {
     u + t(u) - diag(diag(u))
-}        
+}     
 
 Qfn1 <- function(M, lQu) {
+### see wmodel.R for checks
+### M   : square matrix
+### lQu : list of upper matrices 
     K <- ncol(M)
     n <- ncol(lQu[[1]])
     iupp <- upper.tri(diag(n*K), diag = TRUE)
@@ -106,6 +108,7 @@ au <- as.matrix(a);
 au[lower.tri(a)] <- 0
 au
 
+all.equal(au, Qfn(iW, lq))
 all.equal(au, Qfn1(iW, lqu))
 all.equal(au, Qfn2(iW, lqu))
 

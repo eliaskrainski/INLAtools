@@ -27,6 +27,12 @@
 
 #include "INLAtools.h"
 
+static const R_CMethodDef CEntries[] = {
+  {"uQ2Uexpand", (DL_FUNC) &uQ2Uexpand, 4},
+  {"MuQ2kroneckerU", (DL_FUNC) &MuQ2kroneckerU, 7},
+  {NULL, NULL, 0}
+};
+
 static R_CallMethodDef CallEntries[] = {
 	{"inla_cgeneric_element_get", (DL_FUNC) & inla_cgeneric_element_get, 8},
 	{NULL, NULL, 0}
@@ -38,6 +44,6 @@ void
 #endif
     R_init_INLAtools(DllInfo *dll)
 {
-	R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+	R_registerRoutines(dll, CEntries, CallEntries, NULL, NULL);
 	R_useDynamicSymbols(dll, FALSE);
 }
