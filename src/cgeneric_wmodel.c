@@ -126,7 +126,7 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 
 			cache_tp *dCache = Calloc(1, cache_tp);
 #if defined(INLA_WITH_EXTERNAL_PACKAGES)
-			static int dCache->ltdl_cgwm = 0;
+			int dCache->ltdl_cgwm = 0;
 #endif
 			dCache->dataMc = Calloc(1, inla_cgeneric_data_tp);
 
