@@ -11,6 +11,7 @@ typedef struct {
 	inla_cgeneric_data_tp *dataMc;
 #if defined(INLA_WITH_EXTERNAL_PACKAGES)
   lt_dlhandle handleMc;
+  int ltdl_cgwm;
 #else
 	void *handleMc;
 #endif
@@ -126,7 +127,7 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 
 			cache_tp *dCache = Calloc(1, cache_tp);
 #if defined(INLA_WITH_EXTERNAL_PACKAGES)
-			int dCache->ltdl_cgwm = 0;
+			dCache->ltdl_cgwm = 0;
 #endif
 			dCache->dataMc = Calloc(1, inla_cgeneric_data_tp);
 
@@ -148,7 +149,6 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 			if (nsMc > 0) {
 				dCache->dataMc->smats = &data->smats[0];
 			}
-
 #if defined(INLA_WITH_EXTERNAL_PACKAGES)
 			dCache->modelMc_func = (inla_cgeneric_func_tp *) inla_cgeneric_mapper(&dCache->dataMc->chars[0]->chars[0]);
 			if(!dCache->modelMc_func) { // not in main INLA program, use from the shlib
