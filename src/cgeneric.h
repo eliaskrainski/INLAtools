@@ -12,9 +12,9 @@
 #       endif
 
 //
-
+#if defined(_OPENMP)
 #       include <omp.h>
-
+#endif 
 __BEGIN_DECLS
 #       include <assert.h>
 #       include <math.h>
@@ -204,10 +204,10 @@ typedef double *inla_cgeneric_func_tp(inla_cgeneric_cmd_tp cmd, double *theta, i
 typedef double *inla_cloglike_func_tp(inla_cloglike_cmd_tp cmd, double *theta, inla_cgeneric_data_tp * data,
 				      int ny, double *y, int nx, double *x, double *result);
 
-inla_cgeneric_data_tp *inla_cgeneric_read_data(const char *filename, int debug);
-inla_cgeneric_func_tp inla_cgeneric_iid_model;
-inla_cgeneric_func_tp inla_cgeneric_ar1_model;
-inla_cgeneric_func_tp inla_cgeneric_generic0_model;
+//inla_cgeneric_data_tp *inla_cgeneric_read_data(const char *filename, int debug);
+//inla_cgeneric_func_tp inla_cgeneric_iid_model;
+//inla_cgeneric_func_tp inla_cgeneric_ar1_model;
+//inla_cgeneric_func_tp inla_cgeneric_generic0_model;
 
 static void POSSIBLY_UNUSED(inla_cgeneric_data_print) (FILE * fp, inla_cgeneric_data_tp * data) {
 	fp = (fp ? fp : stdout);
