@@ -101,24 +101,89 @@ stopifnot(all.equal(b, Qfn1(iW,lQ)))
 stopifnot(all.equal(b, Qfn2(iW,lQ)))
 
 ### 2) the actual W matrix
-th2w <- function(th, i) {
+th2w <- function(th, i=1) {
+    stopifnot(length(i)==1)
+    stopifnot(i %in% (1:(length(th)+1)))
     k <- length(th) + 1L
     w <- double(k)
-    w[i] <- 1
+    w[i] <- 1##/sqrt(k)
     w[-i] <- th
     return(w/sqrt(sum(w^2)))
 }
 
+th2angles <- function(th, i=1) {
+    stopifnot(length(i)==1)
+    stopifnot(i %in% (1:(length(th)+1)))
+    k <- length(th)+1
+    ai <- 1/(1+exp(-th[i]))
+    x <- rep(1:2, c(k-3,1)) * pi/(1+exp(-th[-i]))
+    cx <- cos(x)
+    sx <- sin(x)
+    u <- c(cx, 1) * c(1, cumprod(sx))
+    a <- rep(0, k)
+    a[i] <- ai;
+    a[-i] <- u * sqrt(1-ai^2)
+    return(a)
+}
+
+th2redundant <- function(th, i=1) {
+    stopifnot(length(i)==1)
+    stopifnot(i %in% (1:(length(th)+1)))
+    u <- numeric(length(th))
+    u[i] <- 1/(1+exp(-th[i]))
+    u[-i] <- sqrt(1-u[i]^2)*th[-i]/sqrt(sum(th[-i]^2))
+    return(u)
+}
+
+th2stereographic <- function(th, i=1) {
+    stopifnot(length(i)==1)
+    stopifnot(i %in% (1:(length(th)+1)))
+    stereographic <- function(z) {
+        s <- sum(z^2)
+        return(c(2 * z / (1 + s),
+        (1 - s) / (1 + s)))
+    }
+    m <- numeric(length(th)+1)
+    m[i] <- 1/(1+exp(-th[1]))
+    m[-i] <- sqrt(1-m[i]^2) * stereographic(th[-1])
+    return(m)
+}
+
+th2w <- function(th,i=1) {
+    stopifnot(length(i)==1)
+    stopifnot(i %in% (1:(length(th)+1)))
+    m0 <- numeric(length(th))
+    m0[i] <- 1/(1+exp(-th[i]))
+    m0[-i] <- th[-i]
+    si <- sqrt(sum(m0^2))
+    m0/si
+}
+
 
 if(FALSE) {
-    
-    rW <- replicate(1000, th2w(rnorm(3), 2))
-    summary(colSums(rW^2))
-    
-    par(mfrow = c(2,2))
-    for(i in 1:4)
-        hist(rW[i,])
-    
+
+
+    th2w(-3:3)
+    sum(th2w(-3:3,1)^2)
+
+    for(i in 2:20)
+        print(th2w(rep(1/sqrt(i),i),1)[1:min(5,i)])
+
+    p <- 9
+    p.5 <- ceiling(sqrt(p))
+    th2w(rep(1/sqrt(p),p-1),1)
+    p.5
+    ##    rW <- t(replicate(1000, th2w(rnorm(p,c(rep(1/sqrt(p),p-1),-1), .10),p.5)))
+    rW <- t(replicate(1000, th2w(rnorm(p-1,-p/sqrt(p),10),p.5)))
+    str(rW)
+    summary(rowSums(rW^2))
+
+    par(mfrow = c(p.5, p.5), mar = c(2,3,1,1), mgp = c(2,.5,0), bty = 'n')
+    for(i in 1:p) {
+        hist(rW[,i], 50, main = paste(i), xlab = '', border = 'transparent')
+        abline(v = c(-1,1)/sqrt(p), lty = 2, lwd = 2, col = 2)
+    }
+       
     rm(rW)
 
 }

@@ -27,6 +27,7 @@ export(cgeneric_initial)
 export(cgeneric_mu)
 export(cgeneric_prior)
 export(cgeneric_shlib_path)
+export(cgeneric_wmodel)
 export(data.expand)
 export(findGetFunction)
 export(inlaQ)
@@ -40,6 +41,7 @@ export(rgeneric)
 export(rgeneric_Q)
 export(rgeneric_graph)
 export(rgeneric_initial)
+export(rgeneric_mmodel)
 export(rgeneric_mu)
 export(rgeneric_prior)
 export(stats.inla)
@@ -48,8 +50,10 @@ exportMethods(kronecker)
 importFrom(Matrix,
   Diagonal,
   as.matrix,
+  bdiag,
   diag,
-  sparseMatrix
+  sparseMatrix,
+  t
 )
 importFrom(graphics,image)
 importFrom(methods,
