@@ -1,5 +1,6 @@
 #ifndef __INLA_CGENERIC_H__
 #       define __INLA_CGENERIC_H__
+#endif
 
 #       undef __BEGIN_DECLS
 #       undef __END_DECLS
