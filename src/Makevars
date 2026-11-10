@@ -1,3 +1,4 @@
+PKG_CFLAGS += -Wno-c23-extensions
 PKG_LIBS = $(LAPACK_LIBS) \
            $(BLAS_LIBS) \
            $(FLIBS) \
