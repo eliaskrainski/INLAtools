@@ -121,7 +121,7 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 		  assert(!strcasecmp(data->ints[0]->name, "n"));
 		  assert(!strcasecmp(data->ints[niMc]->name, "idParam"));
 		  assert(!strcasecmp(data->ints[niMc+1]->name, "idxMc"));
-		  assert((nMc+McU) == data->ints[niMc]->len);
+		  assert((nMc+McU) == data->ints[niMc+1]->len);
 		  assert(!strcasecmp(data->ints[niMc+2]->name, "ii"));
 		  assert(!strcasecmp(data->ints[niMc+3]->name, "jj"));
 
@@ -416,27 +416,45 @@ double *inla_cgeneric_wmodel(inla_cgeneric_cmd_tp cmd, double *theta, inla_cgene
 		assert(ret);
 		ret[0] = 0.0;
 		k = nthW;
+		// collect prior from the models for each Q_k
+		for(i=0; i<K; i++) {
+		  retMc = dCache->modelMc_func(INLA_CGENERIC_LOG_PRIOR, &thetaMc[k], dCache->dataMc);
+		  k += nthMc;
+		  //printf("p%d: %f ", i, retMc[0]);
+		  ret[0] += retMc[0];
+		}
+		// prior for W
 		kk = 0;
 		double lam, r;
 		double dm = (double)(K-1); // dimension of the prior
 		double w0ref = 1.0/SQR(K);
 		for(i=0; i<K; i++) {
-		  retMc = dCache->modelMc_func(INLA_CGENERIC_LOG_PRIOR, &thetaMc[k], dCache->dataMc);
-		  k += nthMc;
-		  ret[0] += retMc[0];
-		  daux = 0;
+		  lam = dCache->dataMc->doubles[ndMc]->doubles[i];
+		  daux = -2.0;
 		  for(j=0; j<K; j++) {
-		    daux += SQR(W[kk] - w0ref);
+		    if(i!=j) {
+		      // one side
+		      daux = -0.5 * SQR(W[kk] - w0ref)/lam;
+		      daux -= 0.5 * log(2*M_PI*lam);
+		      // other side
+		      daux += 0.5 * SQR(W[kk] + w0ref)/lam;
+		      daux -= 0.5 * log(2*M_PI*lam);
+		      kk++;
+		    }
+		  }
+		  /*
+		  for(j=0; j<K; j++) {
+		    daux += SQR(fabs(W[kk]) - w0ref);
 		    kk++;
 		  }
 		  r = sqrt(daux);
-		  lam = dCache->dataMc->doubles[ndMc]->doubles[k];
 		  ret[0] += log(lam) - lam * r;
-		  if(K>1) {
+	    if(K>1) {
 		    ret[0] += lgamma(dm * 0.5);
 		    ret[0] -= (dm*0.5) * log(M_PI);
 		    ret[0] -= (dm -1.0) * log(r);
-		  }
+	    }*/
+		  //printf("%f \n", ret[0]);
 		}
 		break;
 	}

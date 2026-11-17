@@ -37,8 +37,8 @@
 #' \eqn{\sum_j W_{ij}^2 = 1}, which imposes a constraint so that
 #' there is K-1 unknown in each row-vector in W.
 #' Additionally, we impose \eqn{W_{ii}>0}.
-#' W is parametrized from \eqn{m=K(K-1} internal parameters.
-#'  \eqn{\theata_0, \ldots, \theta_m},
+#' W is parametrized from \eqn{m=K(K-1)} internal parameters.
+#'  \eqn{\theta_0, \ldots, \theta_m},
 #' where the first K=1 parameters are to define  the first row of W,
 #' the next K-1 to the second row and so on. The map from the
 #' internal parameters is done from the K-1 internal parameters to
@@ -65,7 +65,7 @@ cgeneric_wmodel <-
       dotArgs$debug <- FALSE
     }
     K <- as.integer(K)[1]
-    stopifnot(K>2)
+    stopifnot(K>1)
     K2 <- K * K
 
     stopifnot(inherits(model, "cgeneric"))
@@ -101,7 +101,7 @@ cgeneric_wmodel <-
     }
     INLAvcheck <- packageCheck(
       name = "INLA",
-      minimum_version = "26.10.1")
+      minimum_version = "26.11.17")
     if(is.na(INLAvcheck) & dotArgs$useINLAprecomp) {
       dotArgs$useINLAprecomp <- FALSE
       warning("INLA version is old. Setting 'useINLAprecomp = FALSE'!")
@@ -123,10 +123,16 @@ cgeneric_wmodel <-
       model = model,
       cmd = "initial")
     nthMc <- length(iniMc)
-    if((missing(id.param)) || is.null(id.param)) {
-      id.param <- min(1:nthMc)
+    if(dotArgs$debug) {
+      print(list(iniMc = iniMc))
     }
-    stopifnot(id.param %in% 1:nthMc) ## work if nthMc==0
+    if((missing(id.param)) || is.null(id.param)) {
+      id.param <- 1:(K*(K-1) + nthMc)
+    }
+    stopifnot(id.param %in% 1:(K*(K-1)+nthMc)) ## work if nthMc==0
+    if(dotArgs$debug) {
+      print(list(id.param = id.param))
+    }
 
     ## Q1 graph
     graphMc <- cgeneric_get(
@@ -261,7 +267,7 @@ cgeneric_wmodel <-
         kronecker_extraconstr(
           Ae, model$f$extraconstr, K, nMc)
       if(dotArgs$debug) {
-        cat(nrow(rmodel$f$extraconstr),
+        cat(nrow(model$f$extraconstr),
             " 'extraconstr' built\n")
       }
     }
